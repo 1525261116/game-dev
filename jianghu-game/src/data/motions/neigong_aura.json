@@ -1,0 +1,193 @@
+{
+  "id": "neigong_aura",
+  "group": "neigong",
+  "duration": 2000,
+  "loop": true,
+  "priority": 0,
+  "anchors": {
+    "bodyCenter": [
+      {
+        "t": 0,
+        "slot": "torso",
+        "x": 0,
+        "y": -22,
+        "angle": 0
+      }
+    ],
+    "palm": [
+      {
+        "t": 0,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      },
+      {
+        "t": 0.3,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      },
+      {
+        "t": 0.5,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      },
+      {
+        "t": 1,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      }
+    ]
+  },
+  "events": [
+    {
+      "t": 0.5,
+      "type": "vfx",
+      "id": "aura_ring"
+    }
+  ],
+  "tracks": [
+    {
+      "slot": "pelvis",
+      "keys": [
+        {
+          "t": 0,
+          "dy": 0
+        },
+        {
+          "t": 0.5,
+          "dy": -1.4
+        },
+        {
+          "t": 1,
+          "dy": 0
+        }
+      ]
+    },
+    {
+      "slot": "torso",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.5,
+          "rot": -0.014
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "head",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.5,
+          "rot": 0.03
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "upperArmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.19
+        },
+        {
+          "t": 0.5,
+          "rot": -0.2356
+        },
+        {
+          "t": 1,
+          "rot": -0.19
+        }
+      ]
+    },
+    {
+      "slot": "forearmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.266
+        },
+        {
+          "t": 0.5,
+          "rot": -0.304
+        },
+        {
+          "t": 1,
+          "rot": -0.266
+        }
+      ]
+    },
+    {
+      "slot": "upperArmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.19
+        },
+        {
+          "t": 0.5,
+          "rot": 0.2356
+        },
+        {
+          "t": 1,
+          "rot": 0.19
+        }
+      ]
+    },
+    {
+      "slot": "forearmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.266
+        },
+        {
+          "t": 0.5,
+          "rot": 0.304
+        },
+        {
+          "t": 1,
+          "rot": 0.266
+        }
+      ]
+    },
+    {
+      "slot": "cloak",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.04
+        },
+        {
+          "t": 0.5,
+          "rot": 0.09
+        },
+        {
+          "t": 1,
+          "rot": 0.04
+        }
+      ]
+    }
+  ]
+}

@@ -9,8 +9,15 @@ function scale(b: FormationBonus, k: number): FormationBonus {
   const mods = b.mods
     ? Object.fromEntries(Object.entries(b.mods).map(([key, v]) => [key, Math.round(v * k * 1000) / 1000]))
     : undefined;
+  // 注意：special 的值可能是 boolean（例如"免疫首次控制"），而 boolean 不能参与乘法，
+  // 必须与下面 tiers() 里的写法保持一致，先判断类型再计算。
   const special = b.special
-    ? Object.fromEntries(Object.entries(b.special).map(([key, v]) => [key, Math.round(v * k * 1000) / 1000]))
+    ? Object.fromEntries(
+        Object.entries(b.special).map(([key, v]) => [
+          key,
+          typeof v === 'boolean' ? v : Math.round(v * k * 1000) / 1000,
+        ]),
+      )
     : undefined;
   return { ...(mods ? { mods } : {}), ...(special ? { special } : {}) } as FormationBonus;
 }

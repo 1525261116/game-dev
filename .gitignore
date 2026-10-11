@@ -8,6 +8,11 @@ build/
 out/
 *.tsbuildinfo
 
+# ---- 可重新生成的预览（4.9MB，由命令生成，不入库以免仓库膨胀）----
+# 重新生成：cd jianghu-game && pnpm preview:rig
+# 静态截图 rig-preview.png 仍然入库，作为里程碑证据
+jianghu-game/preview/rig-preview.html
+
 # ---- 日志 ----
 *.log
 npm-debug.log*

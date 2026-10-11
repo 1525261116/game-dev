@@ -1,0 +1,387 @@
+{
+  "id": "qimen_sweep",
+  "group": "qimen",
+  "duration": 700,
+  "loop": false,
+  "priority": 2,
+  "anchors": {
+    "bodyCenter": [
+      {
+        "t": 0,
+        "slot": "torso",
+        "x": 0,
+        "y": -22,
+        "angle": 0
+      }
+    ],
+    "palm": [
+      {
+        "t": 0,
+        "slot": "handR",
+        "x": 0,
+        "y": 10,
+        "angle": 0
+      },
+      {
+        "t": 0.3,
+        "slot": "handR",
+        "x": 0,
+        "y": 10,
+        "angle": 0
+      },
+      {
+        "t": 0.5,
+        "slot": "handR",
+        "x": 0,
+        "y": 10,
+        "angle": 0
+      },
+      {
+        "t": 1,
+        "slot": "handR",
+        "x": 0,
+        "y": 10,
+        "angle": 0
+      }
+    ],
+    "hitPoint": [
+      {
+        "t": 0,
+        "slot": "pelvis",
+        "x": 25.5,
+        "y": -20,
+        "angle": 0
+      },
+      {
+        "t": 0.45,
+        "slot": "pelvis",
+        "x": 61.2,
+        "y": -26,
+        "angle": -0.35
+      },
+      {
+        "t": 1,
+        "slot": "pelvis",
+        "x": 34,
+        "y": -22,
+        "angle": -0.1
+      }
+    ]
+  },
+  "events": [
+    {
+      "t": 0.1,
+      "type": "sfx",
+      "id": "sweep"
+    },
+    {
+      "t": 0.4,
+      "type": "vfx",
+      "id": "sweep_row"
+    },
+    {
+      "t": 0.58,
+      "type": "hit"
+    },
+    {
+      "t": 0.68,
+      "type": "shake",
+      "id": "1"
+    },
+    {
+      "t": 0.9,
+      "type": "vfxStop"
+    }
+  ],
+  "tracks": [
+    {
+      "slot": "pelvis",
+      "keys": [
+        {
+          "t": 0,
+          "dx": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.28,
+          "dx": -5,
+          "rot": -0.168,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "dx": 8,
+          "rot": 0.315,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "dx": 0,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "torso",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.28,
+          "rot": -0.357,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": 0.504,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "head",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.28,
+          "rot": -0.21,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.168,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.05
+        },
+        {
+          "t": 0.28,
+          "rot": -0.688,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": 0.993,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0.05,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "forearmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.06
+        },
+        {
+          "t": 0.28,
+          "rot": -0.451,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": -0.123,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": -0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "handR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.28,
+          "rot": -0.246,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": 0.205,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.06
+        },
+        {
+          "t": 0.28,
+          "rot": 0.41,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": -0.492,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": -0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "forearmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.08
+        },
+        {
+          "t": 0.28,
+          "rot": -0.205,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": 0.164,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0.08,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "thighR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": -0.0936,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.5,
+          "rot": 0.1092,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "thighL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": 0.078,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.5,
+          "rot": -0.078,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "cloak",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.32,
+          "rot": -0.234,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.286,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "weapon",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.02
+        },
+        {
+          "t": 0.28,
+          "rot": -0.246,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.58,
+          "rot": 0.2624,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0.02,
+          "ease": "sineOut"
+        }
+      ]
+    }
+  ]
+}

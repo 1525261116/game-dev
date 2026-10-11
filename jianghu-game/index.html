@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <!-- 移动端适配：禁止双指缩放导致的画面错位 -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <title>江湖从心</title>
+    <style>
+      /* 整页铺满，深色底衬出水墨画面 */
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        background: #1a1a1e;
+        overflow: hidden;
+      }
+      #game {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Phaser 会把画布挂到这个容器里 -->
+    <div id="game"></div>
+    <!-- 游戏入口：Vite 会把 TypeScript 现场编译，改代码即时生效 -->
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

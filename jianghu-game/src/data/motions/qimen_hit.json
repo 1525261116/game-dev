@@ -1,0 +1,193 @@
+{
+  "id": "qimen_hit",
+  "group": "qimen",
+  "duration": 320,
+  "loop": false,
+  "priority": 5,
+  "anchors": {
+    "bodyCenter": [
+      {
+        "t": 0,
+        "slot": "torso",
+        "x": 0,
+        "y": -22,
+        "angle": 0
+      }
+    ],
+    "footPoint": [
+      {
+        "t": 0,
+        "slot": "pelvis",
+        "x": 0,
+        "y": 62,
+        "angle": 0
+      }
+    ]
+  },
+  "events": [
+    {
+      "t": 0.05,
+      "type": "sfx",
+      "id": "impact"
+    },
+    {
+      "t": 0.12,
+      "type": "shake",
+      "id": "1"
+    }
+  ],
+  "tracks": [
+    {
+      "slot": "pelvis",
+      "keys": [
+        {
+          "t": 0,
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "t": 0.22,
+          "dx": -5,
+          "dy": 3,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "dx": 0,
+          "dy": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "torso",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.22,
+          "rot": 0.3,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "head",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.22,
+          "rot": 0.34,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.06
+        },
+        {
+          "t": 0.22,
+          "rot": 0.388,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.06
+        },
+        {
+          "t": 0.22,
+          "rot": -0.347,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": -0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "thighR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.22,
+          "rot": 0.091,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "thighL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.22,
+          "rot": -0.065,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "cloak",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": -0.24,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    }
+  ]
+}

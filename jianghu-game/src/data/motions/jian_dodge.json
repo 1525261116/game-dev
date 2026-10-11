@@ -1,0 +1,251 @@
+{
+  "id": "jian_dodge",
+  "group": "jian",
+  "duration": 409,
+  "loop": false,
+  "priority": 4,
+  "anchors": {
+    "bodyCenter": [
+      {
+        "t": 0,
+        "slot": "torso",
+        "x": 0,
+        "y": -22,
+        "angle": 0
+      }
+    ],
+    "footPoint": [
+      {
+        "t": 0,
+        "slot": "pelvis",
+        "x": 0,
+        "y": 62,
+        "angle": 0
+      }
+    ]
+  },
+  "events": [
+    {
+      "t": 0.06,
+      "type": "sfx",
+      "id": "dash"
+    },
+    {
+      "t": 0.2,
+      "type": "vfx",
+      "id": "afterimage"
+    },
+    {
+      "t": 0.7,
+      "type": "vfxStop"
+    }
+  ],
+  "tracks": [
+    {
+      "slot": "pelvis",
+      "keys": [
+        {
+          "t": 0,
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "t": 0.3,
+          "dx": -12.48,
+          "dy": 6,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.7,
+          "dx": -10.92,
+          "dy": 5
+        },
+        {
+          "t": 1,
+          "dx": 0,
+          "dy": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "torso",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": -0.238,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.7,
+          "rot": -0.204
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "head",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": -0.12,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.06
+        },
+        {
+          "t": 0.3,
+          "rot": -0.369,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": 0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.06
+        },
+        {
+          "t": 0.3,
+          "rot": -0.411,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": -0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "thighR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": -0.3375,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "thighL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": 0.2625,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "shinR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": 0.375,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "shinL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": 0.315,
+          "ease": "sineOut"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "cloak",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.32,
+          "rot": -0.27,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.33,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    }
+  ]
+}

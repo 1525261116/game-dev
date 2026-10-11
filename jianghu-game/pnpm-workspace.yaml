@@ -1,0 +1,15 @@
+# pnpm 配置（pnpm 12 起，此类设置不再从 package.json 读取，统一放在本文件）
+#
+# allowBuilds：允许这些依赖运行「安装脚本」。
+# pnpm 出于安全，默认不运行第三方包的安装脚本，但下面 3 个必须放行：
+#
+#   esbuild  —— Vite 的编译核心，不放行则开发服务器起不来
+#   electron —— 桌面端（Steam）打包运行时，安装时需要下载对应平台二进制
+#   sharp    —— 图集处理（图片压缩 / 拼合），安装时需要下载平台原生模块
+#
+# 写进本文件（而不是只在本机授权），是为了换电脑 / 别人克隆仓库时不会再遇到同样问题。
+
+allowBuilds:
+  esbuild: true
+  electron: true
+  sharp: true

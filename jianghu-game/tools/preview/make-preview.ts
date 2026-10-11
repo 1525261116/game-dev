@@ -85,8 +85,16 @@ console.log('');
 for (const clip of clipList) {
   const issues = validateClip(clip);
   const errs = issues.filter((i) => i.level === 'error');
-  const tips = [0, 0.25, 0.5, 0.75, 1].map((u) => sampleClip(clip, rig, clip.duration * u).anchors.weaponTip);
-  const valid = tips.filter(Boolean) as { x: number; y: number }[];
+  // 取该动作的「主打击挂点」：刀剑枪看武器尖端，拳掌/奇门看掌心，暗器看掷出点。
+  // 之前只统计 weaponTip，导致拳掌/暗器组都显示 0px，容易被误读成"动作没做"。
+  const strikeKey = (['weaponTip', 'palm', 'throwPoint'] as const).find(
+    (k) => (clip.anchors[k]?.length ?? 0) > 0,
+  );
+  const valid = (
+    strikeKey
+      ? [0, 0.25, 0.5, 0.75, 1].map((u) => sampleClip(clip, rig, clip.duration * u).anchors[strikeKey])
+      : []
+  ).filter(Boolean) as { x: number; y: number }[];
   let travel = 0;
   for (let i = 1; i < valid.length; i++) {
     travel += Math.hypot(valid[i]!.x - valid[i - 1]!.x, valid[i]!.y - valid[i - 1]!.y);
@@ -95,7 +103,7 @@ for (const clip of clipList) {
   console.log(
     `· ${clip.id.padEnd(12)} ${String(clip.duration).padStart(4)}ms ${clip.loop ? '循环' : '单次'} ` +
       `优先级${clip.priority} 轨道${clip.tracks.length} 挂点${Object.keys(clip.anchors).length} ` +
-      `武器尖端轨迹${travel.toFixed(0)}px ` +
+      `打击点轨迹${travel.toFixed(0)}px ` +
       (hitEv ? `命中点${(hitEv.t * clip.duration).toFixed(0)}ms ` : '') +
       `校验:${errs.length === 0 ? '通过' : errs.map((e) => e.code).join(',')}`,
   );

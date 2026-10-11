@@ -1,0 +1,363 @@
+{
+  "id": "neigong_cast",
+  "group": "neigong",
+  "duration": 1059,
+  "loop": false,
+  "priority": 3,
+  "anchors": {
+    "bodyCenter": [
+      {
+        "t": 0,
+        "slot": "torso",
+        "x": 0,
+        "y": -22,
+        "angle": 0
+      }
+    ],
+    "palm": [
+      {
+        "t": 0,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      },
+      {
+        "t": 0.3,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      },
+      {
+        "t": 0.5,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      },
+      {
+        "t": 1,
+        "slot": "handR",
+        "x": 0,
+        "y": 8,
+        "angle": 0
+      }
+    ],
+    "hitPoint": [
+      {
+        "t": 0,
+        "slot": "pelvis",
+        "x": 18,
+        "y": -20,
+        "angle": 0
+      },
+      {
+        "t": 0.45,
+        "slot": "pelvis",
+        "x": 43.2,
+        "y": -26,
+        "angle": -0.35
+      },
+      {
+        "t": 1,
+        "slot": "pelvis",
+        "x": 24,
+        "y": -22,
+        "angle": -0.1
+      }
+    ]
+  },
+  "events": [
+    {
+      "t": 0.1,
+      "type": "sfx",
+      "id": "aura"
+    },
+    {
+      "t": 0.45,
+      "type": "vfx",
+      "id": "aura_body"
+    },
+    {
+      "t": 0.62,
+      "type": "hit"
+    },
+    {
+      "t": 0.72,
+      "type": "shake",
+      "id": "1"
+    },
+    {
+      "t": 0.92,
+      "type": "vfxStop"
+    }
+  ],
+  "tracks": [
+    {
+      "slot": "pelvis",
+      "keys": [
+        {
+          "t": 0,
+          "dx": 0,
+          "dy": 0
+        },
+        {
+          "t": 0.35,
+          "dx": -5,
+          "dy": 3,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "dx": 8,
+          "dy": -2,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "dx": 0,
+          "dy": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "torso",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.35,
+          "rot": -0.049,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.07,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "head",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.35,
+          "rot": -0.035,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.028,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.05
+        },
+        {
+          "t": 0.35,
+          "rot": -0.387,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": -0.52,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0.05,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "forearmR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.06
+        },
+        {
+          "t": 0.35,
+          "rot": -0.323,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": -0.038,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": -0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "handR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.35,
+          "rot": -0.095,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.114,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "upperArmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": -0.06
+        },
+        {
+          "t": 0.35,
+          "rot": 0.19,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": -0.285,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": -0.06,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "forearmL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0.08
+        },
+        {
+          "t": 0.35,
+          "rot": -0.228,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": -0.019,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0.08,
+          "ease": "sineOut"
+        }
+      ]
+    },
+    {
+      "slot": "thighR",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": -0.0162,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.5,
+          "rot": 0.0189,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "thighL",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.3,
+          "rot": 0.0135,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.5,
+          "rot": -0.0135,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    },
+    {
+      "slot": "cloak",
+      "keys": [
+        {
+          "t": 0,
+          "rot": 0
+        },
+        {
+          "t": 0.32,
+          "rot": -0.216,
+          "ease": "sineOut"
+        },
+        {
+          "t": 0.62,
+          "rot": 0.264,
+          "ease": "quadIn"
+        },
+        {
+          "t": 1,
+          "rot": 0
+        }
+      ]
+    }
+  ]
+}

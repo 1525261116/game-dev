@@ -26,7 +26,9 @@ function occupiedSet(p: Placement): Set<SlotIndex> {
 }
 
 function occupiedIn(p: Placement, slots: readonly SlotIndex[]): number {
-  return slots.reduce((n, s) => n + (p[s] ? 1 : 0), 0);
+  // 显式声明累加器为 number：否则 TS 会按数组元素类型把累加器推断成 SlotIndex，
+  // 于是 `n + 1` 的结果（number）无法赋回 SlotIndex 而报错。
+  return slots.reduce<number>((n, s) => n + (p[s] ? 1 : 0), 0);
 }
 
 /** 最高可达成的同类要求（用于 partial 判定） */
@@ -52,7 +54,7 @@ export function evaluateRequirement(req: FormationRequirement, p: Placement): Re
     }
 
     case 'corners': {
-      const n = CORNER_SLOTS.reduce((acc, s) => acc + (occ.has(s) ? 1 : 0), 0);
+      const n = CORNER_SLOTS.reduce<number>((acc, s) => acc + (occ.has(s) ? 1 : 0), 0);
       return n >= 4 ? 'ok' : n === 3 ? 'partial' : 'fail';
     }
 

@@ -21,7 +21,9 @@
     "sim:drop": "node tools/sim-drop.ts",
     "atlas:pack": "node tools/pack-atlas.ts",
     "skin:gen": "node tools/gen-skin.ts",
-    "preview:rig": "node tools/preview/make-preview.ts"
+    "preview:rig": "node tools/preview/make-preview.ts",
+    "gen:motions": "node tools/gen-motions.ts",
+    "gen:motions:force": "node tools/gen-motions.ts --force"
   },
   "dependencies": {
     "phaser": "^3.90.0",
