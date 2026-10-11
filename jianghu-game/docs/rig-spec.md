@@ -85,15 +85,15 @@
 
 ## 5. 武器贴图：按「类型 × 品质」共享（30 张覆盖全游戏）
 
-```
-assets/weapons/
-  dao/     dao_fan.png  dao_li.png  dao_bao.png  dao_shen.png  dao_chuan.png
-  jian/    jian_fan.png …
-  quan/    quan_*.png        （拳套/护手，可只做 3 档）
-  anqi/    anqi_*.png
-  qimen/   qimen_*.png
-  qiang/   qiang_*.png
-```
+| 路径 | 用途 / 说明 |
+|------|------|
+| `assets/weapons/` | 武器贴图根目录 |
+| 　`dao/` | `dao_fan.png` `dao_li.png` `dao_bao.png` `dao_shen.png` `dao_chuan.png` |
+| 　`jian/` | `jian_fan.png` … |
+| 　`quan/` | `quan_*.png`（拳套/护手，可只做 3 档） |
+| 　`anqi/` | `anqi_*.png` |
+| 　`qimen/` | `qimen_*.png` |
+| 　`qiang/` | `qiang_*.png` |
 
 - **全角色共用**：玩家认知自然（"这是一把宝器剑"），且是**外观付费的切入点**。
 - 角色专属武器只在**传世品质 + 剧情关键**时才单独画。
@@ -102,28 +102,46 @@ assets/weapons/
 
 ## 6. 动作数据格式（JSON）
 
-```jsonc
-{
-  "id": "dao_atk_a",
-  "group": "dao",              // dao|jian|quan|anqi|qimen|qiang|neigong|shenfa
-  "duration": 520,             // ms，允许 200~2000
-  "loop": false,               // idle 必须 true 且首尾一致
-  "priority": 2,               // down 9 > hit 5 > cast 3 > attack 2 > idle 0
-  "anchors": {                 // 挂点：特效只认挂点，不认动作名
-    "weaponTip": [{ "t": 0.5, "slot": "weapon", "x": 0, "y": 52, "angle": 0 }]
-  },
-  "events": [
-    { "t": 0.45, "type": "hit" }        // 表现用，不参与数值
-  ],
-  "tracks": [
-    { "slot": "torso", "keys": [
-      { "t": 0,   "rot": 0 },
-      { "t": 0.3, "rot": -0.16, "ease": "sineOut" },
-      { "t": 1,   "rot": 0,     "ease": "sineOut" }
-    ] }
-  ]
-}
-```
+动作数据的顶层字段如下（示例动作 `"id": "dao_atk_a"`）：
+
+| 字段 | 类型 | 说明 / 取值 |
+|------|------|------|
+| `id` | string | 动作标识，示例 `"dao_atk_a"` |
+| `group` | string | 招式分组：`dao` \| `jian` \| `quan` \| `anqi` \| `qimen` \| `qiang` \| `neigong` \| `shenfa` |
+| `duration` | number | 时长，单位 ms，允许 200~2000 |
+| `loop` | boolean | 是否循环，示例 `false`；idle 必须 `true` 且首尾一致 |
+| `priority` | number | 优先级：`down 9` > `hit 5` > `cast 3` > `attack 2` > `idle 0`（示例 `2`） |
+| `anchors` | object | 挂点：特效只认挂点，不认动作名（子字段见下表） |
+| `events` | array | 事件列表：表现用，不参与数值（子字段见下表） |
+| `tracks` | array | 轨道列表（子字段见下表） |
+
+`anchors`（挂点）：键为挂点名，值为挂点数组，示例键名 `weaponTip`。
+
+| 字段 | 类型 | 说明 / 取值 |
+|------|------|------|
+| `anchors.<挂点名>` | array | 挂点数组，示例 `"weaponTip"` |
+| `anchors.<挂点名>[].t` | number | 时间，示例 `0.5` |
+| `anchors.<挂点名>[].slot` | string | 挂载到哪个 slot，示例 `"weapon"` |
+| `anchors.<挂点名>[].x` | number | 相对偏移 x，示例 `0` |
+| `anchors.<挂点名>[].y` | number | 相对偏移 y，示例 `52` |
+| `anchors.<挂点名>[].angle` | number | 角度，示例 `0` |
+
+`events`（事件）：
+
+| 字段 | 类型 | 说明 / 取值 |
+|------|------|------|
+| `events[].t` | number | 时间，示例 `0.45` |
+| `events[].type` | string | 事件类型，示例 `"hit"` |
+
+`tracks`（轨道）与 `keys`（关键帧）：
+
+| 字段 | 类型 | 说明 / 取值 |
+|------|------|------|
+| `tracks[].slot` | string | 该轨道驱动的 slot，示例 `"torso"` |
+| `tracks[].keys` | array | 关键帧数组 |
+| `tracks[].keys[].t` | number | 时间，示例 `0` / `0.3` / `1` |
+| `tracks[].keys[].rot` | number | 旋转，示例 `0` / `-0.16` / `0` |
+| `tracks[].keys[].ease` | string | 缓动（可选），示例 `"sineOut"` |
 
 **时间写法**：`t ∈ [0,1]` 为归一化（推荐）；`t > 1` 视为毫秒。
 

@@ -26,11 +26,9 @@
 ## 文档约定
 
 - 设计文档与交付物统一使用 Markdown（`.md`）
+- **不使用代码块**：图表、公式、流程、数据结构一律用表格 / 正文表达，文档内不出现围栏代码块（2026-10-11 起）
 - 编号前缀 + 语义化目录名称，参考 GDD 行业标准
 
 ## 环境
 
-```bash
-cd jianghu-game
-pnpm install     # 安装依赖
-```
+进入游戏工程目录并安装依赖：先 `cd jianghu-game`，再运行 `pnpm install`（安装 Phaser / Vite / Electron 等依赖；首次需要联网）。

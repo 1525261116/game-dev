@@ -21,13 +21,13 @@
 
 ## 1. 方案 C 到底要造哪些东西（组件清单）
 
-```
-① 规范层    slot 命名规范 + 骨架 schema + 皮肤 schema + 动作 schema
-② 数据层    3 套体型参数 · 12 套皮肤描述 · 56 个动作 clip · 16 个特效模板 · 87 行功法映射
-③ 运行时    Rig / MotionPlayer / SkinRegistry / VfxLayer / HitStop / BattleView 编排
-④ 工具层    浏览器内时间轴编辑器 · 图集打包 · skin.json 生成 · slot 校验 · 动作校验
-⑤ 资产层    部件贴图（美术）· 特效贴图（美术）· 音效（外包）
-```
+| 层 | 内容 |
+|----|------|
+| ① 规范层 | slot 命名规范 + 骨架 schema + 皮肤 schema + 动作 schema |
+| ② 数据层 | 3 套体型参数 · 12 套皮肤描述 · 56 个动作 clip · 16 个特效模板 · 87 行功法映射 |
+| ③ 运行时 | Rig / MotionPlayer / SkinRegistry / VfxLayer / HitStop / BattleView 编排 |
+| ④ 工具层 | 浏览器内时间轴编辑器 · 图集打包 · skin.json 生成 · slot 校验 · 动作校验 |
+| ⑤ 资产层 | 部件贴图（美术）· 特效贴图（美术）· 音效（外包） |
 
 | 组件 | 代码/数据量（估算） | 谁做 |
 |------|:------------------:|:----:|
@@ -92,12 +92,9 @@
 
 **估算方法**（不是猜，按可复算的模型）：
 
-```
-token ≈ Σ(文件行数 × 15) × (1 + 迭代系数) × (1 + 跨会话重读冗余)
-  15      = 每行 TS（含中文注释）约 15 tokens
-  迭代系数 = 1.5~2.5（写完后调试、返工、按你反馈调整）
-  重读冗余 = 0.25（每次新会话我要重读相关文件）
-```
+**公式**：token ≈ Σ（文件行数 × 15）×（1 + 迭代系数）×（1 + 跨会话重读冗余）。
+
+其中：15 = 每行 TS（含中文注释）约 15 tokens；迭代系数 = 1.5~2.5（写完后调试、返工、按你反馈调整）；重读冗余 = 0.25（每次新会话我要重读相关文件）。
 
 | 阶段 | 交付物 | 代码/数据量 | token 区间 |
 |:----:|--------|:-----------:|:----------:|
@@ -156,13 +153,13 @@ token ≈ Σ(文件行数 × 15) × (1 + 迭代系数) × (1 + 跨会话重读�
 
 ## 5. 总耗时（关键路径）
 
-```
-时间轴（周）
-     0    1    2    3    4    5    6    7    8    9   10   11   12   13   14
-我   ├─P0─┤├──P1──┤├──P2──┤├───P3 编辑器───┤├──P4 编排──┤├─P5 打磨─┤
-你   │    ├─1角色贴图─┤├─验─┤  ├─3动作─┤    ├─56clip+16特效+12皮肤（4~10周）─┤
-里程碑        ▲M1 能动          ▲M2 编辑器可用        ▲M3 战斗可看          ▲M4 量产就绪
-```
+**时间轴（周，刻度 0~14，左 → 右即时间推进）**
+
+| 泳道 | 顺序（左 → 右为时间推进） |
+|------|---------------------------|
+| 我 | P0 → P1 → P2 → P3 编辑器 → P4 编排 → P5 打磨 |
+| 你 | （P0 期间留空）→ 1 角色贴图 → 验 → 3 动作 → 56 clip + 16 特效 + 12 皮肤（4~10 周） |
+| 里程碑 | ▲M1 能动 → ▲M2 编辑器可用 → ▲M3 战斗可看 → ▲M4 量产就绪 |
 
 | 里程碑 | 时间点 | 达成标志 |
 |--------|:------:|----------|
@@ -180,10 +177,7 @@ token ≈ Σ(文件行数 × 15) × (1 + 迭代系数) × (1 + 跨会话重读�
 
 ### 6.1 先定"动作原型"，不做"逐功法动画"
 
-```
-动作数量 = 动作组数量 × 原型数量   ← 与角色数、功法数都无关
-         = (6 武器组 + 内功组 + 身法组) × 各自动作原型
-```
+**公式**：动作数量 = 动作组数量 × 原型数量（← 与角色数、功法数都无关）= (6 武器组 + 内功组 + 身法组) × 各自动作原型。
 
 | 动作组 | 原型（8 个） | 数量 |
 |--------|--------------|:----:|
@@ -194,42 +188,53 @@ token ≈ Σ(文件行数 × 15) × (1 + 迭代系数) × (1 + 跨会话重读�
 
 ### 6.2 命名与数据结构
 
-```
-命名：{group}_{archetype}[_{variant}]
-  dao_atk_a         刀·快招
-  dao_atk_b         刀·重击
-  qiang_sweep       枪·横扫（打整排）
-  neigong_meditate  内功·打坐运气
-  shenfa_dash       身法·疾冲
-```
+**命名规则**：`{group}_{archetype}[_{variant}]`
+
+| 命名示例 | 含义 |
+|----------|------|
+| `dao_atk_a` | 刀·快招 |
+| `dao_atk_b` | 刀·重击 |
+| `qiang_sweep` | 枪·横扫（打整排） |
+| `neigong_meditate` | 内功·打坐运气 |
+| `shenfa_dash` | 身法·疾冲 |
 
 **Clip 数据格式（JSON）**
 
-```jsonc
-{
-  "id": "dao_atk_a",
-  "group": "dao",
-  "duration": 520,              // ms
-  "loop": false,
-  "priority": 2,                // 打断优先级：受击(5) > 攻击(2) > 待机(0)
-  "anchors": {                  // 挂点：特效只认挂点，不认动作名
-    "weaponTip": [ { "t": 0.25, "x": 42, "y": -18, "angle": -35 } ],
-    "hitPoint":  [ { "t": 0.35, "x": 55, "y": -10 } ]
-  },
-  "events": [
-    { "t": 0.00, "type": "sfx",  "id": "swing_light" },
-    { "t": 0.35, "type": "hit" },                    // 命中判定点（表现用）
-    { "t": 0.50, "type": "vfxStop" }
-  ],
-  "tracks": [
-    { "slot": "torso",  "keys": [ {"t":0,"rot":0,"x":0,"y":0,"ease":"sineOut"},
-                                  {"t":0.3,"rot":-8,"x":4,"y":-2},
-                                  {"t":1,"rot":0,"x":0,"y":0} ] },
-    { "slot": "upperArmR", "keys": [ /* ... */ ] },
-    { "slot": "weapon",    "keys": [ /* ... */ ] }
-  ]
-}
-```
+顶层字段如下：
+
+| 字段 | 类型 | 说明 | 示例值 |
+|------|------|------|--------|
+| `id` | string | clip 标识 | `dao_atk_a` |
+| `group` | string | 动作组 | `dao` |
+| `duration` | number（ms） | 时长 | `520` |
+| `loop` | boolean | 是否循环 | `false` |
+| `priority` | number | 打断优先级：受击(5) > 攻击(2) > 待机(0) | `2` |
+| `anchors` | object | 挂点：特效只认挂点，不认动作名 | 见下 |
+| `events` | array | 时间点事件 | 见下 |
+| `tracks` | array | 各 slot 的关键帧轨 | 见下 |
+
+**anchors（挂点）**
+
+| 挂点 | 值 |
+|------|----|
+| `weaponTip` | `[ { "t": 0.25, "x": 42, "y": -18, "angle": -35 } ]` |
+| `hitPoint` | `[ { "t": 0.35, "x": 55, "y": -10 } ]` |
+
+**events（事件）**
+
+| t | type | id | 说明 |
+|:--:|------|----|------|
+| 0.00 | `sfx` | `swing_light` | 播放音效 |
+| 0.35 | `hit` | — | 命中判定点（表现用） |
+| 0.50 | `vfxStop` | — | 特效停止 |
+
+**tracks（关键帧轨）**
+
+| slot | keys |
+|------|------|
+| `torso` | `[{t:0,rot:0,x:0,y:0,ease:"sineOut"}, {t:0.3,rot:-8,x:4,y:-2}, {t:1,rot:0,x:0,y:0}]` |
+| `upperArmR` | `[ /* ... */ ]` |
+| `weapon` | `[ /* ... */ ]` |
 
 **设计规则（写进规范，避免动作库失控）**
 
@@ -245,24 +250,21 @@ token ≈ Σ(文件行数 × 15) × (1 + 迭代系数) × (1 + 跨会话重读�
 
 ### 6.3 动作库的三层结构
 
-```
-基础层  idle / ready                          ← 每个动作组必须有，12 角色共用
-动作层  atk_a / atk_b / cast / sweep          ← 战斗中 95% 时间在播这一层
-状态层  hit / dodge / down / dash / leap      ← 被打断时覆盖播放
-```
+| 层 | 动作 | 说明 |
+|----|------|------|
+| 基础层 | `idle` / `ready` | 每个动作组必须有，12 角色共用 |
+| 动作层 | `atk_a` / `atk_b` / `cast` / `sweep` | 战斗中 95% 时间在播这一层 |
+| 状态层 | `hit` / `dodge` / `down` / `dash` / `leap` | 被打断时覆盖播放 |
 
 ### 6.4 动作 → 功法 的映射（87 门功法只写 87 行）
 
-`gongfa_visual.ts` 每行只描述**差异**：
+`gongfa_visual.ts` 每行只描述**差异**，示例三条如下：
 
-```ts
-{ id:'GF_kuangfeng_dao', group:'dao', motion:'cast',  vfx:'slash_arc',
-  timingScale:1.15, hitStopMs:40, shake:1, sfx:'slash_1', targets:'single' },
-{ id:'GF_duanyue_dao',   group:'dao', motion:'atk_b', vfx:'slash_heavy',
-  timingScale:0.85, hitStopMs:90, shake:2, sfx:'slash_heavy', targets:'column' },
-{ id:'GF_badao',         group:'dao', motion:'atk_b', vfx:'slash_heavy',
-  timingScale:0.75, hitStopMs:120, shake:2, sfx:'slash_heavy', targets:'all' },
-```
+| id | group | motion | vfx | timingScale | hitStopMs | shake | sfx | targets |
+|----|-------|--------|-----|:-----------:|:---------:|:-----:|-----|---------|
+| `GF_kuangfeng_dao` | `dao` | `cast` | `slash_arc` | 1.15 | 40 | 1 | `slash_1` | `single` |
+| `GF_duanyue_dao` | `dao` | `atk_b` | `slash_heavy` | 0.85 | 90 | 2 | `slash_heavy` | `column` |
+| `GF_badao` | `dao` | `atk_b` | `slash_heavy` | 0.75 | 120 | 2 | `slash_heavy` | `all` |
 
 > **霸刀与断岳刀法共用 `slash_heavy`**，只改尺寸/颜色/时序/停顿/震屏/范围。**这就是不加动画也能做出"不同的功法"。**
 
@@ -314,15 +316,15 @@ token ≈ Σ(文件行数 × 15) × (1 + 迭代系数) × (1 + 跨会话重读�
 
 ### 7.3 武器贴图按「类型 × 品质」共享（又省一大块）
 
-```
-weapons/
-  dao/    dao_fan.png  dao_li.png  dao_bao.png  dao_shen.png  dao_chuan.png
-  jian/   jian_fan.png ...
-  quan/   (拳套/护手)
-  anqi/   anqi_*.png
-  qimen/  qimen_*.png
-  qiang/  qiang_*.png
-```
+| 路径 | 内容 |
+|------|------|
+| `weapons/` | 武器贴图根目录 |
+| `weapons/dao/` | `dao_fan.png` `dao_li.png` `dao_bao.png` `dao_shen.png` `dao_chuan.png` |
+| `weapons/jian/` | `jian_fan.png ...` |
+| `weapons/quan/` | （拳套/护手） |
+| `weapons/anqi/` | `anqi_*.png` |
+| `weapons/qimen/` | `qimen_*.png` |
+| `weapons/qiang/` | `qiang_*.png` |
 
 - **6 类型 × 5 品质 = 30 张武器图，全角色共用。**
 - 玩家认知自然（"这是一把宝器剑"），且**外观付费的切入点**：角色专属武器皮肤 / 时装 → 对应 GDD 0.5 的"外观付费，不卖数值"。
@@ -330,15 +332,10 @@ weapons/
 
 ### 7.4 交付流程
 
-```
-你画部件 → 放入 assets/chars/<charId>/parts/
-   ↓
-我写的脚本：自动生成 skin.json + 打图集（≤2048²）+ slot 完整性校验
-   ↓
-我写的编辑器：实时预览该角色在任意动作下的样子
-   ↓
-缺件/错位 → 编辑器红框报警 + 占位图兜底（绝不阻塞）
-```
+1. 你画部件 → 放入 `assets/chars/<charId>/parts/`
+2. 我写的脚本：自动生成 `skin.json` + 打图集（≤2048²）+ slot 完整性校验
+3. 我写的编辑器：实时预览该角色在任意动作下的样子
+4. 缺件/错位 → 编辑器红框报警 + 占位图兜底（绝不阻塞）
 
 ---
 
@@ -346,29 +343,38 @@ weapons/
 
 ### 8.1 与战斗系统的对接（关键：表现层不参与计算）
 
-```
-[逻辑层·纯 TS，可 vitest]
-  战斗预结算（GDD 5.4 强制）→ 产出 BattleEvent[]
-  BattleEvent = { t, type:'attack'|'hit'|'heal'|'buff'|'die',
-                  actorId, targetIds, gongfaId, comboLevel, damage, crit }
+**逻辑层·纯 TS，可 vitest**
 
-[表现层·Phaser]
-  BattleView 读事件流 → 逐条调用 CharacterAnimator.play(gongfaVisual[gongfaId])
-                     → VfxLayer 在挂点上生成特效
-                     → HitStop / 震屏 / 飘字
-                     → 支持 1×/2×/4×/跳过（跳过 = 直接把状态设到结果）
-```
+- 战斗预结算（GDD 5.4 强制）→ 产出 `BattleEvent[]`。
+- `BattleEvent` 字段如下：
+
+| 字段 | 说明 |
+|------|------|
+| `t` | 时间点 |
+| `type` | `'attack' \| 'hit' \| 'heal' \| 'buff' \| 'die'` |
+| `actorId` | 施放者 |
+| `targetIds` | 目标 |
+| `gongfaId` | 功法 |
+| `comboLevel` | 连招层级 |
+| `damage` | 伤害 |
+| `crit` | 是否暴击 |
+
+**表现层·Phaser**
+
+`BattleView` 读事件流后的处理步骤：
+
+1. 逐条调用 `CharacterAnimator.play(gongfaVisual[gongfaId])`。
+2. `VfxLayer` 在挂点上生成特效。
+3. `HitStop` / 震屏 / 飘字。
+4. 支持 1×/2×/4×/跳过（跳过 = 直接把状态设到结果）。
 
 **收益**：① 逻辑可单测、可批量模拟（GDD 3.10 要求）；② 低端机表现降级不影响战斗结果；③ 同种子同结果（GDD 5.4 要求）天然成立。
 
 ### 8.2 与九宫格布阵的对接
 
-```
-格位(0~8) → 等距屏幕坐标：screenX = originX + (col - row) * TILE_W/2
-                          screenY = originY + (col + row) * TILE_H/2 - heightOffset
-渲染层级 = (col + row) 升序 → 后排先画、前排压住
-出手顺序由逻辑层决定，表现层只按事件流的 t 排序播放
-```
+1. 格位(0~8) → 等距屏幕坐标：`screenX = originX + (col - row) * TILE_W/2`；`screenY = originY + (col + row) * TILE_H/2 - heightOffset`。
+2. 渲染层级 = `(col + row)` 升序 → 后排先画、前排压住。
+3. 出手顺序由逻辑层决定，表现层只按事件流的 `t` 排序播放。
 
 ### 8.3 与功法/品质/境界/连招的对接（已有系统，只需挂接）
 
