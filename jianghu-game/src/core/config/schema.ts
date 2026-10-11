@@ -106,6 +106,19 @@ export const unitRowSchema = z.object({
 
 export type UnitRow = z.infer<typeof unitRowSchema>;
 
+/* ══════════════════ 对战配置 battle.csv ══════════════════ */
+
+export const battleSetupRowSchema = z.object({
+  /** 阵营 */
+  side: z.enum(['ally', 'enemy']),
+  /** 阵法 id（留空 = 本场不使用阵法） */
+  formationId: optionalString,
+  /** 阵法等级 1~5 */
+  formationLevel: optionalNumber,
+});
+
+export type BattleSetupRow = z.infer<typeof battleSetupRowSchema>;
+
 /* ══════════════════ 跨表一致性检查 ══════════════════ */
 
 export interface TableIssue {
@@ -121,7 +134,12 @@ export interface TableIssue {
  *  ② 同一阵营的站位不能重复（防止两个角色站同一格）
  *  ③ 每方至少要有一个单位（否则战斗无法开始）
  */
-export function checkCrossTable(skills: SkillRow[], units: UnitRow[]): TableIssue[] {
+export function checkCrossTable(
+  skills: SkillRow[],
+  units: UnitRow[],
+  battleSetups: BattleSetupRow[] = [],
+  knownFormationIds: readonly string[] = [],
+): TableIssue[] {
   const issues: TableIssue[] = [];
   const skillIds = new Set(skills.map((s) => s.id));
 
@@ -155,6 +173,46 @@ export function checkCrossTable(skills: SkillRow[], units: UnitRow[]): TableIssu
       used.set(u.slot, u.name);
     }
   }
+
+  /* 阵法配置校验：id 必须存在、等级必须在 1~5、每方最多一条 */
+  const formationSet = new Set(knownFormationIds);
+  const seenSide = new Set<string>();
+  battleSetups.forEach((b, i) => {
+    if (seenSide.has(b.side)) {
+      issues.push({
+        file: 'battle.csv',
+        row: i + 1,
+        field: 'side',
+        message: `${b.side} 阵营出现了多条配置，每方只允许一条`,
+      });
+    }
+    seenSide.add(b.side);
+
+    if (b.formationId && formationSet.size > 0 && !formationSet.has(b.formationId)) {
+      issues.push({
+        file: 'battle.csv',
+        row: i + 1,
+        field: 'formationId',
+        message: `不存在的阵法「${b.formationId}」，请在 data/formations.ts 中核对 id`,
+      });
+    }
+    if (b.formationId && b.formationLevel === undefined) {
+      issues.push({
+        file: 'battle.csv',
+        row: i + 1,
+        field: 'formationLevel',
+        message: `已指定阵法 ${b.formationId}，但没有填阵法等级（1~5）`,
+      });
+    }
+    if (b.formationLevel !== undefined && (b.formationLevel < 1 || b.formationLevel > 5)) {
+      issues.push({
+        file: 'battle.csv',
+        row: i + 1,
+        field: 'formationLevel',
+        message: `阵法等级 ${b.formationLevel} 越界，允许范围 1~5`,
+      });
+    }
+  });
 
   return issues;
 }

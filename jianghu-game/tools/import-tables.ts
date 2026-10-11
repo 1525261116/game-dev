@@ -22,10 +22,11 @@ function main(): void {
   console.log('=== 配置表导入 ===');
   console.log(`数据源：${join('data', 'tables')}`);
 
-  const { skills, units, issues } = loadAllTables();
+  const { skills, units, battleSetups, issues } = loadAllTables();
 
   console.log(`  skills.csv：读到 ${skills.length} 行有效数据`);
   console.log(`  units.csv ：读到 ${units.length} 行有效数据`);
+  console.log(`  battle.csv：读到 ${battleSetups.length} 行有效数据`);
 
   if (issues.length > 0) {
     printIssues(issues);
@@ -41,7 +42,7 @@ function main(): void {
     ' * 要改数值，请编辑 data/tables/*.csv 后运行：pnpm tables:import',
     ' * 直接改本文件会在下次导入时被覆盖。',
     ' */',
-    "import type { SkillRow, UnitRow } from '../../core/config/schema.ts';",
+    "import type { BattleSetupRow, SkillRow, UnitRow } from '../../core/config/schema.ts';",
     '',
   ].join('\n');
 
@@ -51,6 +52,9 @@ function main(): void {
     '',
     '/** 单位表（来自 data/tables/units.csv） */',
     `export const UNIT_ROWS: UnitRow[] = ${JSON.stringify(units, null, 2)};`,
+    '',
+    '/** 对战配置（来自 data/tables/battle.csv） */',
+    `export const BATTLE_SETUP_ROWS: BattleSetupRow[] = ${JSON.stringify(battleSetups, null, 2)};`,
     '',
   ].join('\n');
 

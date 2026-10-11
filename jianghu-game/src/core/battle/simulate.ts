@@ -15,20 +15,37 @@
  *   ② 回放可以 1× / 2× / 4× / 直接跳过，结果都不变
  *   ③ 可以脱离画面跑 1000 场做数值平衡模拟（这正是 GDD M1 的验收标准）
  * ══════════════════════════════════════════════════════════════════
+ *
+ * 阵法系统：
+ *   阵法是「按站位满足条件 → 给全队加成」的机制。它让九宫格的位次有了意义，
+ *   也是玩家愿意反复调整阵容的动力。加成的求解在 core/battle/formation.ts，
+ *   表在 data/formations.ts —— 本文件只负责把结果**应用**到战斗中。
+ *
+ *   注意：`allyFormation` / `enemyFormation` 都是**可选**参数。
+ *         不传阵法时，战斗行为与接入阵法之前完全一致（向后兼容）。
  */
 import { computeDamage, groupDecay } from './formula.ts';
+import { resolveFormation, describeBonus } from './formation.ts';
 import { createRng } from './rng.ts';
 import { colOf, partyScale, rowOf, COL_SLOTS, ROW_SLOTS } from './types.ts';
 import { STATUS_DEFS } from '../../data/status.ts';
+import { getFormation } from '../../data/formations.ts';
 import type { Rng } from './rng.ts';
 import type { AttackerView, DefenderView, SkillView } from './formula.ts';
 import type { MotionGroup } from '../anim/types.ts';
-import type { SlotIndex, StatMods, StatusId } from './types.ts';
+import type {
+  FormationBonus,
+  Placement,
+  RequirementResult,
+  SlotIndex,
+  StatMods,
+  StatusId,
+} from './types.ts';
 import type { TargetShape } from '../../data/gongfa_visual.ts';
 
 /* ══════════════════════ 输入配置 ══════════════════════ */
 
-/** 参战单位的面板数值（全部来自配置，代码里不写死） */
+/** 参战单位的面板数值（全部来自配置表，代码里不写死） */
 export interface UnitStats {
   hpMax: number;
   /** 攻击力（已含臂力×3 + 装备） */
@@ -77,6 +94,12 @@ export interface BattleUnitConfig {
   skill: SkillConfig;
 }
 
+/** 阵法选择：用哪个阵法、练到几级（1~5） */
+export interface FormationChoice {
+  id: string;
+  level: number;
+}
+
 export interface BattleSetup {
   allies: BattleUnitConfig[];
   enemies: BattleUnitConfig[];
@@ -84,6 +107,10 @@ export interface BattleSetup {
   seed: number | string;
   /** 回合上限，超过判负（GDD 失衡红线：> 30 回合视为数值缺陷） */
   maxRounds?: number;
+  /** 我方阵法（可选；不传则无阵法加成） */
+  allyFormation?: FormationChoice;
+  /** 敌方阵法（可选） */
+  enemyFormation?: FormationChoice;
 }
 
 /* ══════════════════════ 输出：战斗日志 ══════════════════════ */
@@ -91,12 +118,26 @@ export interface BattleSetup {
 export type BattleEvent =
   /** 战斗开始：记录双方初始状态 */
   | { type: 'battleStart'; units: { id: string; name: string; side: 'ally' | 'enemy'; slot: SlotIndex; group: MotionGroup; hpMax: number }[] }
+  /** 阵法生效情况（开局公布） */
+  | {
+      type: 'formation';
+      side: 'ally' | 'enemy';
+      formationId: string;
+      formationName: string;
+      level: number;
+      /** ok = 全额生效 / partial = 加成减半 / fail = 未生效 */
+      result: RequirementResult;
+      /** 人类可读的加成说明 */
+      description: string;
+    }
   /** 回合开始 */
   | { type: 'roundStart'; round: number }
   /** 某单位出手 */
   | { type: 'act'; actorId: string; actorName: string; skillId: string; skillName: string; targetIds: string[] }
   /** 被控制，跳过回合 */
   | { type: 'skip'; actorId: string; reason: string }
+  /** 免疫了一次控制（守境阵） */
+  | { type: 'immune'; targetId: string; statusId: StatusId }
   /** 命中并造成伤害 */
   | { type: 'damage'; targetId: string; value: number; crit: boolean; hpAfter: number; lifesteal: number }
   /** 未命中 */
@@ -105,6 +146,8 @@ export type BattleEvent =
   | { type: 'statusApplied'; targetId: string; statusId: StatusId; rounds: number }
   /** 持续伤害（中毒/流血/灼烧） */
   | { type: 'dot'; targetId: string; statusId: StatusId; value: number; hpAfter: number }
+  /** 受击反弹（天罡北斗阵） */
+  | { type: 'reflect'; targetId: string; value: number; hpAfter: number; sourceName: string }
   /** 单位死亡 */
   | { type: 'death'; unitId: string; unitName: string }
   /** 战斗结束 */
@@ -123,7 +166,32 @@ export interface BattleLog {
     allyDamage: number;
     enemyDamage: number;
     deaths: number;
+    /** 反弹造成的总伤害（用于校验阵法效果真的生效） */
+    reflectDamage: number;
   };
+  /** 本场生效的阵法（无阵法时为 null） */
+  formations: {
+    ally: { id: string; name: string; level: number; result: RequirementResult } | null;
+    enemy: { id: string; name: string; level: number; result: RequirementResult } | null;
+  };
+}
+
+/* ══════════════════════ 阵法加成摘要 ══════════════════════ */
+
+/** 某一方的阵法生效结果（已摊平成方便使用的形式） */
+interface SideBonus {
+  id: string;
+  name: string;
+  level: number;
+  result: RequirementResult;
+  mods: Partial<StatMods>;
+  special: NonNullable<FormationBonus['special']>;
+  description: string;
+}
+
+/** 记录某一方"免疫首次控制"是否已被消耗 */
+interface SideState {
+  immuneUsed: boolean;
 }
 
 /* ══════════════════════ 运行时状态 ══════════════════════ */
@@ -176,9 +244,46 @@ function isIncapacitated(unit: UnitState): string | null {
   return null;
 }
 
-/** 把单位转成伤害公式需要的"攻方视图"（含状态修正） */
-function toAttacker(unit: UnitState): AttackerView {
+/**
+ * 把「状态修正」与「阵法修正」合并成最终的属性倍率。
+ * 两者都是百分比，直接相加（GDD：增伤各来源相加）。
+ */
+function mergedMods(unit: UnitState, bonus: SideBonus | null): StatMods {
   const m = collectMods(unit);
+  const f = bonus?.mods ?? {};
+  return {
+    atk: m.atk + (f.atk ?? 0),
+    def: m.def + (f.def ?? 0),
+    hpMax: m.hpMax + (f.hpMax ?? 0),
+    spd: m.spd + (f.spd ?? 0),
+    crit: m.crit + (f.crit ?? 0),
+    dodge: m.dodge + (f.dodge ?? 0),
+    hit: m.hit + (f.hit ?? 0),
+    innerRegen: m.innerRegen + (f.innerRegen ?? 0),
+    damageTaken: m.damageTaken + (f.damageTaken ?? 0),
+    damageDealt: m.damageDealt + (f.damageDealt ?? 0),
+    lifesteal: m.lifesteal + (f.lifesteal ?? 0),
+  };
+}
+
+/**
+ * 把单位转成伤害公式需要的"攻方视图"。
+ * 这里同时处理两种**依赖站位**的阵法效果：
+ *   · 锋矢阵 columnDamage：与目标同列时增伤
+ *   · 雁行阵 backRowDamage：站后排时增伤
+ */
+function toAttacker(unit: UnitState, bonus: SideBonus | null, target: UnitState): AttackerView {
+  const m = mergedMods(unit, bonus);
+  const sp = bonus?.special ?? {};
+
+  let bonusDamage = m.damageDealt;
+  if (sp.columnDamage && colOf(unit.cfg.slot) === colOf(target.cfg.slot)) {
+    bonusDamage += sp.columnDamage;
+  }
+  if (sp.backRowDamage && rowOf(unit.cfg.slot) === 'back') {
+    bonusDamage += sp.backRowDamage;
+  }
+
   return {
     atk: unit.cfg.stats.atk * (1 + m.atk),
     crit: Math.min(0.75, unit.cfg.stats.crit * (1 + m.crit)),
@@ -187,21 +292,69 @@ function toAttacker(unit: UnitState): AttackerView {
     lifesteal: unit.cfg.stats.lifesteal + m.lifesteal,
     innerCultivation: unit.cfg.stats.innerCultivation,
     gongfaCultivation: unit.cfg.stats.gongfaCultivation,
-    bonusDamage: m.damageDealt,
+    bonusDamage,
   };
 }
 
-/** 守方视图；"定身"状态把闪避压到 0（GDD：闪避归零） */
-function toDefender(unit: UnitState): DefenderView {
-  const m = collectMods(unit);
+/**
+ * 守方视图；两种特殊处理：
+ *   · "定身"状态把闪避压到 0（GDD：闪避归零）
+ *   · 雁行阵 frontRowTaken：站前排时少受伤害
+ */
+function toDefender(unit: UnitState, bonus: SideBonus | null): DefenderView {
+  const m = mergedMods(unit, bonus);
+  const sp = bonus?.special ?? {};
   const rooted = unit.statuses.some((s) => s.id === 'root');
+
+  let damageTaken = m.damageTaken;
+  if (sp.frontRowTaken && rowOf(unit.cfg.slot) === 'front') {
+    damageTaken += sp.frontRowTaken; // 该值为负数，表示少受伤害
+  }
+
   const rawDodge = unit.cfg.stats.dodge * (1 + m.dodge);
   return {
     def: Math.max(0, unit.cfg.stats.def * (1 + m.def)),
     dodge: rooted ? 0 : Math.min(0.6, rawDodge),
     innerCultivation: unit.cfg.stats.innerCultivation,
     gongfaCultivation: unit.cfg.stats.gongfaCultivation,
-    damageTaken: m.damageTaken,
+    damageTaken,
+  };
+}
+
+/* ══════════════════════ 阵法求解 ══════════════════════ */
+
+/** 由单位配置构造九宫格站位表（Placement = 9 格，每格一个单位 id 或 null） */
+function toPlacement(cfgs: BattleUnitConfig[]): Placement {
+  const p: (string | null)[] = new Array<string | null>(9).fill(null);
+  for (const c of cfgs) p[c.slot] = c.id;
+  return p;
+}
+
+/**
+ * 求出某一方的阵法加成。
+ *
+ * 三种结果：
+ *   ok      → 全额加成
+ *   partial → 加成减半（站位接近但不完全符合）
+ *   fail    → 完全没有加成
+ * 这让玩家有"再挪一格就凑成阵了"的动机，而不是只有成/不成两种体验。
+ */
+function resolveSideBonus(
+  cfgs: BattleUnitConfig[],
+  choice: FormationChoice | undefined,
+): SideBonus | null {
+  if (!choice) return null;
+  const def = getFormation(choice.id);
+  const res = resolveFormation(def, toPlacement(cfgs), choice.level);
+
+  return {
+    id: def.id,
+    name: def.name,
+    level: res.level,
+    result: res.result,
+    mods: res.effective.mods ?? {},
+    special: res.effective.special ?? {},
+    description: describeBonus(res.effective),
   };
 }
 
@@ -211,11 +364,7 @@ function toDefender(unit: UnitState): DefenderView {
  * 按招式范围挑出**有序**目标列表（第 1 位 = 主目标，吃全额伤害）。
  * 排序规则：站位编号升序（前排优先）。
  */
-function selectTargets(
-  actor: UnitState,
-  all: UnitState[],
-  shape: TargetShape,
-): UnitState[] {
+function selectTargets(actor: UnitState, all: UnitState[], shape: TargetShape): UnitState[] {
   const foes = all
     .filter((u) => u.cfg.side !== actor.cfg.side && u.alive)
     .sort((a, b) => a.cfg.slot - b.cfg.slot);
@@ -244,8 +393,13 @@ function selectTargets(
 
 /* ══════════════════════ 主流程 ══════════════════════ */
 
-function instantiate(cfg: BattleUnitConfig, hpScale: number): UnitState {
-  const hpMax = Math.max(1, Math.round(cfg.stats.hpMax * hpScale));
+/**
+ * 实例化一个单位。
+ * 气血上限在此处应用两类修正：编队系数（敌方随我方人数缩放）+ 阵法 hpMax 加成。
+ */
+function instantiate(cfg: BattleUnitConfig, hpScale: number, bonus: SideBonus | null): UnitState {
+  const hpBonus = bonus?.mods.hpMax ?? 0;
+  const hpMax = Math.max(1, Math.round(cfg.stats.hpMax * hpScale * (1 + hpBonus)));
   return { cfg, hp: hpMax, hpMax, statuses: [], alive: true };
 }
 
@@ -254,11 +408,22 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
   const maxRounds = setup.maxRounds ?? 30;
   const events: BattleEvent[] = [];
 
-  // ① 实例化双方。敌方气血按我方人数缩放（GDD：以 4 人为基准，保证 TTK 恒定）
+  // ① 先算两边的阵法（必须在实例化之前，因为阵法会影响气血上限）
+  const allyBonus = resolveSideBonus(setup.allies, setup.allyFormation);
+  const enemyBonus = resolveSideBonus(setup.enemies, setup.enemyFormation);
+  const bonusOf = (side: 'ally' | 'enemy'): SideBonus | null =>
+    side === 'ally' ? allyBonus : enemyBonus;
+
+  const sideState: Record<'ally' | 'enemy', SideState> = {
+    ally: { immuneUsed: false },
+    enemy: { immuneUsed: false },
+  };
+
+  // ② 实例化双方。敌方气血按我方人数缩放（GDD：以 4 人为基准，保证 TTK 恒定）
   const allyScale = partyScale(setup.allies.length);
   const units: UnitState[] = [
-    ...setup.allies.map((c) => instantiate(c, 1)),
-    ...setup.enemies.map((c) => instantiate(c, allyScale)),
+    ...setup.allies.map((c) => instantiate(c, 1, allyBonus)),
+    ...setup.enemies.map((c) => instantiate(c, allyScale, enemyBonus)),
   ];
 
   events.push({
@@ -273,10 +438,25 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
     })),
   });
 
+  // 阵法在开局公布一次（让玩家/日志能明确看到"阵起作用了没有"）
+  for (const side of ['ally', 'enemy'] as const) {
+    const b = bonusOf(side);
+    if (!b) continue;
+    events.push({
+      type: 'formation',
+      side,
+      formationId: b.id,
+      formationName: b.name,
+      level: b.level,
+      result: b.result,
+      description: b.description,
+    });
+  }
+
   const aliveOf = (side: 'ally' | 'enemy'): UnitState[] =>
     units.filter((u) => u.cfg.side === side && u.alive);
 
-  const stats = { totalDamage: 0, allyDamage: 0, enemyDamage: 0, deaths: 0 };
+  const stats = { totalDamage: 0, allyDamage: 0, enemyDamage: 0, deaths: 0, reflectDamage: 0 };
 
   let round = 0;
   let winner: 'ally' | 'enemy' | 'draw' = 'draw';
@@ -285,12 +465,12 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
   for (round = 1; round <= maxRounds; round++) {
     events.push({ type: 'roundStart', round });
 
-    // 行动顺序：按当前有效速度降序（速度受状态影响，所以每回合重排）
+    // 行动顺序：按当前有效速度降序（速度受状态与阵法影响，所以每回合重排）
     const order = units
       .filter((u) => u.alive)
       .sort((a, b) => {
-        const sa = a.cfg.stats.spd * (1 + collectMods(a).spd);
-        const sb = b.cfg.stats.spd * (1 + collectMods(b).spd);
+        const sa = a.cfg.stats.spd * (1 + mergedMods(a, bonusOf(a.cfg.side)).spd);
+        const sb = b.cfg.stats.spd * (1 + mergedMods(b, bonusOf(b.cfg.side)).spd);
         return sb - sa;
       });
 
@@ -327,8 +507,8 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
         if (!target.alive) continue;
 
         const result = computeDamage({
-          attacker: toAttacker(actor),
-          defender: toDefender(target),
+          attacker: toAttacker(actor, bonusOf(actor.cfg.side), target),
+          defender: toDefender(target, bonusOf(target.cfg.side)),
           skill,
           groupDecay: groupDecay(i + 1), // 第 i+1 个目标的递减系数
           hitRoll: rng.next(),
@@ -362,13 +542,36 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
           lifesteal: healed,
         });
 
+        // ── 受击反弹（天罡北斗阵）：被打的人按比例弹回去 ──
+        const reflectRate = bonusOf(target.cfg.side)?.special.reflect ?? 0;
+        if (reflectRate > 0 && result.damage > 0) {
+          const back = Math.max(1, Math.round(result.damage * reflectRate));
+          actor.hp = Math.max(0, actor.hp - back);
+          stats.totalDamage += back;
+          stats.reflectDamage += back;
+          if (actor.cfg.side === 'ally') stats.enemyDamage += back;
+          else stats.allyDamage += back;
+          events.push({
+            type: 'reflect',
+            targetId: actor.cfg.id,
+            value: back,
+            hpAfter: actor.hp,
+            sourceName: target.cfg.name,
+          });
+          if (actor.hp <= 0) {
+            actor.alive = false;
+            stats.deaths++;
+            events.push({ type: 'death', unitId: actor.cfg.id, unitName: actor.cfg.name });
+          }
+        }
+
         // 施加状态：命中的目标按概率中招（控制类同样掷骰）
         const statusCfg = actor.cfg.skill.status;
         if (statusCfg && target.hp > 0 && rng.chance(statusCfg.chance)) {
-          applyStatus(target, statusCfg.id, statusCfg.rounds, events, round);
+          applyStatus(target, statusCfg.id, statusCfg.rounds, events, round, sideState, bonusOf);
         }
 
-        if (target.hp <= 0) {
+        if (target.hp <= 0 && target.alive) {
           target.alive = false;
           stats.deaths++;
           events.push({ type: 'death', unitId: target.cfg.id, unitName: target.cfg.name });
@@ -395,6 +598,9 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
   const finalRounds = Math.min(round, maxRounds);
   events.push({ type: 'battleEnd', winner, rounds: finalRounds, allyAlive, enemyAlive });
 
+  const summaryOf = (b: SideBonus | null) =>
+    b ? { id: b.id, name: b.name, level: b.level, result: b.result } : null;
+
   return {
     seed: setup.seed,
     winner,
@@ -402,6 +608,7 @@ export function simulateBattle(setup: BattleSetup): BattleLog {
     events,
     finalHp: Object.fromEntries(units.map((u) => [u.cfg.id, u.hp])),
     stats,
+    formations: { ally: summaryOf(allyBonus), enemy: summaryOf(enemyBonus) },
   };
 }
 
@@ -413,13 +620,25 @@ function applyStatus(
   rounds: number,
   events: BattleEvent[],
   currentRound: number,
+  sideState: Record<'ally' | 'enemy', SideState>,
+  bonusOf: (side: 'ally' | 'enemy') => SideBonus | null,
 ): void {
   const def = STATUS_BY_ID.get(id);
   if (!def) return;
 
-  // 免疫检查：例如"铁壁"状态可以挡下"破防 / 击退"。
-  // 注：immuneFirstControl（免疫首次控制）依赖阵法系统，待阵法接入后再启用。
+  // 免疫检查 ①：目标身上有能挡下该状态的护体效果（例如"铁壁"挡"破防"）
   if (def.blockedBy === 'ironWall' && target.statuses.some((s) => s.id === 'ironWall')) return;
+
+  // 免疫检查 ②：守境阵「首次受制可免」—— 只免第一次，之后照常中招
+  const sideBonus = bonusOf(target.cfg.side);
+  if (def.kind === 'control' && sideBonus?.special.immuneFirstControl) {
+    const st = sideState[target.cfg.side];
+    if (!st.immuneUsed) {
+      st.immuneUsed = true;
+      events.push({ type: 'immune', targetId: target.cfg.id, statusId: id });
+      return;
+    }
+  }
 
   const existing = target.statuses.find((s) => s.id === id);
   if (existing) {
@@ -475,6 +694,7 @@ export interface SimulationSummary {
   avgRounds: number;
   avgAllyDamage: number;
   avgEnemyDamage: number;
+  avgReflectDamage: number;
   /** 回合数分布，用来发现"秒杀"或"打不完"的失衡 */
   roundHistogram: Record<number, number>;
 }
@@ -488,6 +708,7 @@ export function simulateMany(setup: Omit<BattleSetup, 'seed'>, runs: number): Si
   let totalRounds = 0;
   let totalAllyDmg = 0;
   let totalEnemyDmg = 0;
+  let totalReflect = 0;
   const roundHistogram: Record<number, number> = {};
 
   for (let i = 0; i < runs; i++) {
@@ -496,6 +717,7 @@ export function simulateMany(setup: Omit<BattleSetup, 'seed'>, runs: number): Si
     totalRounds += log.rounds;
     totalAllyDmg += log.stats.allyDamage;
     totalEnemyDmg += log.stats.enemyDamage;
+    totalReflect += log.stats.reflectDamage;
     roundHistogram[log.rounds] = (roundHistogram[log.rounds] ?? 0) + 1;
   }
 
@@ -505,6 +727,7 @@ export function simulateMany(setup: Omit<BattleSetup, 'seed'>, runs: number): Si
     avgRounds: totalRounds / runs,
     avgAllyDamage: totalAllyDmg / runs,
     avgEnemyDamage: totalEnemyDmg / runs,
+    avgReflectDamage: totalReflect / runs,
     roundHistogram,
   };
 }

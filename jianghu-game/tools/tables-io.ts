@@ -9,8 +9,14 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'csv-parse/sync';
 
-import { checkCrossTable, skillRowSchema, unitRowSchema } from '../src/core/config/schema.ts';
-import type { SkillRow, TableIssue, UnitRow } from '../src/core/config/schema.ts';
+import {
+  battleSetupRowSchema,
+  checkCrossTable,
+  skillRowSchema,
+  unitRowSchema,
+} from '../src/core/config/schema.ts';
+import { FORMATIONS } from '../src/data/formations.ts';
+import type { BattleSetupRow, SkillRow, TableIssue, UnitRow } from '../src/core/config/schema.ts';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -77,23 +83,39 @@ export function loadUnits(): LoadResult<UnitRow> {
   return validateRows<UnitRow>('units.csv', readCsv('units.csv'), unitRowSchema);
 }
 
+export function loadBattleSetups(): LoadResult<BattleSetupRow> {
+  return validateRows<BattleSetupRow>('battle.csv', readCsv('battle.csv'), battleSetupRowSchema);
+}
+
 /** 一次性加载全部表，并做跨表一致性检查 */
 export function loadAllTables(): {
   skills: SkillRow[];
   units: UnitRow[];
+  battleSetups: BattleSetupRow[];
   issues: TableIssue[];
 } {
   const skills = loadSkills();
   const units = loadUnits();
+  const battles = loadBattleSetups();
+
+  // 只有单表都通过时，跨表检查才有意义
+  const singleOk =
+    skills.issues.length === 0 && units.issues.length === 0 && battles.issues.length === 0;
+
   const issues = [
     ...skills.issues,
     ...units.issues,
-    // 只有单表都通过时，跨表检查才有意义
-    ...(skills.issues.length === 0 && units.issues.length === 0
-      ? checkCrossTable(skills.rows, units.rows)
+    ...battles.issues,
+    ...(singleOk
+      ? checkCrossTable(
+          skills.rows,
+          units.rows,
+          battles.rows,
+          FORMATIONS.map((f) => f.id),
+        )
       : []),
   ];
-  return { skills: skills.rows, units: units.rows, issues };
+  return { skills: skills.rows, units: units.rows, battleSetups: battles.rows, issues };
 }
 
 /** 把校验问题打印成人能直接照做的清单 */

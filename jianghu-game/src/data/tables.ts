@@ -11,11 +11,22 @@
  * 关键设计：**数值一律在这里从表格翻译成战斗配置**，
  * 战斗代码里不出现任何具体数字，真正实现"改表格就能改游戏"。
  */
-import { checkCrossTable, skillRowSchema, unitRowSchema } from '../core/config/schema.ts';
-import { SKILL_ROWS, UNIT_ROWS } from './generated/tables.ts';
+import {
+  battleSetupRowSchema,
+  checkCrossTable,
+  skillRowSchema,
+  unitRowSchema,
+} from '../core/config/schema.ts';
+import { BATTLE_SETUP_ROWS, SKILL_ROWS, UNIT_ROWS } from './generated/tables.ts';
+import { FORMATIONS } from './formations.ts';
 import { gongfaPower } from './gongfa-power.ts';
-import type { SkillRow, TableIssue, UnitRow } from '../core/config/schema.ts';
-import type { BattleUnitConfig, SkillConfig, UnitStats } from '../core/battle/simulate.ts';
+import type { BattleSetupRow, SkillRow, TableIssue, UnitRow } from '../core/config/schema.ts';
+import type {
+  BattleUnitConfig,
+  FormationChoice,
+  SkillConfig,
+  UnitStats,
+} from '../core/battle/simulate.ts';
 import type { MotionGroup } from '../core/anim/types.ts';
 import type { SlotIndex } from '../core/battle/types.ts';
 import type { Quality, TargetShape } from './gongfa_visual.ts';
@@ -58,8 +69,29 @@ export function validateTablesAtRuntime(): { ok: boolean; issues: TableIssue[] }
     }
   });
 
+  BATTLE_SETUP_ROWS.forEach((r, i) => {
+    const res = battleSetupRowSchema.safeParse(r);
+    if (!res.success) {
+      for (const e of res.error.issues) {
+        issues.push({
+          file: 'generated/battle',
+          row: i + 1,
+          field: e.path.join('.'),
+          message: e.message,
+        });
+      }
+    }
+  });
+
   if (issues.length === 0) {
-    issues.push(...checkCrossTable(SKILL_ROWS, UNIT_ROWS));
+    issues.push(
+      ...checkCrossTable(
+        SKILL_ROWS,
+        UNIT_ROWS,
+        BATTLE_SETUP_ROWS,
+        FORMATIONS.map((f) => f.id),
+      ),
+    );
   }
 
   return { ok: issues.length === 0, issues };
@@ -131,3 +163,16 @@ export function describeUnit(row: UnitRow): string {
   const skill = SKILLS_BY_ID[row.skillId];
   return `${row.name}（气血 ${row.hpMax}／攻 ${row.atk}／防 ${row.def}／速 ${row.spd}）招式：${skill?.name ?? row.skillId}`;
 }
+
+/**
+ * 取某一方配置的阵法。
+ * battle.csv 里留空则返回 undefined，表示本场不使用阵法（不加任何加成）。
+ */
+export function getFormationChoice(side: 'ally' | 'enemy'): FormationChoice | undefined {
+  const row: BattleSetupRow | undefined = BATTLE_SETUP_ROWS.find((b) => b.side === side);
+  if (!row?.formationId || row.formationLevel === undefined) return undefined;
+  return { id: row.formationId, level: row.formationLevel };
+}
+
+/** 阵法配置原样导出（UI 显示阵法名用） */
+export const BATTLE_SETUPS: readonly BattleSetupRow[] = BATTLE_SETUP_ROWS;

@@ -67,6 +67,9 @@ export class BattleScene extends Phaser.Scene {
 
   private roundText!: Phaser.GameObjects.Text;
   private tipText!: Phaser.GameObjects.Text;
+  /** 双方阵法提示（开局公布，让玩家一眼看到阵有没有生效） */
+  private allyFormationText!: Phaser.GameObjects.Text;
+  private enemyFormationText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('battle');
@@ -100,6 +103,15 @@ export class BattleScene extends Phaser.Scene {
     this.tipText = this.add
       .text(VIEW_W / 2, VIEW_H - 78, '自动战斗中…', bodyStyle(13))
       .setOrigin(0.5)
+      .setResolution(2);
+
+    // 阵法提示（我方靠左、敌方靠右，开局即公布）
+    this.allyFormationText = this.add.text(24, 72, '', dimStyle(11)).setLineSpacing(3).setResolution(2);
+    this.enemyFormationText = this.add
+      .text(VIEW_W - 24, 72, '', dimStyle(11))
+      .setOrigin(1, 0)
+      .setAlign('right')
+      .setLineSpacing(3)
       .setResolution(2);
 
     this.drawGrid();
@@ -199,6 +211,21 @@ export class BattleScene extends Phaser.Scene {
         this.timer = 0;
         break;
 
+      case 'formation': {
+        // 阵法有三种结果，画面要把差别说清楚，否则玩家不知道"为什么没加成"
+        const note =
+          ev.result === 'ok' ? '' : ev.result === 'partial' ? '（站位接近，加成减半）' : '（站位不符，未生效）';
+        const color =
+          ev.result === 'fail' ? THEME.dimHex : ev.side === 'ally' ? THEME.jadeHex : THEME.redHex;
+        const text =
+          `阵法：${ev.formationName} ${ev.level} 级${note}` +
+          (ev.description ? `\n${ev.description}` : '');
+        if (ev.side === 'ally') this.allyFormationText.setText(text).setColor(color);
+        else this.enemyFormationText.setText(text).setColor(color);
+        this.timer = 320;
+        break;
+      }
+
       case 'roundStart':
         this.roundText.setText(`第 ${ev.round} 回合`);
         this.timer = 180;
@@ -263,6 +290,26 @@ export class BattleScene extends Phaser.Scene {
           this.floatText(target.x, target.y - 78, `-${ev.value}`, THEME.jadeHex, 17);
         }
         this.timer = 200;
+        break;
+      }
+
+      case 'reflect': {
+        // 天罡北斗阵的反震：伤害弹回攻击者
+        const u = this.units.get(ev.targetId);
+        if (u) {
+          u.hp = ev.hpAfter;
+          this.refreshHp(u);
+          this.floatText(u.x, u.y - 78, `反弹 ${ev.value}`, THEME.goldHex, 18);
+        }
+        this.timer = 240;
+        break;
+      }
+
+      case 'immune': {
+        // 守境阵「首次受制可免」
+        const u = this.units.get(ev.targetId);
+        if (u) this.floatText(u.x, u.y - 100, '免疫', THEME.goldHex, 18);
+        this.timer = 220;
         break;
       }
 

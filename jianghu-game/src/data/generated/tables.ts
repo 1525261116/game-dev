@@ -4,7 +4,7 @@
  * 要改数值，请编辑 data/tables/*.csv 后运行：pnpm tables:import
  * 直接改本文件会在下次导入时被覆盖。
  */
-import type { SkillRow, UnitRow } from '../../core/config/schema.ts';
+import type { BattleSetupRow, SkillRow, UnitRow } from '../../core/config/schema.ts';
 /** 功法表（来自 data/tables/skills.csv） */
 export const SKILL_ROWS: SkillRow[] = [
   {
@@ -172,5 +172,19 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 25,
     "gongfaCultivation": 8,
     "skillId": "GF_judge_bi"
+  }
+];
+
+/** 对战配置（来自 data/tables/battle.csv） */
+export const BATTLE_SETUP_ROWS: BattleSetupRow[] = [
+  {
+    "side": "ally",
+    "formationId": "FM_changshe",
+    "formationLevel": 5
+  },
+  {
+    "side": "enemy",
+    "formationId": "FM_youyue",
+    "formationLevel": 3
   }
 ];
