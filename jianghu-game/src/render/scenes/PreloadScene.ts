@@ -14,6 +14,7 @@ import Phaser from 'phaser';
 import { validateClip } from '../../core/anim/validate.ts';
 import { BODY_TYPE_IDS, getRig } from '../../data/rigs.ts';
 import { MOTIONS } from '../anim/MotionLib.ts';
+import { validateTablesAtRuntime } from '../../data/tables.ts';
 import { FONT, THEME, bodyStyle, dimStyle, titleStyle } from '../ui/Theme.ts';
 
 /** 一个加载步骤：label 是给玩家看的说明，run 是真正要做的事 */
@@ -75,6 +76,17 @@ export class PreloadScene extends Phaser.Scene {
             const errs = validateClip(clip).filter((i) => i.level === 'error');
             if (errs.length > 0) {
               this.errors.push(`${clip.id}: ${errs.map((e) => e.code).join(',')}`);
+            }
+          }
+        },
+      },
+      {
+        label: '正在校验配置表…',
+        run: () => {
+          const { ok, issues } = validateTablesAtRuntime();
+          if (!ok) {
+            for (const i of issues) {
+              this.errors.push(`配置表 ${i.file} 第 ${i.row} 行「${i.field}」：${i.message}`);
             }
           }
         },

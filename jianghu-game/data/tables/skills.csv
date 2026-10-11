@@ -1,0 +1,7 @@
+id,name,quality,realm,multiplier,targets,statusId,statusChance,statusRounds
+GF_duanyue_dao,断岳刀法,liang,lveyou,1.2,column,,,
+GF_liuyun_jian,流云剑法,shang,chujiao,1.0,single,,,
+GF_luohan_quan,罗汉拳,liang,lveyou,1.1,single,stun,0.25,1
+GF_yangjia_qiang,杨家枪法,fan,chujiao,1.0,row,,,
+GF_liuye_feidao,柳叶飞刀,fan,chujiao,1.0,single,,,
+GF_judge_bi,判官笔,liang,chujiao,1.0,single,seal,0.3,2
