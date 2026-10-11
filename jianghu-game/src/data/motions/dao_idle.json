@@ -1,0 +1,60 @@
+{
+  "id": "dao_idle",
+  "group": "dao",
+  "duration": 1600,
+  "loop": true,
+  "priority": 0,
+  "anchors": {
+    "weaponTip": [{ "t": 0, "slot": "weapon", "x": 0, "y": 52, "angle": 0 }],
+    "bodyCenter": [{ "t": 0, "slot": "torso", "x": 0, "y": -22, "angle": 0 }],
+    "footPoint": [{ "t": 0, "slot": "pelvis", "x": 0, "y": 62, "angle": 0 }]
+  },
+  "events": [],
+  "tracks": [
+    { "slot": "pelvis", "keys": [
+      { "t": 0, "dy": 0 },
+      { "t": 0.5, "dy": -1.2, "ease": "sineOut" },
+      { "t": 1, "dy": 0, "ease": "sineIn" }
+    ] },
+    { "slot": "torso", "keys": [
+      { "t": 0, "rot": 0 },
+      { "t": 0.5, "rot": -0.025, "ease": "sineOut" },
+      { "t": 1, "rot": 0, "ease": "sineIn" }
+    ] },
+    { "slot": "head", "keys": [
+      { "t": 0, "rot": 0.01, "dy": 0 },
+      { "t": 0.5, "rot": -0.02, "dy": -1 },
+      { "t": 1, "rot": 0.01, "dy": 0 }
+    ] },
+    { "slot": "upperArmR", "keys": [
+      { "t": 0, "rot": 0.05 },
+      { "t": 0.5, "rot": 0.12, "ease": "sineOut" },
+      { "t": 1, "rot": 0.05, "ease": "sineIn" }
+    ] },
+    { "slot": "forearmR", "keys": [
+      { "t": 0, "rot": -0.05 },
+      { "t": 0.5, "rot": -0.12, "ease": "sineOut" },
+      { "t": 1, "rot": -0.05, "ease": "sineIn" }
+    ] },
+    { "slot": "weapon", "keys": [
+      { "t": 0, "rot": 0.02 },
+      { "t": 0.5, "rot": 0.06, "ease": "sineOut" },
+      { "t": 1, "rot": 0.02, "ease": "sineIn" }
+    ] },
+    { "slot": "upperArmL", "keys": [
+      { "t": 0, "rot": -0.06 },
+      { "t": 0.5, "rot": -0.13, "ease": "sineOut" },
+      { "t": 1, "rot": -0.06, "ease": "sineIn" }
+    ] },
+    { "slot": "forearmL", "keys": [
+      { "t": 0, "rot": 0.08 },
+      { "t": 0.5, "rot": 0.16, "ease": "sineOut" },
+      { "t": 1, "rot": 0.08, "ease": "sineIn" }
+    ] },
+    { "slot": "cloak", "keys": [
+      { "t": 0, "rot": 0 },
+      { "t": 0.5, "rot": 0.04, "ease": "sineOut" },
+      { "t": 1, "rot": 0, "ease": "sineIn" }
+    ] }
+  ]
+}

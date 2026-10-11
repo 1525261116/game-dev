@@ -1,0 +1,50 @@
+{
+  "name": "jianghu-congxin",
+  "private": true,
+  "version": "0.1.0",
+  "description": "《江湖从心》— 武侠开放世界单机 RPG（多端）",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "test": "node --test tests/**/*.test.ts",
+    "test:anim": "node --test tests/anim.test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src tools --ext .ts",
+    "tables:import": "node tools/import-tables.ts",
+    "tables:validate": "node tools/validate-tables.ts",
+    "sim:battle": "node tools/sim-battle.ts",
+    "sim:drop": "node tools/sim-drop.ts",
+    "atlas:pack": "node tools/pack-atlas.ts",
+    "skin:gen": "node tools/gen-skin.ts",
+    "preview:rig": "node tools/preview/make-preview.ts"
+  },
+  "dependencies": {
+    "phaser": "^3.90.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "csv-parse": "^5.6.0",
+    "electron": "^33.0.0",
+    "electron-builder": "^25.1.8",
+    "eslint": "^9.17.0",
+    "sharp": "^0.33.5",
+    "typescript": "^5.7.0",
+    "vite": "^6.0.0"
+  },
+  "optionalDependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/filesystem": "^8.0.0",
+    "steamworks.js": "^0.3.0"
+  },
+  "comment": {
+    "runtimes": "Node 22+ 可直接运行 .ts；因此全部 Core 逻辑测试无需任何依赖即可运行：node --test tests/**/*.test.ts",
+    "pendingInstall": "Phaser / Vite / Electron 需先执行 pnpm install（当前 AI 沙箱无法访问 npm registry）"
+  }
+}
