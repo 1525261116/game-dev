@@ -12,6 +12,7 @@ import { BootScene } from './render/scenes/BootScene.ts';
 import { PreloadScene } from './render/scenes/PreloadScene.ts';
 import { MenuScene } from './render/scenes/MenuScene.ts';
 import { BattleScene } from './render/scenes/BattleScene.ts';
+import { BattleLabScene } from './render/scenes/BattleLabScene.ts';
 import { MotionLabScene } from './render/scenes/MotionLabScene.ts';
 
 const config: Phaser.Types.Core.GameConfig = {
@@ -31,7 +32,7 @@ const config: Phaser.Types.Core.GameConfig = {
   },
 
   // 场景列表：数组里的第一个会自动启动，其余按 key 手动切换
-  scene: [BootScene, PreloadScene, MenuScene, BattleScene, MotionLabScene],
+  scene: [BootScene, PreloadScene, MenuScene, BattleScene, BattleLabScene, MotionLabScene],
 };
 
 // 全局只允许存在一个 Phaser.Game 实例

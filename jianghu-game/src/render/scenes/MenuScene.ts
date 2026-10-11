@@ -31,8 +31,9 @@ export class MenuScene extends Phaser.Scene {
     this.add.rectangle(cx, height * 0.22 + 82, 320, 1, THEME.gold, 0.5);
 
     // ── 按钮区 ──
-    createButton(this, cx, height * 0.56, '开始战斗', () => this.scene.start('battle'));
-    createButton(this, cx, height * 0.56 + 72, '动作库预览', () => this.scene.start('motion-lab'));
+    createButton(this, cx, height * 0.52, '开始战斗', () => this.scene.start('battle'));
+    createButton(this, cx, height * 0.52 + 64, '战斗验证台', () => this.scene.start('battle-lab'));
+    createButton(this, cx, height * 0.52 + 128, '动作库预览', () => this.scene.start('motion-lab'));
 
     // ── 页脚 ──
     this.add
