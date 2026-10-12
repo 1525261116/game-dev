@@ -1,0 +1,72 @@
+[
+  {
+    "id": "party_scale_base",
+    "value": 4,
+    "note": "编队系数基准人数"
+  },
+  {
+    "id": "party_scale_3",
+    "value": 0.75,
+    "note": "3 人编队"
+  },
+  {
+    "id": "party_scale_4",
+    "value": 1,
+    "note": "4 人编队（基准）"
+  },
+  {
+    "id": "party_scale_5",
+    "value": 1.25,
+    "note": "5 人编队"
+  },
+  {
+    "id": "party_scale_6",
+    "value": 1.5,
+    "note": "6 人编队（门派战）"
+  },
+  {
+    "id": "max_rounds",
+    "value": 30,
+    "note": "回合上限，超出判负"
+  },
+  {
+    "id": "crit_rate_cap",
+    "value": 0.75,
+    "note": "暴击率上限"
+  },
+  {
+    "id": "crit_damage_cap",
+    "value": 3,
+    "note": "暴击伤害上限"
+  },
+  {
+    "id": "dodge_cap",
+    "value": 0.6,
+    "note": "闪避上限"
+  },
+  {
+    "id": "hit_min",
+    "value": 0.05,
+    "note": "命中下限"
+  },
+  {
+    "id": "hit_max",
+    "value": 0.95,
+    "note": "命中上限"
+  },
+  {
+    "id": "defense_constant",
+    "value": 150,
+    "note": "防御减伤常数"
+  },
+  {
+    "id": "damage_bonus_cap",
+    "value": 0.6,
+    "note": "增伤总上限"
+  },
+  {
+    "id": "damage_reduction_cap",
+    "value": 0.9,
+    "note": "减伤总上限"
+  }
+]

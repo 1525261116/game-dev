@@ -1,0 +1,82 @@
+[
+  {
+    "id": "REALM_1",
+    "index": 1,
+    "name": "初窥门径",
+    "multiplier": 1.0,
+    "exp_required": 1000,
+    "cultivation_gain": 0
+  },
+  {
+    "id": "REALM_2",
+    "index": 2,
+    "name": "略有小成",
+    "multiplier": 1.2,
+    "exp_required": 3000,
+    "cultivation_gain": 1
+  },
+  {
+    "id": "REALM_3",
+    "index": 3,
+    "name": "登堂入室",
+    "multiplier": 1.5,
+    "exp_required": 6000,
+    "cultivation_gain": 1
+  },
+  {
+    "id": "REALM_4",
+    "index": 4,
+    "name": "融会贯通",
+    "multiplier": 1.9,
+    "exp_required": 10000,
+    "cultivation_gain": 1
+  },
+  {
+    "id": "REALM_5",
+    "index": 5,
+    "name": "炉火纯青",
+    "multiplier": 2.6,
+    "exp_required": 15000,
+    "cultivation_gain": 1
+  },
+  {
+    "id": "REALM_6",
+    "index": 6,
+    "name": "登峰造极",
+    "multiplier": 3.3,
+    "exp_required": 21000,
+    "cultivation_gain": 1
+  },
+  {
+    "id": "REALM_7",
+    "index": 7,
+    "name": "出神入化",
+    "multiplier": 4.3,
+    "exp_required": 28000,
+    "cultivation_gain": 2
+  },
+  {
+    "id": "REALM_8",
+    "index": 8,
+    "name": "大巧若拙",
+    "multiplier": 5.4,
+    "exp_required": 36000,
+    "cultivation_gain": 3
+  },
+  {
+    "id": "REALM_9",
+    "index": 9,
+    "name": "超凡入圣",
+    "multiplier": 6.6,
+    "exp_required": 45000,
+    "cultivation_gain": 4
+  },
+  {
+    "id": "REALM_10",
+    "index": 10,
+    "name": "天人合一",
+    "multiplier": 8.0,
+    "exp_required": 0,
+    "cultivation_gain": 5
+  }
+]

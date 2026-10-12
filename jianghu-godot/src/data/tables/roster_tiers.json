@@ -1,0 +1,25 @@
+[
+  {
+    "id": "roster_3",
+    "members": 3,
+    "unlock": "初始"
+  },
+  {
+    "id": "roster_4",
+    "members": 4,
+    "unlock": "自创门派（阶段 3）",
+    "reputation": 500
+  },
+  {
+    "id": "roster_5",
+    "members": 5,
+    "unlock": "门派等级 ≥ 3（阶段 4~5）",
+    "sectLevel": 3
+  },
+  {
+    "id": "roster_6",
+    "members": 6,
+    "unlock": "门派战（含战斗型弟子）",
+    "sectLevel": 3
+  }
+]

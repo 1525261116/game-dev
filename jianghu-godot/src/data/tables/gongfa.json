@@ -1,0 +1,1600 @@
+[
+  {
+    "id": "GF_dao_jichu",
+    "name": "基础刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "刀走偏锋",
+      "realm": 3,
+      "kind": "critDamage",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_liuye_dao",
+    "name": "柳叶刀",
+    "group": "dao",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "柳叶纷飞",
+      "realm": 10,
+      "kind": "trueStrike",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_kuangfeng_dao",
+    "name": "狂风刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "狂风不息",
+      "realm": 3,
+      "kind": "extraAttack",
+      "value": 0.2
+    }
+  },
+  {
+    "id": "GF_duanyue_dao",
+    "name": "断岳刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "column",
+    "passive": {
+      "name": "断岳之势",
+      "realm": 6,
+      "kind": "vsHighHp",
+      "value": 0.3
+    }
+  },
+  {
+    "id": "GF_duanhun_dao",
+    "name": "断魂刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "势如破竹",
+      "realm": 6,
+      "kind": "ignoreDef",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_jifeng_dao",
+    "name": "疾风刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "刀意通神",
+      "realm": 10,
+      "kind": "extraAttack",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_lieshi_dao",
+    "name": "裂石刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "刀走偏锋",
+      "realm": 3,
+      "kind": "critDamage",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_jinghong_dao",
+    "name": "惊鸿刀法",
+    "group": "dao",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "row",
+    "passive": {
+      "name": "势如破竹",
+      "realm": 6,
+      "kind": "ignoreDef",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_badao",
+    "name": "霸刀",
+    "group": "dao",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "all",
+    "passive": {
+      "name": "霸者横栏",
+      "realm": 10,
+      "kind": "aoeLifesteal",
+      "value": 0.25
+    }
+  },
+  {
+    "id": "GF_xuezhan_shishi",
+    "name": "血战十式",
+    "group": "dao",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "all",
+    "passive": {
+      "name": "刀走偏锋",
+      "realm": 3,
+      "kind": "critDamage",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_tiandao_bajue",
+    "name": "天刀八诀",
+    "group": "dao",
+    "type": "external",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "row",
+    "passive": {
+      "name": "势如破竹",
+      "realm": 6,
+      "kind": "ignoreDef",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_jian_jichu",
+    "name": "基础剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "剑随意动",
+      "realm": 3,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_qingfeng_jian",
+    "name": "青锋剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "轻灵如风",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_liuyun_jian",
+    "name": "流云剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "流云无迹",
+      "realm": 6,
+      "kind": "dodgeCrit",
+      "value": 0.2
+    }
+  },
+  {
+    "id": "GF_luoxia_jian",
+    "name": "落霞剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "column",
+    "passive": {
+      "name": "剑随意动",
+      "realm": 3,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_songfeng_jian",
+    "name": "松风剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "轻灵如风",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_baihong_jian",
+    "name": "白虹剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "column",
+    "passive": {
+      "name": "剑心通明",
+      "realm": 10,
+      "kind": "damageBonus",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_qingya_jian",
+    "name": "青崖剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "剑随意动",
+      "realm": 3,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_liangyi_jian",
+    "name": "两仪剑法",
+    "group": "jian",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "row",
+    "passive": {
+      "name": "轻灵如风",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_lingyun_jiujian",
+    "name": "凌云九剑",
+    "group": "jian",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "row",
+    "passive": {
+      "name": "剑心通明",
+      "realm": 10,
+      "kind": "damageBonus",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_dugu_jiujian",
+    "name": "独孤九剑",
+    "group": "jian",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "无剑胜有剑",
+      "realm": 10,
+      "kind": "ignoreDefFirst",
+      "value": 0.3
+    }
+  },
+  {
+    "id": "GF_taixu_jianyi",
+    "name": "太虚剑意",
+    "group": "jian",
+    "type": "external",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "all",
+    "passive": {
+      "name": "轻灵如风",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_quan_jichu",
+    "name": "基础拳法",
+    "group": "quan",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "力透拳背",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_luohan_quan",
+    "name": "罗汉拳",
+    "group": "quan",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "金刚怒目",
+      "realm": 3,
+      "kind": "stunChance",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_changquan",
+    "name": "长拳",
+    "group": "quan",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "拳意浑圆",
+      "realm": 10,
+      "kind": "stunChance",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_taiji_quan",
+    "name": "太极拳",
+    "group": "quan",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "力透拳背",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_fuhu_quan",
+    "name": "伏虎拳",
+    "group": "quan",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "铁桥硬马",
+      "realm": 6,
+      "kind": "defPct",
+      "value": 0.1
+    }
+  },
+  {
+    "id": "GF_tongbi_quan",
+    "name": "通臂拳",
+    "group": "quan",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "column",
+    "passive": {
+      "name": "拳意浑圆",
+      "realm": 10,
+      "kind": "stunChance",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_boruo_zhang",
+    "name": "般若掌",
+    "group": "quan",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "row",
+    "passive": {
+      "name": "力透拳背",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_cuixin_zhang",
+    "name": "摧心掌",
+    "group": "quan",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "铁桥硬马",
+      "realm": 6,
+      "kind": "defPct",
+      "value": 0.1
+    }
+  },
+  {
+    "id": "GF_xianglong_zhang",
+    "name": "降龙十八掌",
+    "group": "quan",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "row",
+    "passive": {
+      "name": "拳意浑圆",
+      "realm": 10,
+      "kind": "stunChance",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_anran_zhang",
+    "name": "黯然销魂掌",
+    "group": "quan",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "all",
+    "passive": {
+      "name": "力透拳背",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_rulai_shenzhang",
+    "name": "如来神掌",
+    "group": "quan",
+    "type": "external",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "all",
+    "passive": {
+      "name": "铁桥硬马",
+      "realm": 6,
+      "kind": "defPct",
+      "value": 0.1
+    }
+  },
+  {
+    "id": "GF_anqi_jichu",
+    "name": "基础暗器",
+    "group": "anqi",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "出手无声",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.06
+    }
+  },
+  {
+    "id": "GF_feihuang_shi",
+    "name": "飞蝗石",
+    "group": "anqi",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "百步穿杨",
+      "realm": 6,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_liuye_feidao",
+    "name": "柳叶飞刀",
+    "group": "anqi",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "封喉一瞬",
+      "realm": 10,
+      "kind": "ignoreDef",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_baoyu_lihua",
+    "name": "暴雨梨花针",
+    "group": "anqi",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "row",
+    "passive": {
+      "name": "出手无声",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.06
+    }
+  },
+  {
+    "id": "GF_xiujian",
+    "name": "袖箭",
+    "group": "anqi",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "百步穿杨",
+      "realm": 6,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_tiejili",
+    "name": "铁蒺藜",
+    "group": "anqi",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "column",
+    "passive": {
+      "name": "封喉一瞬",
+      "realm": 10,
+      "kind": "ignoreDef",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_mantian_huayu",
+    "name": "满天花雨",
+    "group": "anqi",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "all",
+    "passive": {
+      "name": "出手无声",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.06
+    }
+  },
+  {
+    "id": "GF_zhuihen_biao",
+    "name": "追魂镖",
+    "group": "anqi",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "百步穿杨",
+      "realm": 6,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_yanwang_tie",
+    "name": "阎王帖",
+    "group": "anqi",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "封喉一瞬",
+      "realm": 10,
+      "kind": "ignoreDef",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_tianjue_biao",
+    "name": "天绝镖",
+    "group": "anqi",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "row",
+    "passive": {
+      "name": "出手无声",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.06
+    }
+  },
+  {
+    "id": "GF_wanliu_guizong",
+    "name": "万流归宗",
+    "group": "anqi",
+    "type": "external",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "all",
+    "passive": {
+      "name": "百步穿杨",
+      "realm": 6,
+      "kind": "crit",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_qimen_jichu",
+    "name": "基础奇门",
+    "group": "qimen",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "机关百出",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.05
+    }
+  },
+  {
+    "id": "GF_judge_bi",
+    "name": "判官笔",
+    "group": "qimen",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "single",
+    "passive": {
+      "name": "封穴点脉",
+      "realm": 6,
+      "kind": "sealChance",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_tieshan_gong",
+    "name": "铁扇功",
+    "group": "qimen",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "column",
+    "passive": {
+      "name": "奇门遁甲",
+      "realm": 10,
+      "kind": "dodge",
+      "value": 0.1
+    }
+  },
+  {
+    "id": "GF_shengsi_fu",
+    "name": "生死符",
+    "group": "qimen",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "机关百出",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.05
+    }
+  },
+  {
+    "id": "GF_shehun_ling",
+    "name": "摄魂铃",
+    "group": "qimen",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "row",
+    "passive": {
+      "name": "封穴点脉",
+      "realm": 6,
+      "kind": "sealChance",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_xuantie_ling",
+    "name": "玄铁令",
+    "group": "qimen",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "column",
+    "passive": {
+      "name": "奇门遁甲",
+      "realm": 10,
+      "kind": "dodge",
+      "value": 0.1
+    }
+  },
+  {
+    "id": "GF_yinyang_daoluan",
+    "name": "阴阳倒乱刃",
+    "group": "qimen",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "row",
+    "passive": {
+      "name": "机关百出",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.05
+    }
+  },
+  {
+    "id": "GF_wuxing_lun",
+    "name": "五行轮",
+    "group": "qimen",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "all",
+    "passive": {
+      "name": "封穴点脉",
+      "realm": 6,
+      "kind": "sealChance",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_tianji_baibian",
+    "name": "天机百变",
+    "group": "qimen",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "all",
+    "passive": {
+      "name": "奇门遁甲",
+      "realm": 10,
+      "kind": "dodge",
+      "value": 0.1
+    }
+  },
+  {
+    "id": "GF_shengsi_fu_jue",
+    "name": "生死符·绝",
+    "group": "qimen",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "机关百出",
+      "realm": 3,
+      "kind": "hit",
+      "value": 0.05
+    }
+  },
+  {
+    "id": "GF_wanfa_guiyuan",
+    "name": "万法归元",
+    "group": "qimen",
+    "type": "external",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "all",
+    "passive": {
+      "name": "封穴点脉",
+      "realm": 6,
+      "kind": "sealChance",
+      "value": 0.15
+    }
+  },
+  {
+    "id": "GF_qiang_jichu",
+    "name": "基础枪法",
+    "group": "qiang",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "枪出如龙",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_yangjia_qiang",
+    "name": "杨家枪法",
+    "group": "qiang",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "row",
+    "passive": {
+      "name": "横扫千军",
+      "realm": 6,
+      "kind": "aoeDamage",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_baila_gan",
+    "name": "白蜡杆",
+    "group": "qiang",
+    "type": "external",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "single",
+    "passive": {
+      "name": "一往无前",
+      "realm": 10,
+      "kind": "ignoreDef",
+      "value": 0.18
+    }
+  },
+  {
+    "id": "GF_huima_qiang",
+    "name": "回马枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "single",
+    "passive": {
+      "name": "枪出如龙",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_lihua_qiang",
+    "name": "梨花枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "row",
+    "passive": {
+      "name": "横扫千军",
+      "realm": 6,
+      "kind": "aoeDamage",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_tieqiang_jue",
+    "name": "铁枪诀",
+    "group": "qiang",
+    "type": "external",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "column",
+    "passive": {
+      "name": "一往无前",
+      "realm": 10,
+      "kind": "ignoreDef",
+      "value": 0.18
+    }
+  },
+  {
+    "id": "GF_wuhu_duanmen",
+    "name": "五虎断门枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "row",
+    "passive": {
+      "name": "枪出如龙",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_bawang_qiang",
+    "name": "霸王枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "column",
+    "passive": {
+      "name": "横扫千军",
+      "realm": 6,
+      "kind": "aoeDamage",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_yuejia_qiang",
+    "name": "岳家枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 3,
+    "end_mark": 1,
+    "targets": "all",
+    "passive": {
+      "name": "一往无前",
+      "realm": 10,
+      "kind": "ignoreDef",
+      "value": 0.18
+    }
+  },
+  {
+    "id": "GF_pojun_qiang",
+    "name": "破军枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 1,
+    "end_mark": 2,
+    "targets": "row",
+    "passive": {
+      "name": "枪出如龙",
+      "realm": 3,
+      "kind": "atkPct",
+      "value": 0.08
+    }
+  },
+  {
+    "id": "GF_longdan_qiang",
+    "name": "龙胆亮银枪",
+    "group": "qiang",
+    "type": "external",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 2,
+    "end_mark": 3,
+    "targets": "all",
+    "passive": {
+      "name": "横扫千军",
+      "realm": 6,
+      "kind": "aoeDamage",
+      "value": 0.12
+    }
+  },
+  {
+    "id": "GF_neigong_jichu",
+    "name": "基础内功",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "返璞归真",
+      "realm": 10,
+      "kind": "allRound",
+      "value": 0.1
+    },
+    "hp_bonus": 40,
+    "inner_bonus": 30
+  },
+  {
+    "id": "GF_tuna_fa",
+    "name": "吐纳法",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "周天运转",
+      "realm": 6,
+      "kind": "innerMax",
+      "value": 0.15
+    },
+    "hp_bonus": 40,
+    "inner_bonus": 30
+  },
+  {
+    "id": "GF_yangsheng_jue",
+    "name": "养生诀",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "返虚入浑",
+      "realm": 10,
+      "kind": "allRound",
+      "value": 0.08
+    },
+    "hp_bonus": 40,
+    "inner_bonus": 30
+  },
+  {
+    "id": "GF_bingxin_jue",
+    "name": "冰心诀",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "气沉丹田",
+      "realm": 3,
+      "kind": "innerRegen",
+      "value": 0.2
+    },
+    "hp_bonus": 80,
+    "inner_bonus": 60
+  },
+  {
+    "id": "GF_hunyuan_gong",
+    "name": "混元功",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "周天运转",
+      "realm": 6,
+      "kind": "innerMax",
+      "value": 0.15
+    },
+    "hp_bonus": 80,
+    "inner_bonus": 60
+  },
+  {
+    "id": "GF_xiaowuxiang",
+    "name": "小无相功",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "返虚入浑",
+      "realm": 10,
+      "kind": "allRound",
+      "value": 0.08
+    },
+    "hp_bonus": 80,
+    "inner_bonus": 60
+  },
+  {
+    "id": "GF_jingang_buhuai",
+    "name": "金刚不坏体",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "气沉丹田",
+      "realm": 3,
+      "kind": "innerRegen",
+      "value": 0.2
+    },
+    "hp_bonus": 140,
+    "inner_bonus": 105
+  },
+  {
+    "id": "GF_chunyang_wuji",
+    "name": "纯阳无极功",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "周天运转",
+      "realm": 6,
+      "kind": "innerMax",
+      "value": 0.15
+    },
+    "hp_bonus": 140,
+    "inner_bonus": 105
+  },
+  {
+    "id": "GF_xixing_dafa",
+    "name": "吸星大法",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "row",
+    "passive": {
+      "name": "返虚入浑",
+      "realm": 10,
+      "kind": "allRound",
+      "value": 0.08
+    },
+    "hp_bonus": 220,
+    "inner_bonus": 165
+  },
+  {
+    "id": "GF_longxiang_boruo",
+    "name": "龙象般若功",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "all",
+    "passive": {
+      "name": "气沉丹田",
+      "realm": 3,
+      "kind": "innerRegen",
+      "value": 0.2
+    },
+    "hp_bonus": 220,
+    "inner_bonus": 165
+  },
+  {
+    "id": "GF_taixuan_jing",
+    "name": "太玄经",
+    "group": "neigong",
+    "type": "neigong",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "all",
+    "passive": {
+      "name": "周天运转",
+      "realm": 6,
+      "kind": "innerMax",
+      "value": 0.15
+    },
+    "hp_bonus": 320,
+    "inner_bonus": 240
+  },
+  {
+    "id": "GF_shenfa_jichu",
+    "name": "基础轻功",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "身轻如燕",
+      "realm": 3,
+      "kind": "speed",
+      "value": 0.1
+    },
+    "speed_bonus": 20
+  },
+  {
+    "id": "GF_tizong_shu",
+    "name": "提纵术",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "踏雪无痕",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.1
+    },
+    "speed_bonus": 20
+  },
+  {
+    "id": "GF_tiebushan_qinggong",
+    "name": "铁布衫轻功",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "fan",
+    "power": 10,
+    "inner_cost": 10,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "凌虚而行",
+      "realm": 10,
+      "kind": "firstStrike",
+      "value": 0.15
+    },
+    "speed_bonus": 20
+  },
+  {
+    "id": "GF_taoxue_wuhen",
+    "name": "踏雪无痕",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "身轻如燕",
+      "realm": 3,
+      "kind": "speed",
+      "value": 0.1
+    },
+    "speed_bonus": 45
+  },
+  {
+    "id": "GF_yanzi_sanchaoshui",
+    "name": "燕子三抄水",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "踏雪无痕",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.1
+    },
+    "speed_bonus": 45
+  },
+  {
+    "id": "GF_jifeng_bu",
+    "name": "疾风步",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "liang",
+    "power": 20,
+    "inner_cost": 20,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "凌虚而行",
+      "realm": 10,
+      "kind": "firstStrike",
+      "value": 0.15
+    },
+    "speed_bonus": 45
+  },
+  {
+    "id": "GF_lingbo_weibu",
+    "name": "凌波微步",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "身轻如燕",
+      "realm": 3,
+      "kind": "speed",
+      "value": 0.1
+    },
+    "speed_bonus": 70
+  },
+  {
+    "id": "GF_babu_ganchan",
+    "name": "八步赶蝉",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "shang",
+    "power": 35,
+    "inner_cost": 35,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "踏雪无痕",
+      "realm": 6,
+      "kind": "dodge",
+      "value": 0.1
+    },
+    "speed_bonus": 70
+  },
+  {
+    "id": "GF_shenxing_baibian",
+    "name": "神行百变",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "ji",
+    "power": 55,
+    "inner_cost": 55,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "凌虚而行",
+      "realm": 10,
+      "kind": "firstStrike",
+      "value": 0.15
+    },
+    "speed_bonus": 95
+  },
+  {
+    "id": "GF_xiaoyao_yufeng",
+    "name": "逍遥御风",
+    "group": "shenfa",
+    "type": "shenfa",
+    "quality": "jue",
+    "power": 80,
+    "inner_cost": 80,
+    "start_mark": 0,
+    "end_mark": 0,
+    "targets": "single",
+    "passive": {
+      "name": "身轻如燕",
+      "realm": 3,
+      "kind": "speed",
+      "value": 0.1
+    },
+    "speed_bonus": 120
+  }
+]

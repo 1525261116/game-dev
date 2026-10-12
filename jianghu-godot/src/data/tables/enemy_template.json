@@ -1,0 +1,518 @@
+[
+  {
+    "id": "EN_01_normal",
+    "name": "山贼",
+    "tier": "normal",
+    "level_min": 1,
+    "level_max": 10,
+    "hp": 200,
+    "atk": 25,
+    "def": 10,
+    "spd": 60,
+    "inner": 96,
+    "skill_ids": [
+      "GF_dao_jichu"
+    ],
+    "ai_preference": "damage",
+    "bracket": "Lv1~10",
+    "group": "dao"
+  },
+  {
+    "id": "EN_01_elite",
+    "name": "山贼头目",
+    "tier": "elite",
+    "level_min": 1,
+    "level_max": 10,
+    "hp": 700,
+    "atk": 40,
+    "def": 15,
+    "spd": 63,
+    "inner": 96,
+    "skill_ids": [
+      "GF_jian_jichu",
+      "GF_songfeng_jian"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv1~10",
+    "group": "jian"
+  },
+  {
+    "id": "EN_01_boss",
+    "name": "黑风寨主",
+    "tier": "boss",
+    "level_min": 1,
+    "level_max": 10,
+    "hp": 2200,
+    "atk": 55,
+    "def": 20,
+    "spd": 69,
+    "inner": 96,
+    "skill_ids": [
+      "GF_changquan",
+      "GF_fuhu_quan",
+      "GF_cuixin_zhang"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv1~10",
+    "group": "quan"
+  },
+  {
+    "id": "EN_02_normal",
+    "name": "流寇",
+    "tier": "normal",
+    "level_min": 11,
+    "level_max": 25,
+    "hp": 800,
+    "atk": 75,
+    "def": 35,
+    "spd": 120,
+    "inner": 288,
+    "skill_ids": [
+      "GF_jian_jichu"
+    ],
+    "ai_preference": "damage",
+    "bracket": "Lv11~25",
+    "group": "jian"
+  },
+  {
+    "id": "EN_02_elite",
+    "name": "流寇首领",
+    "tier": "elite",
+    "level_min": 11,
+    "level_max": 25,
+    "hp": 2800,
+    "atk": 120,
+    "def": 55,
+    "spd": 126,
+    "inner": 288,
+    "skill_ids": [
+      "GF_changquan",
+      "GF_fuhu_quan"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv11~25",
+    "group": "quan"
+  },
+  {
+    "id": "EN_02_boss",
+    "name": "铁背狼王",
+    "tier": "boss",
+    "level_min": 11,
+    "level_max": 25,
+    "hp": 8800,
+    "atk": 160,
+    "def": 70,
+    "spd": 138,
+    "inner": 288,
+    "skill_ids": [
+      "GF_anqi_jichu",
+      "GF_xiujian",
+      "GF_yanwang_tie"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv11~25",
+    "group": "anqi"
+  },
+  {
+    "id": "EN_03_normal",
+    "name": "镖局叛徒",
+    "tier": "normal",
+    "level_min": 26,
+    "level_max": 45,
+    "hp": 1600,
+    "atk": 165,
+    "def": 75,
+    "spd": 200,
+    "inner": 576,
+    "skill_ids": [
+      "GF_changquan"
+    ],
+    "ai_preference": "damage",
+    "bracket": "Lv26~45",
+    "group": "quan"
+  },
+  {
+    "id": "EN_03_elite",
+    "name": "叛徒教头",
+    "tier": "elite",
+    "level_min": 26,
+    "level_max": 45,
+    "hp": 5600,
+    "atk": 260,
+    "def": 110,
+    "spd": 210,
+    "inner": 576,
+    "skill_ids": [
+      "GF_anqi_jichu",
+      "GF_xiujian"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv26~45",
+    "group": "anqi"
+  },
+  {
+    "id": "EN_03_boss",
+    "name": "断魂刀客",
+    "tier": "boss",
+    "level_min": 26,
+    "level_max": 45,
+    "hp": 17600,
+    "atk": 340,
+    "def": 140,
+    "spd": 229,
+    "inner": 576,
+    "skill_ids": [
+      "GF_judge_bi",
+      "GF_shengsi_fu",
+      "GF_shengsi_fu_jue"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv26~45",
+    "group": "qimen"
+  },
+  {
+    "id": "EN_04_normal",
+    "name": "邪派弟子",
+    "tier": "normal",
+    "level_min": 46,
+    "level_max": 70,
+    "hp": 2700,
+    "atk": 330,
+    "def": 155,
+    "spd": 320,
+    "inner": 960,
+    "skill_ids": [
+      "GF_anqi_jichu"
+    ],
+    "ai_preference": "damage",
+    "bracket": "Lv46~70",
+    "group": "anqi"
+  },
+  {
+    "id": "EN_04_elite",
+    "name": "邪派执事",
+    "tier": "elite",
+    "level_min": 46,
+    "level_max": 70,
+    "hp": 9500,
+    "atk": 520,
+    "def": 220,
+    "spd": 336,
+    "inner": 960,
+    "skill_ids": [
+      "GF_judge_bi",
+      "GF_shengsi_fu"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv46~70",
+    "group": "qimen"
+  },
+  {
+    "id": "EN_04_boss",
+    "name": "血手判官",
+    "tier": "boss",
+    "level_min": 46,
+    "level_max": 70,
+    "hp": 29700,
+    "atk": 700,
+    "def": 270,
+    "spd": 368,
+    "inner": 960,
+    "skill_ids": [
+      "GF_baila_gan",
+      "GF_qiang_jichu",
+      "GF_huima_qiang"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv46~70",
+    "group": "qiang"
+  },
+  {
+    "id": "EN_05_normal",
+    "name": "魔教香主",
+    "tier": "normal",
+    "level_min": 71,
+    "level_max": 100,
+    "hp": 6800,
+    "atk": 700,
+    "def": 340,
+    "spd": 480,
+    "inner": 1520,
+    "skill_ids": [
+      "GF_judge_bi"
+    ],
+    "ai_preference": "damage",
+    "bracket": "Lv71~100",
+    "group": "qimen"
+  },
+  {
+    "id": "EN_05_elite",
+    "name": "魔教护法",
+    "tier": "elite",
+    "level_min": 71,
+    "level_max": 100,
+    "hp": 24000,
+    "atk": 1100,
+    "def": 480,
+    "spd": 504,
+    "inner": 1520,
+    "skill_ids": [
+      "GF_baila_gan",
+      "GF_qiang_jichu"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv71~100",
+    "group": "qiang"
+  },
+  {
+    "id": "EN_05_boss",
+    "name": "魔教左使",
+    "tier": "boss",
+    "level_min": 71,
+    "level_max": 100,
+    "hp": 74800,
+    "atk": 1450,
+    "def": 590,
+    "spd": 552,
+    "inner": 1520,
+    "skill_ids": [
+      "GF_dao_jichu",
+      "GF_duanhun_dao",
+      "GF_lieshi_dao"
+    ],
+    "ai_preference": "combo",
+    "bracket": "Lv71~100",
+    "group": "dao"
+  },
+  {
+    "id": "EN_06_normal",
+    "name": "先天散人",
+    "tier": "normal",
+    "level_min": 101,
+    "level_max": 130,
+    "hp": 12000,
+    "atk": 1300,
+    "def": 620,
+    "spd": 700,
+    "inner": 2560,
+    "skill_ids": [
+      "GF_baila_gan"
+    ],
+    "ai_preference": "damage",
+    "bracket": "后天段",
+    "group": "qiang"
+  },
+  {
+    "id": "EN_06_elite",
+    "name": "先天宗师",
+    "tier": "elite",
+    "level_min": 101,
+    "level_max": 130,
+    "hp": 42000,
+    "atk": 2000,
+    "def": 880,
+    "spd": 735,
+    "inner": 2560,
+    "skill_ids": [
+      "GF_dao_jichu",
+      "GF_duanhun_dao"
+    ],
+    "ai_preference": "combo",
+    "bracket": "后天段",
+    "group": "dao"
+  },
+  {
+    "id": "EN_06_boss",
+    "name": "无相真人",
+    "tier": "boss",
+    "level_min": 101,
+    "level_max": 130,
+    "hp": 132000,
+    "atk": 2700,
+    "def": 1080,
+    "spd": 804,
+    "inner": 2560,
+    "skill_ids": [
+      "GF_jian_jichu",
+      "GF_songfeng_jian",
+      "GF_dugu_jiujian"
+    ],
+    "ai_preference": "combo",
+    "bracket": "后天段",
+    "group": "jian"
+  },
+  {
+    "id": "EN_06_leader",
+    "name": "无相道人",
+    "tier": "leader",
+    "level_min": 101,
+    "level_max": 130,
+    "hp": 178200,
+    "atk": 3104,
+    "def": 1242,
+    "spd": 875,
+    "inner": 2560,
+    "skill_ids": [
+      "GF_changquan",
+      "GF_fuhu_quan",
+      "GF_cuixin_zhang"
+    ],
+    "ai_preference": "combo",
+    "bracket": "后天段",
+    "group": "quan"
+  },
+  {
+    "id": "EN_07_normal",
+    "name": "剑冢守灵",
+    "tier": "normal",
+    "level_min": 131,
+    "level_max": 160,
+    "hp": 18000,
+    "atk": 2000,
+    "def": 900,
+    "spd": 950,
+    "inner": 4160,
+    "skill_ids": [
+      "GF_dao_jichu"
+    ],
+    "ai_preference": "damage",
+    "bracket": "先天段",
+    "group": "dao"
+  },
+  {
+    "id": "EN_07_elite",
+    "name": "剑冢剑奴",
+    "tier": "elite",
+    "level_min": 131,
+    "level_max": 160,
+    "hp": 63000,
+    "atk": 3100,
+    "def": 1280,
+    "spd": 997,
+    "inner": 4160,
+    "skill_ids": [
+      "GF_jian_jichu",
+      "GF_songfeng_jian"
+    ],
+    "ai_preference": "combo",
+    "bracket": "先天段",
+    "group": "jian"
+  },
+  {
+    "id": "EN_07_boss",
+    "name": "剑冢剑主",
+    "tier": "boss",
+    "level_min": 131,
+    "level_max": 160,
+    "hp": 198000,
+    "atk": 4200,
+    "def": 1560,
+    "spd": 1092,
+    "inner": 4160,
+    "skill_ids": [
+      "GF_changquan",
+      "GF_fuhu_quan",
+      "GF_cuixin_zhang"
+    ],
+    "ai_preference": "combo",
+    "bracket": "先天段",
+    "group": "quan"
+  },
+  {
+    "id": "EN_07_leader",
+    "name": "剑冢剑魂",
+    "tier": "leader",
+    "level_min": 131,
+    "level_max": 160,
+    "hp": 267300,
+    "atk": 4830,
+    "def": 1793,
+    "spd": 1187,
+    "inner": 4160,
+    "skill_ids": [
+      "GF_anqi_jichu",
+      "GF_xiujian",
+      "GF_yanwang_tie"
+    ],
+    "ai_preference": "combo",
+    "bracket": "先天段",
+    "group": "anqi"
+  },
+  {
+    "id": "EN_08_normal",
+    "name": "天机楼主",
+    "tier": "normal",
+    "level_min": 161,
+    "level_max": 200,
+    "hp": 25000,
+    "atk": 2900,
+    "def": 1250,
+    "spd": 1200,
+    "inner": 6400,
+    "skill_ids": [
+      "GF_jian_jichu"
+    ],
+    "ai_preference": "damage",
+    "bracket": "宗师段",
+    "group": "jian"
+  },
+  {
+    "id": "EN_08_elite",
+    "name": "天机长老",
+    "tier": "elite",
+    "level_min": 161,
+    "level_max": 200,
+    "hp": 87000,
+    "atk": 4500,
+    "def": 1800,
+    "spd": 1260,
+    "inner": 6400,
+    "skill_ids": [
+      "GF_changquan",
+      "GF_fuhu_quan"
+    ],
+    "ai_preference": "combo",
+    "bracket": "宗师段",
+    "group": "quan"
+  },
+  {
+    "id": "EN_08_boss",
+    "name": "天机阁主",
+    "tier": "boss",
+    "level_min": 161,
+    "level_max": 200,
+    "hp": 275000,
+    "atk": 6000,
+    "def": 2200,
+    "spd": 1380,
+    "inner": 6400,
+    "skill_ids": [
+      "GF_anqi_jichu",
+      "GF_xiujian",
+      "GF_yanwang_tie"
+    ],
+    "ai_preference": "combo",
+    "bracket": "宗师段",
+    "group": "anqi"
+  },
+  {
+    "id": "EN_08_leader",
+    "name": "天机谪仙",
+    "tier": "leader",
+    "level_min": 161,
+    "level_max": 200,
+    "hp": 371250,
+    "atk": 6899,
+    "def": 2530,
+    "spd": 1500,
+    "inner": 6400,
+    "skill_ids": [
+      "GF_judge_bi",
+      "GF_shengsi_fu",
+      "GF_shengsi_fu_jue"
+    ],
+    "ai_preference": "combo",
+    "bracket": "宗师段",
+    "group": "qimen"
+  }
+]

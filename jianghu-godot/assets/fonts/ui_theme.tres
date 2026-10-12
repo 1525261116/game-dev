@@ -1,0 +1,172 @@
+[gd_resource type="Theme" load_steps=12 format=3]
+
+; ═══════════════════════════════════════════════════════════════
+; 《江湖从心》全局 UI 主题
+;
+; ① 字体：Godot 内置字体不含 CJK 字形，中文会显示成方框（tofu）。
+;    这里用 SystemFont 引用系统字体，零资产成本解决中文渲染：
+;      macOS → PingFang SC ｜ Windows → Microsoft YaHei ｜ Linux/Android → Noto Sans CJK SC
+;    发行版若要保证跨端字形完全一致，再改为随包内置字体文件。
+;
+; ② 配色：水墨江湖 —— 墨色 / 宣纸白 / 暗金 / 朱红（见 GDD 09_art_ui/UI规范）
+;    ⚠️ 必须显式指定控件字色：Godot 默认主题是按「深色底」配的浅色字，
+;       直接用在宣纸白底上会导致「浅字浅底」不可读。
+; ═══════════════════════════════════════════════════════════════
+
+[sub_resource type="SystemFont" id="SystemFont_cjk"]
+font_names = PackedStringArray("PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "WenQuanYi Micro Hei", "sans-serif")
+font_italic = false
+subpixel_positioning = 1
+
+; ── 按钮：常态 / 悬停 / 按下 ──────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="SBF_btn_normal"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.906, 0.882, 0.82, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.792, 0.741, 0.624, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SBF_btn_hover"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.949, 0.925, 0.859, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.549, 0.42, 0.184, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SBF_btn_pressed"]
+content_margin_left = 18.0
+content_margin_top = 8.0
+content_margin_right = 18.0
+content_margin_bottom = 8.0
+bg_color = Color(0.788, 0.749, 0.659, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.651, 0.169, 0.122, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="StyleBoxFlat" id="SBF_btn_focus"]
+draw_center = false
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.651, 0.169, 0.122, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+; ── 面板 ─────────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="SBF_panel"]
+content_margin_left = 10.0
+content_margin_top = 8.0
+content_margin_right = 10.0
+content_margin_bottom = 8.0
+bg_color = Color(0.937, 0.925, 0.894, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.847, 0.816, 0.733, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+; ── 进度条 ───────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="SBF_pb_bg"]
+bg_color = Color(0.878, 0.863, 0.827, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+[sub_resource type="StyleBoxFlat" id="SBF_pb_fill"]
+bg_color = Color(0.549, 0.42, 0.184, 1)
+corner_radius_top_left = 6
+corner_radius_top_right = 6
+corner_radius_bottom_right = 6
+corner_radius_bottom_left = 6
+
+; ── 滚动条 ───────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="SBF_scroll"]
+bg_color = Color(0.784, 0.769, 0.729, 0.6)
+corner_radius_top_left = 3
+corner_radius_top_right = 3
+corner_radius_bottom_right = 3
+corner_radius_bottom_left = 3
+
+; ── 输入框 ───────────────────────────────────────────────────
+[sub_resource type="StyleBoxFlat" id="SBF_lineedit"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 6.0
+bg_color = Color(0.98, 0.973, 0.953, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.792, 0.741, 0.624, 1)
+
+[resource]
+default_font = SubResource("SystemFont_cjk")
+default_font_size = 16
+
+; 全局字色：墨色（关键——否则浅底浅字不可读）
+Label/colors/font_color = Color(0.122, 0.122, 0.122, 1)
+RichTextLabel/colors/default_color = Color(0.122, 0.122, 0.122, 1)
+Button/colors/font_color = Color(0.122, 0.122, 0.122, 1)
+Button/colors/font_hover_color = Color(0.408, 0.302, 0.114, 1)
+Button/colors/font_pressed_color = Color(0.651, 0.169, 0.122, 1)
+Button/colors/font_focus_color = Color(0.122, 0.122, 0.122, 1)
+Button/colors/font_disabled_color = Color(0.573, 0.565, 0.541, 1)
+Button/font_sizes/font_size = 17
+Button/styles/normal = SubResource("SBF_btn_normal")
+Button/styles/hover = SubResource("SBF_btn_hover")
+Button/styles/pressed = SubResource("SBF_btn_pressed")
+Button/styles/focus = SubResource("SBF_btn_focus")
+Button/styles/disabled = SubResource("SBF_btn_normal")
+
+PanelContainer/styles/panel = SubResource("SBF_panel")
+Panel/styles/panel = SubResource("SBF_panel")
+
+ProgressBar/styles/background = SubResource("SBF_pb_bg")
+ProgressBar/styles/fill = SubResource("SBF_pb_fill")
+ProgressBar/colors/font_color = Color(0.122, 0.122, 0.122, 1)
+
+VScrollBar/styles/grabber = SubResource("SBF_scroll")
+VScrollBar/styles/grabber_highlight = SubResource("SBF_scroll")
+HScrollBar/styles/grabber = SubResource("SBF_scroll")
+HScrollBar/styles/grabber_highlight = SubResource("SBF_scroll")
+
+LineEdit/styles/normal = SubResource("SBF_lineedit")
+LineEdit/colors/font_color = Color(0.122, 0.122, 0.122, 1)
+LineEdit/colors/font_placeholder_color = Color(0.573, 0.565, 0.541, 1)
+
+CheckBox/colors/font_color = Color(0.122, 0.122, 0.122, 1)
+OptionButton/colors/font_color = Color(0.122, 0.122, 0.122, 1)
+TooltipLabel/colors/font_color = Color(0.122, 0.122, 0.122, 1)

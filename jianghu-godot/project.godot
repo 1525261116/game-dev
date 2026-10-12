@@ -1,0 +1,87 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="江湖从心"
+config/description="武侠开放世界 + 单机 RPG（多端：移动端 / PC）"
+config/version="0.1.0"
+run/main_scene="res://scenes/boot/boot.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+boot_splash/bg_color=Color(0.957, 0.945, 0.914, 1)
+boot_splash/show_image=false
+config/icon="res://icon.svg"
+
+[audio]
+
+buses/default_bus_layout=""
+
+[autoload]
+
+EventBus="*res://src/autoload/event_bus.gd"
+GameState="*res://src/autoload/game_state.gd"
+DataRegistry="*res://src/autoload/data_registry.gd"
+SaveManager="*res://src/autoload/save_manager.gd"
+SceneRouter="*res://src/autoload/scene_router.gd"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[dotnet]
+
+project/assembly_name=""
+
+[editor]
+
+version_control/plugin_name="Git"
+
+[filesystem]
+
+import/fbx2gltf/enabled=false
+import/blender/enabled=false
+
+[gui]
+
+theme/default_font_multichannel_signed_distance_field=true
+theme/custom="res://assets/fonts/ui_theme.tres"
+
+[input_devices]
+
+pointing/emulate_touch_from_mouse=true
+
+[internationalization]
+
+locale/fallback="zh_CN"
+
+[layer_names]
+
+2d_physics/layer_1="world"
+2d_physics/layer_2="actor"
+2d_physics/layer_3="hitbox"
+2d_physics/layer_4="interactable"
+2d_physics/layer_5="trigger"
+
+[physics]
+
+2d/default_gravity=0.0
+common/max_fps=0
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+environment/defaults/default_clear_color=Color(0.957, 0.945, 0.914, 1)

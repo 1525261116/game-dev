@@ -1,0 +1,310 @@
+[
+  {
+    "id": "TAG_01",
+    "name": "刀法合璧",
+    "layer": 1,
+    "a": "GF_dao_jichu",
+    "b": "GF_tiandao_bajue",
+    "a_group": "dao",
+    "b_group": "dao",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.1
+    },
+    "desc": "刀法威力 +10%"
+  },
+  {
+    "id": "TAG_02",
+    "name": "刀法合璧",
+    "layer": 1,
+    "a": "GF_jifeng_dao",
+    "b": "GF_tiandao_bajue",
+    "a_group": "dao",
+    "b_group": "dao",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.15
+    },
+    "desc": "刀法威力 +15%"
+  },
+  {
+    "id": "TAG_03",
+    "name": "剑法合璧",
+    "layer": 1,
+    "a": "GF_jian_jichu",
+    "b": "GF_taixu_jianyi",
+    "a_group": "jian",
+    "b_group": "jian",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.1
+    },
+    "desc": "剑法威力 +10%"
+  },
+  {
+    "id": "TAG_04",
+    "name": "剑法合璧",
+    "layer": 1,
+    "a": "GF_songfeng_jian",
+    "b": "GF_taixu_jianyi",
+    "a_group": "jian",
+    "b_group": "jian",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.15
+    },
+    "desc": "剑法威力 +15%"
+  },
+  {
+    "id": "TAG_05",
+    "name": "拳掌合璧",
+    "layer": 1,
+    "a": "GF_changquan",
+    "b": "GF_rulai_shenzhang",
+    "a_group": "quan",
+    "b_group": "quan",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.1
+    },
+    "desc": "拳掌威力 +10%"
+  },
+  {
+    "id": "TAG_06",
+    "name": "拳掌合璧",
+    "layer": 1,
+    "a": "GF_tongbi_quan",
+    "b": "GF_rulai_shenzhang",
+    "a_group": "quan",
+    "b_group": "quan",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.15
+    },
+    "desc": "拳掌威力 +15%"
+  },
+  {
+    "id": "TAG_07",
+    "name": "暗器合璧",
+    "layer": 1,
+    "a": "GF_anqi_jichu",
+    "b": "GF_wanliu_guizong",
+    "a_group": "anqi",
+    "b_group": "anqi",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.1
+    },
+    "desc": "暗器威力 +10%"
+  },
+  {
+    "id": "TAG_08",
+    "name": "暗器合璧",
+    "layer": 1,
+    "a": "GF_xiujian",
+    "b": "GF_wanliu_guizong",
+    "a_group": "anqi",
+    "b_group": "anqi",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.15
+    },
+    "desc": "暗器威力 +15%"
+  },
+  {
+    "id": "TAG_09",
+    "name": "奇门合璧",
+    "layer": 1,
+    "a": "GF_judge_bi",
+    "b": "GF_wanfa_guiyuan",
+    "a_group": "qimen",
+    "b_group": "qimen",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.1
+    },
+    "desc": "奇门威力 +10%"
+  },
+  {
+    "id": "TAG_10",
+    "name": "奇门合璧",
+    "layer": 1,
+    "a": "GF_xuantie_ling",
+    "b": "GF_wanfa_guiyuan",
+    "a_group": "qimen",
+    "b_group": "qimen",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.15
+    },
+    "desc": "奇门威力 +15%"
+  },
+  {
+    "id": "TAG_11",
+    "name": "枪法合璧",
+    "layer": 1,
+    "a": "GF_baila_gan",
+    "b": "GF_longdan_qiang",
+    "a_group": "qiang",
+    "b_group": "qiang",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.1
+    },
+    "desc": "枪法威力 +10%"
+  },
+  {
+    "id": "TAG_12",
+    "name": "枪法合璧",
+    "layer": 1,
+    "a": "GF_tieqiang_jue",
+    "b": "GF_longdan_qiang",
+    "a_group": "qiang",
+    "b_group": "qiang",
+    "tag": "",
+    "mods": {
+      "damageBonus": 0.15
+    },
+    "desc": "枪法威力 +15%"
+  },
+  {
+    "id": "TAG_13",
+    "name": "刀法·刚猛",
+    "layer": 2,
+    "a": "GF_neigong_jichu",
+    "b": "GF_dao_jichu",
+    "a_group": "neigong",
+    "b_group": "dao",
+    "tag": "刚猛",
+    "mods": {
+      "damageBonus": 0.2
+    },
+    "desc": "刀法威力 +20%"
+  },
+  {
+    "id": "TAG_14",
+    "name": "剑法·深厚",
+    "layer": 2,
+    "a": "GF_jingang_buhuai",
+    "b": "GF_qingfeng_jian",
+    "a_group": "neigong",
+    "b_group": "jian",
+    "tag": "深厚",
+    "mods": {
+      "lifesteal": 0.12
+    },
+    "desc": "剑法吸血 +12%"
+  },
+  {
+    "id": "TAG_15",
+    "name": "拳掌·深厚",
+    "layer": 2,
+    "a": "GF_chunyang_wuji",
+    "b": "GF_changquan",
+    "a_group": "neigong",
+    "b_group": "quan",
+    "tag": "深厚",
+    "mods": {
+      "innerRegen": 0.2
+    },
+    "desc": "拳掌内力回复 +20%"
+  },
+  {
+    "id": "TAG_16",
+    "name": "暗器·诡变",
+    "layer": 2,
+    "a": "GF_taixuan_jing",
+    "b": "GF_baoyu_lihua",
+    "a_group": "neigong",
+    "b_group": "anqi",
+    "tag": "诡变",
+    "mods": {
+      "ignoreDef": 0.15
+    },
+    "desc": "暗器无视防御 +15%"
+  },
+  {
+    "id": "TAG_17",
+    "name": "奇门·灵动",
+    "layer": 2,
+    "a": "GF_xixing_dafa",
+    "b": "GF_shehun_ling",
+    "a_group": "neigong",
+    "b_group": "qimen",
+    "tag": "灵动",
+    "mods": {
+      "speed": 0.12
+    },
+    "desc": "奇门速度 +12%"
+  },
+  {
+    "id": "TAG_18",
+    "name": "枪法·刚猛",
+    "layer": 2,
+    "a": "GF_tuna_fa",
+    "b": "GF_tieqiang_jue",
+    "a_group": "neigong",
+    "b_group": "qiang",
+    "tag": "刚猛",
+    "mods": {
+      "defPct": 0.15
+    },
+    "desc": "枪法防御 +15%"
+  },
+  {
+    "id": "TAG_19",
+    "name": "深厚·身法",
+    "layer": 3,
+    "a": "GF_jingang_buhuai",
+    "b": "GF_shenfa_jichu",
+    "a_group": "neigong",
+    "b_group": "shenfa",
+    "tag": "深厚",
+    "mods": {
+      "lifesteal": 0.15
+    },
+    "desc": "身法吸血 +15%"
+  },
+  {
+    "id": "TAG_20",
+    "name": "刚猛·身法",
+    "layer": 3,
+    "a": "GF_neigong_jichu",
+    "b": "GF_tiebushan_qinggong",
+    "a_group": "neigong",
+    "b_group": "shenfa",
+    "tag": "刚猛",
+    "mods": {
+      "defPct": 0.15
+    },
+    "desc": "身法防御 +15%"
+  },
+  {
+    "id": "TAG_21",
+    "name": "诡变·身法",
+    "layer": 3,
+    "a": "GF_taixuan_jing",
+    "b": "GF_tizong_shu",
+    "a_group": "neigong",
+    "b_group": "shenfa",
+    "tag": "诡变",
+    "mods": {
+      "dodge": 0.15
+    },
+    "desc": "身法闪避 +15%"
+  },
+  {
+    "id": "TAG_22",
+    "name": "灵动·身法",
+    "layer": 3,
+    "a": "GF_xixing_dafa",
+    "b": "GF_jifeng_bu",
+    "a_group": "neigong",
+    "b_group": "shenfa",
+    "tag": "灵动",
+    "mods": {
+      "speed": 0.1
+    },
+    "desc": "身法速度 +10%"
+  }
+]

@@ -1,0 +1,468 @@
+[
+  {
+    "id": "HINT_battle_start",
+    "key": "battle_start",
+    "tier": "toast",
+    "text": "交手！{ally_count} 对 {enemy_count}",
+    "vars": [
+      "ally_count",
+      "enemy_count"
+    ]
+  },
+  {
+    "id": "HINT_formation_ok",
+    "key": "formation_ok",
+    "tier": "toast",
+    "text": "阵势已成 · {formation_name}（{bonus_text}）",
+    "vars": [
+      "formation_name",
+      "bonus_text"
+    ]
+  },
+  {
+    "id": "HINT_formation_partial",
+    "key": "formation_partial",
+    "tier": "toast",
+    "text": "阵势不稳 · 站位仅部分契合，加成减半",
+    "vars": []
+  },
+  {
+    "id": "HINT_formation_partial_log",
+    "key": "formation_partial_log",
+    "tier": "log",
+    "text": "{formation_name} 要求「{requirement}」，当前站位仅部分契合，加成按五成计",
+    "vars": [
+      "formation_name",
+      "requirement"
+    ]
+  },
+  {
+    "id": "HINT_formation_fail",
+    "key": "formation_fail",
+    "tier": "toast",
+    "text": "阵势未成 · 加成失效，请调整九宫格站位",
+    "vars": []
+  },
+  {
+    "id": "HINT_formation_fail_log",
+    "key": "formation_fail_log",
+    "tier": "log",
+    "text": "{formation_name} 要求「{requirement}」，当前站位不符，本战无阵法加成",
+    "vars": [
+      "formation_name",
+      "requirement"
+    ]
+  },
+  {
+    "id": "HINT_formation_hint",
+    "key": "formation_hint",
+    "tier": "tooltip",
+    "text": "阵法要求特定站位方能生效：完全契合给全额，部分契合给五成，不符则失效。点击阵法可查看要求。",
+    "vars": []
+  },
+  {
+    "id": "HINT_round_start",
+    "key": "round_start",
+    "tier": "float",
+    "text": "第 {round} 合",
+    "vars": [
+      "round"
+    ]
+  },
+  {
+    "id": "HINT_combo_2",
+    "key": "combo_2",
+    "tier": "float",
+    "text": "连招 · 成",
+    "vars": []
+  },
+  {
+    "id": "HINT_combo_2_toast",
+    "key": "combo_2_toast",
+    "tier": "toast",
+    "text": "顺势而为 · 第二式威力增三成",
+    "vars": []
+  },
+  {
+    "id": "HINT_combo_3",
+    "key": "combo_3",
+    "tier": "float",
+    "text": "三连 · 破",
+    "vars": []
+  },
+  {
+    "id": "HINT_combo_3_toast",
+    "key": "combo_3_toast",
+    "tier": "toast",
+    "text": "三式贯通 · 威力增六成，兼有吸血",
+    "vars": []
+  },
+  {
+    "id": "HINT_combo_fail",
+    "key": "combo_fail",
+    "tier": "log",
+    "text": "{skill_name} 起势为 {start_mark}，与上一式收势不合，连招未成",
+    "vars": [
+      "skill_name",
+      "start_mark"
+    ]
+  },
+  {
+    "id": "HINT_combo_hint",
+    "key": "combo_hint",
+    "tier": "tooltip",
+    "text": "每门外功皆有起势与收势。当上一式的收势与本式的起势相合，即为连招，威力大増。装备功法时留意起收之势的衔接。",
+    "vars": []
+  },
+  {
+    "id": "HINT_hit_normal",
+    "key": "hit_normal",
+    "tier": "float",
+    "text": "{damage}",
+    "vars": [
+      "damage"
+    ]
+  },
+  {
+    "id": "HINT_hit_crit",
+    "key": "hit_crit",
+    "tier": "float",
+    "text": "破绽 {damage}",
+    "vars": [
+      "damage"
+    ]
+  },
+  {
+    "id": "HINT_hit_crit_log",
+    "key": "hit_crit_log",
+    "tier": "log",
+    "text": "{actor_name} 击中破绽，{skill_name} 造成 {damage} 伤害",
+    "vars": [
+      "actor_name",
+      "skill_name",
+      "damage"
+    ]
+  },
+  {
+    "id": "HINT_attack_miss",
+    "key": "attack_miss",
+    "tier": "float",
+    "text": "落空",
+    "vars": []
+  },
+  {
+    "id": "HINT_attack_miss_log",
+    "key": "attack_miss_log",
+    "tier": "log",
+    "text": "{actor_name} 的 {skill_name} 被 {target_name} 避开",
+    "vars": [
+      "actor_name",
+      "skill_name",
+      "target_name"
+    ]
+  },
+  {
+    "id": "HINT_lifesteal",
+    "key": "lifesteal",
+    "tier": "float",
+    "text": "回气 {heal}",
+    "vars": [
+      "heal"
+    ]
+  },
+  {
+    "id": "HINT_inner_low",
+    "key": "inner_low",
+    "tier": "float",
+    "text": "内力不济",
+    "vars": []
+  },
+  {
+    "id": "HINT_inner_low_toast",
+    "key": "inner_low_toast",
+    "tier": "toast",
+    "text": "内力不足（需 {need}，余 {have}），改以普攻应对",
+    "vars": [
+      "need",
+      "have"
+    ]
+  },
+  {
+    "id": "HINT_inner_hint",
+    "key": "inner_hint",
+    "tier": "tooltip",
+    "text": "外功释放消耗内力，无冷却；内力足够即可连续施展。内力耗尽时自动改用普攻。内功决定内力上限与每回合回复。",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_stun",
+    "key": "status_stun",
+    "tier": "float",
+    "text": "目眩",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_stun_toast",
+    "key": "status_stun_toast",
+    "tier": "toast",
+    "text": "{target_name} 目眩神迷，一合之内无法行动",
+    "vars": [
+      "target_name"
+    ]
+  },
+  {
+    "id": "HINT_status_seal",
+    "key": "status_seal",
+    "tier": "float",
+    "text": "封穴",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_seal_toast",
+    "key": "status_seal_toast",
+    "tier": "toast",
+    "text": "{target_name} 穴道受制，{duration} 合之内无法运使功法",
+    "vars": [
+      "target_name",
+      "duration"
+    ]
+  },
+  {
+    "id": "HINT_status_root",
+    "key": "status_root",
+    "tier": "float",
+    "text": "定身",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_root_toast",
+    "key": "status_root_toast",
+    "tier": "toast",
+    "text": "{target_name} 身形受滞，闪避全失",
+    "vars": [
+      "target_name"
+    ]
+  },
+  {
+    "id": "HINT_status_knockback",
+    "key": "status_knockback",
+    "tier": "float",
+    "text": "退！",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_knockback_toast",
+    "key": "status_knockback_toast",
+    "tier": "toast",
+    "text": "{target_name} 被震退，出手顺位后移三格",
+    "vars": [
+      "target_name"
+    ]
+  },
+  {
+    "id": "HINT_status_poison",
+    "key": "status_poison",
+    "tier": "float",
+    "text": "中毒",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_bleed",
+    "key": "status_bleed",
+    "tier": "float",
+    "text": "流血",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_burn",
+    "key": "status_burn",
+    "tier": "float",
+    "text": "灼烧",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_dot_log",
+    "key": "status_dot_log",
+    "tier": "log",
+    "text": "{target_name} 受 {status_name} 所苦，损血 {damage}（剩 {remaining} 合）",
+    "vars": [
+      "target_name",
+      "status_name",
+      "damage",
+      "remaining"
+    ]
+  },
+  {
+    "id": "HINT_status_regen",
+    "key": "status_regen",
+    "tier": "float",
+    "text": "回春 {heal}",
+    "vars": [
+      "heal"
+    ]
+  },
+  {
+    "id": "HINT_status_shield",
+    "key": "status_shield",
+    "tier": "float",
+    "text": "护体",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_ironwall",
+    "key": "status_ironwall",
+    "tier": "log",
+    "text": "{target_name} 运起铁壁，{status_name} 未能奏效",
+    "vars": [
+      "target_name",
+      "status_name"
+    ]
+  },
+  {
+    "id": "HINT_status_immune_control",
+    "key": "status_immune_control",
+    "tier": "toast",
+    "text": "守境之气护体，首次受制已免",
+    "vars": []
+  },
+  {
+    "id": "HINT_status_stack_cap",
+    "key": "status_stack_cap",
+    "tier": "log",
+    "text": "{status_name} 已至 {max_stacks} 层，不再叠加",
+    "vars": [
+      "status_name",
+      "max_stacks"
+    ]
+  },
+  {
+    "id": "HINT_status_expired",
+    "key": "status_expired",
+    "tier": "log",
+    "text": "{target_name} 的 {status_name} 已解",
+    "vars": [
+      "target_name",
+      "status_name"
+    ]
+  },
+  {
+    "id": "HINT_passive_trigger",
+    "key": "passive_trigger",
+    "tier": "float",
+    "text": "{passive_name}",
+    "vars": [
+      "passive_name"
+    ]
+  },
+  {
+    "id": "HINT_passive_trigger_log",
+    "key": "passive_trigger_log",
+    "tier": "log",
+    "text": "{actor_name} 触发「{passive_name}」",
+    "vars": [
+      "actor_name",
+      "passive_name"
+    ]
+  },
+  {
+    "id": "HINT_talent_trigger",
+    "key": "talent_trigger",
+    "tier": "log",
+    "text": "天赋「{talent_name}」生效：{effect_text}",
+    "vars": [
+      "talent_name",
+      "effect_text"
+    ]
+  },
+  {
+    "id": "HINT_unit_down",
+    "key": "unit_down",
+    "tier": "toast",
+    "text": "{actor_name} 力竭倒地",
+    "vars": [
+      "actor_name"
+    ]
+  },
+  {
+    "id": "HINT_ally_down_warn",
+    "key": "ally_down_warn",
+    "tier": "toast",
+    "text": "{actor_name} 已倒 · 全队覆灭即战败",
+    "vars": [
+      "actor_name"
+    ]
+  },
+  {
+    "id": "HINT_round_limit_warn",
+    "key": "round_limit_warn",
+    "tier": "toast",
+    "text": "已过二十五合，再过五合未分胜负即判负",
+    "vars": []
+  },
+  {
+    "id": "HINT_round_limit_end",
+    "key": "round_limit_end",
+    "tier": "toast",
+    "text": "久战不下，此战判负",
+    "vars": []
+  },
+  {
+    "id": "HINT_victory",
+    "key": "victory",
+    "tier": "toast",
+    "text": "此战告捷",
+    "vars": []
+  },
+  {
+    "id": "HINT_victory_log",
+    "key": "victory_log",
+    "tier": "log",
+    "text": "历 {rounds} 合，我方 {survivors} 人尚存，共造成 {damage} 伤害",
+    "vars": [
+      "rounds",
+      "survivors",
+      "damage"
+    ]
+  },
+  {
+    "id": "HINT_defeat",
+    "key": "defeat",
+    "tier": "toast",
+    "text": "力有未逮，此战失利",
+    "vars": []
+  },
+  {
+    "id": "HINT_defeat_log",
+    "key": "defeat_log",
+    "tier": "log",
+    "text": "历 {rounds} 合，敌方 {survivors} 人尚存。可读档再战，或调整功法与站位。",
+    "vars": [
+      "rounds",
+      "survivors"
+    ]
+  },
+  {
+    "id": "HINT_battle_hint_first",
+    "key": "battle_hint_first",
+    "tier": "tooltip",
+    "text": "战后胜负多在战前已定：布阵看站位，出战看功法起收之势，内力决定能连多久。",
+    "vars": []
+  },
+  {
+    "id": "HINT_enemy_weakness",
+    "key": "enemy_weakness",
+    "tier": "toast",
+    "text": "系统提示：此敌「{weakness}」较弱，宜以 {counter_skill} 应对",
+    "vars": [
+      "weakness",
+      "counter_skill"
+    ]
+  },
+  {
+    "id": "HINT_enemy_scan_locked",
+    "key": "enemy_scan_locked",
+    "tier": "toast",
+    "text": "系统等级不足，无法解析此敌",
+    "vars": []
+  }
+]

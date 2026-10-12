@@ -1,0 +1,506 @@
+[
+  {
+    "id": "FM_changshe",
+    "name": "一字长蛇阵",
+    "quality": "fan",
+    "requirement": {
+      "kind": "frontFull"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "def": 0.08
+        }
+      },
+      {
+        "mods": {
+          "def": 0.12
+        }
+      },
+      {
+        "mods": {
+          "def": 0.16
+        }
+      },
+      {
+        "mods": {
+          "def": 0.2
+        }
+      },
+      {
+        "mods": {
+          "def": 0.24
+        }
+      }
+    ],
+    "source": "初始",
+    "desc": "前排 3 格满员，以阵如长蛇，守御绵密"
+  },
+  {
+    "id": "FM_erlong",
+    "name": "二龙出水阵",
+    "quality": "fan",
+    "requirement": {
+      "kind": "singleColumn",
+      "count": 2
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "atk": 0.06
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.09
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.12
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.15
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.18
+        }
+      }
+    ],
+    "source": "中原·双王镇",
+    "desc": "两列各 2 人，双龙出水，攻势锋锐"
+  },
+  {
+    "id": "FM_sancai",
+    "name": "三才阵",
+    "quality": "fan",
+    "requirement": {
+      "kind": "allThreeRows"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "atk": 0.04,
+          "def": 0.04
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.06,
+          "def": 0.06
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.08,
+          "def": 0.08
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.1,
+          "def": 0.1
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.12,
+          "def": 0.12
+        }
+      }
+    ],
+    "source": "初始",
+    "desc": "前中后各据一人，天地人三才相济"
+  },
+  {
+    "id": "FM_sixiang",
+    "name": "四象阵",
+    "quality": "liang",
+    "requirement": {
+      "kind": "corners"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "lifesteal": 0.06
+        }
+      },
+      {
+        "mods": {
+          "lifesteal": 0.09
+        }
+      },
+      {
+        "mods": {
+          "lifesteal": 0.12
+        }
+      },
+      {
+        "mods": {
+          "lifesteal": 0.15
+        }
+      },
+      {
+        "mods": {
+          "lifesteal": 0.18
+        }
+      }
+    ],
+    "source": "江南·剑冢",
+    "desc": "四人分据四角，四象轮转，饮血自养"
+  },
+  {
+    "id": "FM_wuxing",
+    "name": "五行阵",
+    "quality": "liang",
+    "requirement": {
+      "kind": "minMembers",
+      "count": 5
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "innerRegen": 0.15
+        }
+      },
+      {
+        "mods": {
+          "innerRegen": 0.225
+        }
+      },
+      {
+        "mods": {
+          "innerRegen": 0.3
+        }
+      },
+      {
+        "mods": {
+          "innerRegen": 0.375
+        }
+      },
+      {
+        "mods": {
+          "innerRegen": 0.45
+        }
+      }
+    ],
+    "source": "巴蜀·青城后山",
+    "desc": "满编五人，五行相生，内力生生不息"
+  },
+  {
+    "id": "FM_tiangang",
+    "name": "天罡北斗阵",
+    "quality": "shang",
+    "requirement": {
+      "kind": "frontOneBackThree"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "damageTaken": -0.1
+        },
+        "special": {
+          "reflect": 0.05
+        }
+      },
+      {
+        "mods": {
+          "damageTaken": -0.15
+        },
+        "special": {
+          "reflect": 0.075
+        }
+      },
+      {
+        "mods": {
+          "damageTaken": -0.2
+        },
+        "special": {
+          "reflect": 0.1
+        }
+      },
+      {
+        "mods": {
+          "damageTaken": -0.25
+        },
+        "special": {
+          "reflect": 0.125
+        }
+      },
+      {
+        "mods": {
+          "damageTaken": -0.3
+        },
+        "special": {
+          "reflect": 0.15
+        }
+      }
+    ],
+    "source": "六扇门兑换",
+    "desc": "一人当关、三人列宿，北斗护身，反震来敌"
+  },
+  {
+    "id": "FM_yanxing",
+    "name": "雁行阵",
+    "quality": "shang",
+    "requirement": {
+      "kind": "rowFull",
+      "row": "mid"
+    },
+    "bonuses": [
+      {
+        "special": {
+          "backRowDamage": 0.1,
+          "frontRowTaken": -0.08
+        }
+      },
+      {
+        "special": {
+          "backRowDamage": 0.15,
+          "frontRowTaken": -0.12
+        }
+      },
+      {
+        "special": {
+          "backRowDamage": 0.2,
+          "frontRowTaken": -0.16
+        }
+      },
+      {
+        "special": {
+          "backRowDamage": 0.25,
+          "frontRowTaken": -0.2
+        }
+      },
+      {
+        "special": {
+          "backRowDamage": 0.3,
+          "frontRowTaken": -0.24
+        }
+      }
+    ],
+    "source": "江湖散人",
+    "desc": "中排充塞，雁行斜列，后排劲发、前排少受"
+  },
+  {
+    "id": "FM_hunyuan",
+    "name": "混元阵",
+    "quality": "shang",
+    "requirement": {
+      "kind": "any"
+    },
+    "bonuses": [
+      {
+        "special": {
+          "comboPower": 0.1
+        }
+      },
+      {
+        "special": {
+          "comboPower": 0.15
+        }
+      },
+      {
+        "special": {
+          "comboPower": 0.2
+        }
+      },
+      {
+        "special": {
+          "comboPower": 0.25
+        }
+      },
+      {
+        "special": {
+          "comboPower": 0.3
+        }
+      }
+    ],
+    "source": "门派藏经阁",
+    "desc": "不拘站位，混元一气，连招威力大涨"
+  },
+  {
+    "id": "FM_guishe",
+    "name": "龟蛇阵",
+    "quality": "liang",
+    "requirement": {
+      "kind": "rowFull",
+      "row": "front"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "hpMax": 0.1,
+          "spd": -0.05
+        }
+      },
+      {
+        "mods": {
+          "hpMax": 0.15,
+          "spd": -0.05
+        }
+      },
+      {
+        "mods": {
+          "hpMax": 0.2,
+          "spd": -0.05
+        }
+      },
+      {
+        "mods": {
+          "hpMax": 0.25,
+          "spd": -0.05
+        }
+      },
+      {
+        "mods": {
+          "hpMax": 0.3,
+          "spd": -0.05
+        }
+      }
+    ],
+    "source": "药王谷",
+    "desc": "前中皆满，龟蛇盘结，气血浑厚而身法略滞"
+  },
+  {
+    "id": "FM_fengshi",
+    "name": "锋矢阵",
+    "quality": "ji",
+    "requirement": {
+      "kind": "singleColumn",
+      "count": 3
+    },
+    "bonuses": [
+      {
+        "special": {
+          "columnDamage": 0.15
+        }
+      },
+      {
+        "special": {
+          "columnDamage": 0.225
+        }
+      },
+      {
+        "special": {
+          "columnDamage": 0.3
+        }
+      },
+      {
+        "special": {
+          "columnDamage": 0.375
+        }
+      },
+      {
+        "special": {
+          "columnDamage": 0.45
+        }
+      }
+    ],
+    "source": "西北·塞北",
+    "desc": "单列三人成矢，与列连击相叠，穿阵破敌"
+  },
+  {
+    "id": "FM_youyue",
+    "name": "幽月阵",
+    "quality": "ji",
+    "requirement": {
+      "kind": "any"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "crit": 0.05,
+          "hit": -0.03
+        }
+      },
+      {
+        "mods": {
+          "crit": 0.075,
+          "hit": -0.03
+        }
+      },
+      {
+        "mods": {
+          "crit": 0.1,
+          "hit": -0.03
+        }
+      },
+      {
+        "mods": {
+          "crit": 0.125,
+          "hit": -0.03
+        }
+      },
+      {
+        "mods": {
+          "crit": 0.15,
+          "hit": -0.03
+        }
+      }
+    ],
+    "source": "幽月教（邪线）",
+    "desc": "月色隐曜，出手刁钻，暴烈而易失准"
+  },
+  {
+    "id": "FM_shoujing",
+    "name": "守境阵",
+    "quality": "jue",
+    "requirement": {
+      "kind": "any"
+    },
+    "bonuses": [
+      {
+        "mods": {
+          "atk": 0.06,
+          "def": 0.06
+        },
+        "special": {
+          "immuneFirstControl": false
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.09,
+          "def": 0.09
+        },
+        "special": {
+          "immuneFirstControl": false
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.12,
+          "def": 0.12
+        },
+        "special": {
+          "immuneFirstControl": false
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.15,
+          "def": 0.15
+        },
+        "special": {
+          "immuneFirstControl": false
+        }
+      },
+      {
+        "mods": {
+          "atk": 0.18,
+          "def": 0.18
+        },
+        "special": {
+          "immuneFirstControl": true
+        }
+      }
+    ],
+    "source": "秘境守护者（终局）",
+    "desc": "守境司秘传，五行归位，首次受制可免"
+  }
+]
