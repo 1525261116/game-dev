@@ -5,6 +5,27 @@
 
 ---
 
+## 0. 先看效果
+
+下图是 `pnpm art:placeholder` 生成的**占位贴图**跑在真实战斗里的样子（无头 Chrome 实拍，非合成图）：
+三层水墨背景 + 6 个角色各自换色 + 按品质换过的武器 + 头顶状态图标。
+
+![战斗画面（占位贴图）](../preview/art/01-battle-skinned.png)
+
+| 画面元素 | 数据来源 |
+|----------|----------|
+| 6 个角色的外观 | `assets/chars/<charId>/parts/`（3 套底图）+ `skin.json` 的 `palette` 换色 |
+| 手里的武器 | `units.csv` 的 `group` × 当前功法品质 → `assets/weapons/<组>/<组>_<后缀>.png` |
+| 三层背景 | `assets/bg/battle/{far,mid,ground}.png` |
+| 头顶 **状态图标**（下图为「眩」= 眩晕） | 战斗日志的 `statusApplied` / `statusExpired` 事件 |
+
+![状态图标](../preview/art/02-status-icons.png)
+
+> 第二张截图为了让状态必定出现，**临时**把罗汉拳的眩晕概率从 15% 调到 100% 再还原；
+> 仓库里的配置是设计值 15%（`data/tables/skills.csv`）。
+
+---
+
 ## 1. 三条命令
 
 | 命令 | 作用 | 什么时候用 |
