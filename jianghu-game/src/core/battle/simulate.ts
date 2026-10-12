@@ -915,6 +915,12 @@ export interface SimulationSummary {
   avgAllyDamage: number;
   avgEnemyDamage: number;
   avgReflectDamage: number;
+  /** 场均连招第 2 段次数（用来验证"连招真的在触发"，而不是纸面机制） */
+  avgComboStage2: number;
+  /** 场均三连次数 */
+  avgComboStage3: number;
+  /** 场均因内力不足/被封穴而改用普攻的次数 */
+  avgBasicAttacks: number;
   /** 回合数分布，用来发现"秒杀"或"打不完"的失衡 */
   roundHistogram: Record<number, number>;
 }
@@ -929,6 +935,9 @@ export function simulateMany(setup: Omit<BattleSetup, 'seed'>, runs: number): Si
   let totalAllyDmg = 0;
   let totalEnemyDmg = 0;
   let totalReflect = 0;
+  let totalCombo2 = 0;
+  let totalCombo3 = 0;
+  let totalBasic = 0;
   const roundHistogram: Record<number, number> = {};
 
   for (let i = 0; i < runs; i++) {
@@ -938,6 +947,9 @@ export function simulateMany(setup: Omit<BattleSetup, 'seed'>, runs: number): Si
     totalAllyDmg += log.stats.allyDamage;
     totalEnemyDmg += log.stats.enemyDamage;
     totalReflect += log.stats.reflectDamage;
+    totalCombo2 += log.stats.comboStage2;
+    totalCombo3 += log.stats.comboStage3;
+    totalBasic += log.stats.basicAttacks;
     roundHistogram[log.rounds] = (roundHistogram[log.rounds] ?? 0) + 1;
   }
 
@@ -948,6 +960,9 @@ export function simulateMany(setup: Omit<BattleSetup, 'seed'>, runs: number): Si
     avgAllyDamage: totalAllyDmg / runs,
     avgEnemyDamage: totalEnemyDmg / runs,
     avgReflectDamage: totalReflect / runs,
+    avgComboStage2: totalCombo2 / runs,
+    avgComboStage3: totalCombo3 / runs,
+    avgBasicAttacks: totalBasic / runs,
     roundHistogram,
   };
 }

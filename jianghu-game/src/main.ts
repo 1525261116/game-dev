@@ -37,3 +37,18 @@ const config: Phaser.Types.Core.GameConfig = {
 
 // 全局只允许存在一个 Phaser.Game 实例
 export const game = new Phaser.Game(config);
+
+/**
+ * 开发期把实例挂到 window。
+ *
+ * 为什么需要它？
+ *   Vite 热更新会给模块地址加上 `?t=` 时间戳，于是"在控制台里 import 一次
+ *   main.ts"很可能拿到**另一份模块实例**，结果是又 new 了一个 Phaser.Game
+ *   （画面上出现两块画布）。挂到 window 后，调试脚本 / 截图脚本 / 你自己在
+ *   控制台里切场景，拿到的永远是**同一个**实例。
+ *
+ * 生产构建时 `import.meta.env.DEV` 为 false，这段会被摇树掉。
+ */
+if (import.meta.env.DEV) {
+  (globalThis as typeof globalThis & { __jianghuGame?: Phaser.Game }).__jianghuGame = game;
+}

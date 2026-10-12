@@ -170,9 +170,9 @@ export class BattleLabScene extends Phaser.Scene {
 
     // 控制按钮
     let by = FIELD.y0 + 176;
-    createButton(this, PANEL_X + 90, by, '换种子重放', () => this.restart({ seed: `lab-${Math.floor(Math.random() * 1e9)}` }), 168, 34);
-    by += 42;
-    createButton(this, PANEL_X + 50, by, '回放速度', () => this.restart({ speedIdx: (this.speedIdx + 1) % SPEEDS.length }), 96, 34);
+    createButton(this, PANEL_X + 90, by, '换种子重放', () => this.restart({ seed: `lab-${Math.floor(Math.random() * 1e9)}` }), 168, 30);
+    by += 38;
+    createButton(this, PANEL_X + 50, by, '回放速度', () => this.restart({ speedIdx: (this.speedIdx + 1) % SPEEDS.length }), 96, 30);
     createButton(
       this,
       PANEL_X + 152,
@@ -180,18 +180,18 @@ export class BattleLabScene extends Phaser.Scene {
       this.intent === 'combo' ? '倾向·连招' : '倾向·输出',
       () => this.toggleIntent(),
       96,
-      34,
+      30,
     );
-    by += 42;
-    createButton(this, PANEL_X + 90, by, '我方阵法 ▸', () => this.restart({ allyFmIdx: nextFormationIdx(this.allyFmIdx) }), 168, 34);
-    by += 42;
-    createButton(this, PANEL_X + 90, by, '敌方阵法 ▸', () => this.restart({ enemyFmIdx: nextFormationIdx(this.enemyFmIdx) }), 168, 34);
-    by += 42;
-    createButton(this, PANEL_X + 90, by, '重跑 100 场统计', () => this.runBatch(), 168, 34);
+    by += 38;
+    createButton(this, PANEL_X + 90, by, '我方阵法 ▸', () => this.restart({ allyFmIdx: nextFormationIdx(this.allyFmIdx) }), 168, 30);
+    by += 38;
+    createButton(this, PANEL_X + 90, by, '敌方阵法 ▸', () => this.restart({ enemyFmIdx: nextFormationIdx(this.enemyFmIdx) }), 168, 30);
+    by += 38;
+    createButton(this, PANEL_X + 90, by, '重跑 100 场统计', () => this.runBatch(), 168, 30);
 
     this.statText = this.add
-      .text(PANEL_X + 10, by + 34, '', dimStyle(11))
-      .setLineSpacing(5)
+      .text(PANEL_X + 10, by + 26, '', dimStyle(11))
+      .setLineSpacing(4)
       .setResolution(2);
 
     // 底部日志
@@ -245,6 +245,7 @@ export class BattleLabScene extends Phaser.Scene {
       `种子：${this.seed}`,
       `预计回合：${this.log.rounds}`,
       `结果：${this.log.winner === 'ally' ? '我方胜' : this.log.winner === 'enemy' ? '敌方胜' : '平局'}`,
+      `连招 ${this.log.stats.comboStage2}　三连 ${this.log.stats.comboStage3}　普攻 ${this.log.stats.basicAttacks}`,
     ]);
     this.fmText.setText([`我方阵法：${fmt(this.allyFmIdx)}`, `敌方阵法：${fmt(this.enemyFmIdx)}`]);
     this.speedText.setText(
@@ -290,24 +291,16 @@ export class BattleLabScene extends Phaser.Scene {
       100,
     );
 
-    // 回合分布用方块画成简易直方图，一眼看出有没有"秒杀"或"打不完"
+    // 回合分布压成一行（原来逐回合竖排会被挤出画面，看不到直方图）
     const rounds = Object.keys(s.roundHistogram).map(Number).sort((a, b) => a - b);
-    const maxCount = Math.max(...Object.values(s.roundHistogram), 1);
-    const bars = rounds
-      .map((r) => `${String(r).padStart(2)}回合 ${'█'.repeat(Math.max(1, Math.round((s.roundHistogram[r]! / maxCount) * 8)))} ${s.roundHistogram[r]}`)
-      .join('\n');
+    const bars = rounds.map((r) => `${r}回合×${s.roundHistogram[r]}`).join('　');
 
     this.statText.setText([
       '── 100 场模拟 ──',
-      `胜率　　${(s.allyWinRate * 100).toFixed(1)}%`,
-      `平均回合 ${s.avgRounds.toFixed(2)}`,
-      `我方输出 ${s.avgAllyDamage.toFixed(0)}`,
-      `敌方输出 ${s.avgEnemyDamage.toFixed(0)}`,
-      `反弹伤害 ${s.avgReflectDamage.toFixed(1)}`,
-      `连招次数 ${this.log.stats.comboStage2}　三连 ${this.log.stats.comboStage3}　普攻 ${this.log.stats.basicAttacks}`,
-      '',
-      '回合分布：',
-      bars,
+      `胜率 ${(s.allyWinRate * 100).toFixed(1)}%　平均 ${s.avgRounds.toFixed(2)} 回合`,
+      `输出 我 ${s.avgAllyDamage.toFixed(0)} / 敌 ${s.avgEnemyDamage.toFixed(0)}`,
+      `连招 ${s.avgComboStage2.toFixed(1)}　三连 ${s.avgComboStage3.toFixed(1)}　普攻 ${s.avgBasicAttacks.toFixed(1)}`,
+      `反弹 ${s.avgReflectDamage.toFixed(1)}　分布 ${bars}`,
     ]);
   }
 
