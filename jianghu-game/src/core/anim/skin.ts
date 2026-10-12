@@ -136,7 +136,7 @@ export interface PartFit {
   top: number;
 }
 
-export type PartFitMode = 'contain' | 'height' | 'width';
+export type PartFitMode = 'contain' | 'height' | 'width' | 'fill';
 
 /**
  * 把"内容包围盒"放进"部件画布"，**并让枢轴点对齐**。
@@ -161,14 +161,53 @@ export function fitPartGeometry(
         ? canvas.w / box.w
         : Math.min(canvas.w / box.w, canvas.h / box.h);
 
-  const destW = Math.max(1, Math.round(box.w * scale));
-  const destH = Math.max(1, Math.round(box.h * scale));
+  // fill = 直接铺满画布（允许非等比拉伸）。见 DEFAULT_PART_FIT 的说明。
+  const destW = mode === 'fill' ? canvas.w : Math.max(1, Math.round(box.w * scale));
+  const destH = mode === 'fill' ? canvas.h : Math.max(1, Math.round(box.h * scale));
 
   // 内容盒上的枢轴点 → 画布上的枢轴点
   const left = Math.round(pivot.x * canvas.w - pivot.x * destW);
   const top = Math.round(pivot.y * canvas.h - pivot.y * destH);
 
   return { destW, destH, scale, left, top };
+}
+
+/**
+ * 每个 slot 的**默认对位策略**。
+ *
+ * 为什么不能一律用 contain（等比）？
+ *   实测：AI 把"上臂"画成一根很细的竖长条（宽高比 1:8），而骨骼盒是 24×52（1:2.2）。
+ *   等比缩放后袖子只剩 5px 宽，渲染到屏幕上约 2px —— 等于手臂没了。
+ *
+ *   判断依据是"这个部件是不是一个软性筒状物"：
+ *     · 四肢（上臂/前臂/大腿/小腿）= 布筒 → `fill`：**骨架盒就是形状权威**，
+ *       轻微非等比拉伸在纯色布料上几乎看不出来，且能保证关节与比例正确
+ *     · 躯干/头/手/脚/披风/武器 = 有明确外形 → `contain`：宁可窄一点，也不能把脸拉变形
+ */
+export const DEFAULT_PART_FIT: Record<SlotName, PartFitMode> = {
+  pelvis: 'contain',
+  torso: 'contain',
+  head: 'contain',
+  cloak: 'contain',
+  upperArmR: 'fill',
+  forearmR: 'fill',
+  upperArmL: 'fill',
+  forearmL: 'fill',
+  thighR: 'fill',
+  shinR: 'fill',
+  thighL: 'fill',
+  shinL: 'fill',
+  handR: 'contain',
+  handL: 'contain',
+  footR: 'contain',
+  footL: 'contain',
+  weapon: 'contain',
+};
+
+/** 取某个 slot 的对位策略（override 传了就用 override） */
+export function resolveFitMode(slot: SlotName, override?: PartFitMode | 'auto'): PartFitMode {
+  if (override && override !== 'auto') return override;
+  return DEFAULT_PART_FIT[slot] ?? 'contain';
 }
 
 /* ══════════════════════ 校验 ══════════════════════ */

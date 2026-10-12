@@ -32,7 +32,8 @@ import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 
 import { RIGS, DEFAULT_RIG_ID } from '../src/data/rigs.ts';
-import { expectedSkinSize, fitPartGeometry } from '../src/core/anim/skin.ts';
+import { expectedSkinSize, fitPartGeometry, resolveFitMode } from '../src/core/anim/skin.ts';
+import type { PartFitMode } from '../src/core/anim/skin.ts';
 import { SLOT_NAMES } from '../src/core/anim/types.ts';
 import type { RigDef, SlotName } from '../src/core/anim/types.ts';
 
@@ -53,7 +54,8 @@ interface Options {
   char: string | null;
   key: string;
   keyTol: number;
-  fit: 'contain' | 'height' | 'width';
+  /** auto = 按 slot 用 DEFAULT_PART_FIT（四肢 fill、其余 contain） */
+  fit: PartFitMode | 'auto';
   dry: boolean;
   pad: number;
 }
@@ -70,7 +72,7 @@ function parseArgs(argv: string[]): Options {
     char: flag('char') ?? null,
     key: flag('key') ?? 'auto',
     keyTol: Number(flag('key-tol') ?? 36),
-    fit: (flag('fit') as Options['fit']) ?? 'contain',
+    fit: (flag('fit') as Options['fit']) ?? 'auto',
     dry: argv.includes('--dry'),
     pad: Number(flag('pad') ?? 0),
   };
@@ -205,7 +207,8 @@ export async function fitPart(
   if (!box) throw new Error(`${basename(rawPath)}：抠底后没有任何不透明内容（背景色判断错了？试试 --key=none）`);
 
   // ④⑤⑥ 缩放 + 对枢轴（几何在 core 里，可零依赖测试）
-  const fit = fitPartGeometry({ w: box.w, h: box.h }, { w: targetW, h: targetH }, { x: px, y: py }, opts.fit);
+  const mode = resolveFitMode(slot, opts.fit);
+  const fit = fitPartGeometry({ w: box.w, h: box.h }, { w: targetW, h: targetH }, { x: px, y: py }, mode);
   const { destW, destH } = fit;
 
   // ⑤ 裁到内容盒 → 缩放到目标尺寸（lanczos 保细节）
@@ -245,7 +248,7 @@ export async function fitPart(
       scale: Math.round(fit.scale * 1000) / 1000,
       outputSize: `${targetW}×${targetH}`,
       keyed: keyed ? `是（${keyColor}，tol=${opts.keyTol}）` : '否',
-      anchor: `枢轴 ${px},${py} → 画布 (${Math.round(px * targetW)}, ${Math.round(py * targetH)}) 已钉住`,
+      anchor: `[${mode}] 枢轴 ${px},${py} → 画布 (${Math.round(px * targetW)}, ${Math.round(py * targetH)}) 已钉住`,
     },
   };
 }
@@ -264,7 +267,7 @@ async function main(): Promise<void> {
   if (!rig) throw new Error(`未知体型「${opts.body}」（可用：${Object.keys(RIGS).join(' / ')}）`);
 
   console.log('=== 部件贴图对位 ===');
-  console.log(`体型 ${opts.body}　抠底 ${opts.key}　适配 ${opts.fit}`);
+  console.log(`体型 ${opts.body}　抠底 ${opts.key}　适配 ${opts.fit}（auto = 四肢 fill、其余 contain）`);
 
   // ── 单个文件模式 ──
   if (!opts.char) {
@@ -274,7 +277,7 @@ async function main(): Promise<void> {
       console.log('  node tools/fit-skin-part.ts 原始图.png --slot=torso --body=male_adult --out=输出/torso.png');
       console.log('  node tools/fit-skin-part.ts 原始目录/ --char=ren_dao --body=burly [--dry]');
       console.log('');
-      console.log('可选参数：--key=auto|none|#rrggbb（默认 auto）　--key-tol=36　--fit=contain|height|width');
+      console.log('可选参数：--key=auto|none|#rrggbb（默认 auto）　--key-tol=36　--fit=auto|contain|height|width|fill');
       return;
     }
     if (!SLOT_NAMES.includes(opts.slot)) throw new Error(`未知 slot：${opts.slot}`);

@@ -17,6 +17,7 @@ import { join } from 'node:path';
 
 import {
   ART_SCALE,
+  DEFAULT_PART_FIT,
   expectedSkinPivot,
   expectedSkinSize,
   fitPartGeometry,
@@ -191,6 +192,30 @@ test('对位：height 模式按高度贴合（宽度可溢出画布，相邻部�
   assert.equal(byHeight.destH, 92);
   assert.ok(byHeight.destW > 80, 'height 模式下宽度按比例放大并溢出画布');
   assert.equal(byHeight.top + byHeight.destH, 92, '枢轴仍然钉住');
+});
+
+test('对位：fill 模式直接铺满画布（四肢用，允许非等比拉伸）', () => {
+  // 实测问题：AI 把上臂画成 1:8 的细长条，contain 后只剩 5px 宽 ≈ 手臂消失
+  const thin = { w: 60, h: 480 };
+  const contain = fitPartGeometry(thin, { w: 24, h: 52 }, { x: 0.5, y: 0 });
+  assert.ok(contain.destW < 8, `contain 会把细长条压得过窄（实际 ${contain.destW}px）`);
+
+  const fill = fitPartGeometry(thin, { w: 24, h: 52 }, { x: 0.5, y: 0 }, 'fill');
+  assert.equal(fill.destW, 24, 'fill 铺满画布宽');
+  assert.equal(fill.destH, 52, 'fill 铺满画布高');
+  assert.equal(fill.left, 0);
+  assert.equal(fill.top, 0, '枢轴在顶边 → 正好顶格');
+});
+
+test('对位策略表：四肢 fill、头/躯干/手/脚 contain', () => {
+  assert.equal(DEFAULT_PART_FIT.upperArmR, 'fill');
+  assert.equal(DEFAULT_PART_FIT.forearmL, 'fill');
+  assert.equal(DEFAULT_PART_FIT.thighR, 'fill');
+  assert.equal(DEFAULT_PART_FIT.shinL, 'fill');
+  assert.equal(DEFAULT_PART_FIT.head, 'contain', '头不能被拉伸变形');
+  assert.equal(DEFAULT_PART_FIT.torso, 'contain');
+  assert.equal(DEFAULT_PART_FIT.handR, 'contain');
+  assert.equal(DEFAULT_PART_FIT.footL, 'contain');
 });
 
 test('对位：内容比画布小很多时会放大（不设上限），且尺寸至少 1px', () => {

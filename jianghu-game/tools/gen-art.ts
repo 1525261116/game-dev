@@ -39,8 +39,19 @@ export interface PromptConfig {
   charId: string;
   name?: string;
   body: string;
+  /** 武器组：写进 skin.json，决定用哪一套共享武器贴图（不填则跟随所在单位的武器组） */
+  weaponGroup?: string;
   model: string;
+  /** 默认出图尺寸（WxH 或 1K/2K/4K 预设） */
   size: string;
+  /**
+   * 按部件覆盖出图尺寸。
+   *
+   * ⚠️ 这条是实测逼出来的：**画布比例会决定模型怎么摆部件**。
+   *   给 2496×1664（横）它就把袖子画成横的；给 1584×2816（竖）才画成竖的。
+   *   而 cutout 管线要求四肢"像平铺在桌面上"、主轴竖直 —— 所以四肢必须给竖构图。
+   */
+  sizes?: Record<string, string>;
   /** true 会带上平台的"AI 生成"水印 —— 部件贴图必须为 false */
   watermark?: boolean;
   stylePrefix: string;
@@ -200,6 +211,8 @@ interface Cli {
   force: boolean;
   only: string[] | null;
   char: string | null;
+  /** 覆盖原始图输出目录（用于 A/B 对比两版提示语，互不覆盖） */
+  out: string | null;
   model: string | null;
   size: string | null;
   delayMs: number;
@@ -212,6 +225,7 @@ function parseCli(argv: string[]): Cli {
     force: argv.includes('--force'),
     only: flag('only')?.split(',').map((s) => s.trim()).filter(Boolean) ?? null,
     char: flag('char') ?? null,
+    out: flag('out') ?? null,
     model: flag('model') ?? null,
     size: flag('size') ?? null,
     delayMs: Number(flag('delay') ?? 1200),
@@ -229,24 +243,39 @@ async function main(): Promise<void> {
   const cfg = JSON.parse(readFileSync(PROMPTS_FILE, 'utf8')) as PromptConfig;
   const charId = cli.char ?? cfg.charId;
   const model = cli.model ?? cfg.model;
-  const size = cli.size ?? cfg.size;
+  const defaultSize = cli.size ?? cfg.size;
 
-  const rawDir = join(ASSETS, 'chars', charId, 'raw');
+  const rawDir = cli.out
+    ? join(GAME_ROOT, cli.out)
+    : join(ASSETS, 'chars', charId, 'raw');
   const extrasDir = join(rawDir, '_extras');
 
   // 组装任务清单：parts 进 raw/，extras 进 raw/_extras/
-  const jobs: { name: string; prompt: string; outPath: string }[] = [];
+  const jobs: { name: string; prompt: string; size: string; outPath: string }[] = [];
   for (const [slot, subject] of Object.entries(cfg.parts)) {
     if (cli.only && !cli.only.includes(slot)) continue;
-    jobs.push({ name: slot, prompt: composePrompt(cfg, subject), outPath: join(rawDir, `${slot}.png`) });
+    jobs.push({
+      name: slot,
+      prompt: composePrompt(cfg, subject),
+      size: cfg.sizes?.[slot] ?? defaultSize,
+      outPath: join(rawDir, `${slot}.png`),
+    });
   }
   for (const [name, subject] of Object.entries(cfg.extras ?? {})) {
     if (cli.only && !cli.only.includes(name)) continue;
-    jobs.push({ name, prompt: composePrompt(cfg, subject, true), outPath: join(extrasDir, `${name}.png`) });
+    jobs.push({
+      name,
+      prompt: composePrompt(cfg, subject, true),
+      size: cfg.sizes?.[name] ?? defaultSize,
+      outPath: join(extrasDir, `${name}.png`),
+    });
   }
 
   console.log('=== 生图（火山方舟 · Seedream）===');
-  console.log(`角色 ${charId}　体型 ${cfg.body}　模型 ${model}　尺寸 ${size}　水印 ${cfg.watermark === true ? '开（部件贴图建议关）' : '关'}`);
+  const usedSizes = new Set(jobs.map((j) => j.size));
+  console.log(
+    `角色 ${charId}　体型 ${cfg.body}　模型 ${model}　尺寸 ${[...usedSizes].join(' / ')}　水印 ${cfg.watermark === true ? '开（部件贴图建议关）' : '关'}`,
+  );
   console.log(`输出目录 ${rawDir.replace(`${GAME_ROOT}/`, '')}/`);
   console.log(`任务 ${jobs.length} 张${cli.only ? `（--only=${cli.only.join(',')}）` : ''}`);
 
@@ -255,7 +284,7 @@ async function main(): Promise<void> {
     console.log('── --dry：以下是将要发送的请求（不调用 API、不花钱）──');
     for (const j of jobs) {
       console.log('');
-      console.log(`【${j.name}】→ ${j.outPath.replace(`${GAME_ROOT}/`, '')}`);
+      console.log(`【${j.name}】${j.size} → ${j.outPath.replace(`${GAME_ROOT}/`, '')}`);
       console.log(j.prompt);
     }
     console.log('');
@@ -291,7 +320,7 @@ async function main(): Promise<void> {
       model,
       prompt: job.prompt,
       response_format: 'url',
-      size,
+      size: job.size,
       stream: false,
       watermark: cfg.watermark === true,
     });
@@ -333,11 +362,25 @@ async function main(): Promise<void> {
     console.log(`已生成审图接触表（${n} 张）：${sheet.replace(`${GAME_ROOT}/`, '')}`);
     // 顺手写一份"试穿用"的皮肤声明（已存在则不动）
     const skinPath = join(ASSETS, 'chars', charId, 'skin.json');
-    if (!existsSync(skinPath)) {
+    if (cli.out) {
+      console.log('（--out 模式：不改动 skin.json）');
+    } else if (!existsSync(skinPath)) {
       mkdirSync(dirname(skinPath), { recursive: true });
       writeFileSync(
         skinPath,
-        `${JSON.stringify({ id: charId, name: cfg.name ?? charId, body: cfg.body, art: 'base_male', palette: {}, parts: {} }, null, 2)}\n`,
+        `${JSON.stringify(
+          {
+            id: charId,
+            name: cfg.name ?? charId,
+            body: cfg.body,
+            art: 'base_male',
+            ...(cfg.weaponGroup ? { weaponGroup: cfg.weaponGroup } : {}),
+            palette: {},
+            parts: {},
+          },
+          null,
+          2,
+        )}\n`,
         'utf8',
       );
       console.log(`已写试穿声明：${skinPath.replace(`${GAME_ROOT}/`, '')}（未画的部件继承底图 base_male）`);

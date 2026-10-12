@@ -4,9 +4,10 @@
   "body": "male_adult",
   "art": "base_male",
   "palette": {},
+  "weaponGroup": "dao",
   "parts": {
     "cloak": {
-      "file": "chars/base_male/parts/cloak.png",
+      "file": "chars/hero_trial/parts/cloak.png",
       "w": 92,
       "h": 116,
       "pivot": [
@@ -15,7 +16,7 @@
       ]
     },
     "footL": {
-      "file": "chars/base_male/parts/footL.png",
+      "file": "chars/hero_trial/parts/footL.png",
       "w": 36,
       "h": 16,
       "pivot": [
@@ -24,7 +25,7 @@
       ]
     },
     "footR": {
-      "file": "chars/base_male/parts/footR.png",
+      "file": "chars/hero_trial/parts/footR.png",
       "w": 36,
       "h": 16,
       "pivot": [
@@ -51,7 +52,7 @@
       ]
     },
     "handL": {
-      "file": "chars/base_male/parts/handL.png",
+      "file": "chars/hero_trial/parts/handL.png",
       "w": 20,
       "h": 20,
       "pivot": [
@@ -60,7 +61,7 @@
       ]
     },
     "handR": {
-      "file": "chars/base_male/parts/handR.png",
+      "file": "chars/hero_trial/parts/handR.png",
       "w": 20,
       "h": 20,
       "pivot": [
@@ -78,7 +79,7 @@
       ]
     },
     "pelvis": {
-      "file": "chars/base_male/parts/pelvis.png",
+      "file": "chars/hero_trial/parts/pelvis.png",
       "w": 68,
       "h": 32,
       "pivot": [
@@ -87,7 +88,7 @@
       ]
     },
     "shinL": {
-      "file": "chars/base_male/parts/shinL.png",
+      "file": "chars/hero_trial/parts/shinL.png",
       "w": 24,
       "h": 60,
       "pivot": [
@@ -96,7 +97,7 @@
       ]
     },
     "shinR": {
-      "file": "chars/base_male/parts/shinR.png",
+      "file": "chars/hero_trial/parts/shinR.png",
       "w": 24,
       "h": 60,
       "pivot": [
@@ -105,7 +106,7 @@
       ]
     },
     "thighL": {
-      "file": "chars/base_male/parts/thighL.png",
+      "file": "chars/hero_trial/parts/thighL.png",
       "w": 28,
       "h": 64,
       "pivot": [
@@ -114,7 +115,7 @@
       ]
     },
     "thighR": {
-      "file": "chars/base_male/parts/thighR.png",
+      "file": "chars/hero_trial/parts/thighR.png",
       "w": 28,
       "h": 64,
       "pivot": [
