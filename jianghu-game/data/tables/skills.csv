@@ -3,7 +3,7 @@ GF_kuangfeng_dao,狂风刀法,fan,chujiao,1.2,single_any,,1,2,,,
 GF_duanyue_dao,断岳刀法,liang,lveyou,1.5,single_any,,2,3,,,
 GF_badao,霸刀,ji,chujiao,0.7,all,,3,1,,,
 GF_liuyun_jian,流云剑法,liang,chujiao,0.8,single_any,,1,2,,,
-GF_luohan_quan,罗汉拳,fan,chujiao,1.2,single_any,,1,2,stun,1,1
+GF_luohan_quan,罗汉拳,fan,chujiao,1.2,single_any,,1,2,stun,0.15,1
 GF_yangjia_qiang,杨家枪法,fan,chujiao,1.2,single_any,,1,2,knockback,0.15,1
 GF_liuye_feidao,柳叶飞刀,fan,chujiao,1.2,single_back,,1,2,,,
 GF_judge_bi,判官笔,fan,chujiao,1.2,single_any,,2,3,seal,0.1,1

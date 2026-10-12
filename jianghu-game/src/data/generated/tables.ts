@@ -57,7 +57,7 @@ export const SKILL_ROWS: SkillRow[] = [
     "stanceStart": 1,
     "stanceEnd": 2,
     "statusId": "stun",
-    "statusChance": 1,
+    "statusChance": 0.15,
     "statusRounds": 1
   },
   {

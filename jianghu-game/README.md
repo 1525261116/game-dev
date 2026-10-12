@@ -36,19 +36,25 @@
 | **M0 骨架能动** | ✅ **已达成** | 3 体型 / 3 动作 / 60 测试全绿 / 无头截图验证 |
 | **动作库补齐** | ✅ **已完成** | **62 个动作**（6 武器组 × 9 + 内功 4 + 身法 4）/ 测试 **69 项**全绿 |
 | **M1 游戏骨架** | 🚧 **进行中** | 场景流转 + Phaser 骨架渲染 + 九宫格布阵 + 战斗预结算与日志回放 + **阵法系统接入**（站位真正影响攻防） |
-| **战斗系统深化** | ✅ **已完成** | **10 型攻击范围 + 战斗倾向选目标 + 连招起收势 + 内力消耗**；测试 **186 项**全绿 |
+| **战斗系统深化** | ✅ **已完成** | **10 型攻击范围 + 战斗倾向选目标 + 连招起收势 + 内力消耗** |
+| **美术资源管线** | ✅ **已完成** | `assets/` 放图即生效（改名不改代码）；skin.json 自动生成 + 8 类错误导入期拦截；**占位贴图 + 三层水墨背景**已就位；测试 **202 项**全绿 |
 
 详见 [`docs/sprint-01-report.md`](docs/sprint-01-report.md) 与 [`docs/sprint-02-report.md`](docs/sprint-02-report.md)
+> **要改人物贴图 / 战斗背景 / 战斗 UI？先读 [`docs/asset-pipeline.md`](docs/asset-pipeline.md)** —— 那篇就是"放图 → 跑命令 → 生效"的完整手册。
 
 ## 目录结构
 
 | 路径 | 用途 / 说明 |
 |------|------|
 | `jianghu-game/` | 工程根目录 |
+| 　`assets/chars/<角色>/parts/` | **美术贴图**（17 个部件，文件名 = slot 名）；`skin.json` 由 `pnpm skin:gen` 生成 |
+| 　`assets/weapons/<组>/` | 武器贴图（6 组 × 5 品质，全角色共享） |
+| 　`assets/bg/battle/` | 战斗背景三层（远山 / 中景 / 地面） |
 | 　`data/tables/*.csv` | **策划编辑的配置表源文件**（Excel 可直接打开） |
 | 　`docs/` | — |
 | 　　`零基础上手手册_v1.0.md` | **零基础上手手册**（原理 / 术语 / 实操） |
 | 　　`rig-spec.md` | 骨架与部件规范（贴图按此画） |
+| 　　`asset-pipeline.md` | **美术资源管线手册**（换贴图 / 换背景 / 改战斗 UI 全流程） |
 | 　　`sprint-01-report.md` | Sprint-01 报告 |
 | 　　`sprint-02-report.md` | Sprint-02 报告（战斗系统深化） |
 | 　`src/` | — |
@@ -82,11 +88,13 @@
 | 　　　`anim/RigView.ts` | 骨架渲染（预创建部件、每帧只改属性，避免手机掉帧） |
 | 　　　`anim/CharacterView.ts` | 角色视图（骨架 + 动作播放 + 朝向镜像） |
 | 　　　`anim/MotionLib.ts` | 动作库注册表（自动收进全部动作，新增文件不用改代码） |
+| 　　　`anim/SkinRegistry.ts` | 皮肤注册表（资源路径 ↔ 纹理 key ↔ 单位 charId） |
+| 　　　`anim/RigView.ts` | 部件渲染：**有贴图用贴图，没贴图回退色块**（美术可分批交付） |
 | 　　　`scenes/` | 场景：启动 / 资源加载 / 主菜单 / 战斗 / **战斗验证台** / 动作库预览 |
 | 　　　`ui/Theme.ts` | 视觉主题与按钮（改一处，全游戏生效） |
 | 　`main.ts` | 游戏入口（只做配置与场景注册，保持极短） |
 | 　`index.html` | 网页入口（含移动端 viewport 适配） |
-| 　`tests/` | node --test（**186 项**：动画 24 / 战斗 27 / 伤害公式 23 / 范围 9 / 选目标 20 / 内力 9 / 连招 14 / 战斗结算 14 / 配置管线 14 / 阵法集成 14 / 功法 9 / 动作库 9） |
+| 　`tests/` | node --test（**202 项**：动画 24 / 战斗 27 / 伤害公式 23 / 范围 9 / 选目标 20 / 内力 9 / 连招 14 / **皮肤 16** / 战斗结算 14 / 配置管线 14 / 阵法集成 14 / 功法 9 / 动作库 9） |
 | 　　`fixtures.ts` | 测试夹具（面板可完全指定，用于精确断言；非 .test.ts 不会被收集） |
 | 　`tools/` | — |
 | 　　`load-json.ts` | — |
@@ -94,6 +102,8 @@
 | 　　`tables-io.ts` | 配置表读取与校验（脚本与测试共用，报错精确到行列） |
 | 　　`import-tables.ts` | **配置表导入器**（CSV → 生成的 TS；校验不通过不写盘） |
 | 　　`validate-tables.ts` | 配置表校验器（只检查，不生成文件） |
+| 　　`gen-skin.ts` | **皮肤导入器**（零依赖，自己读 PNG 文件头；校验 + 生成 skin.json） |
+| 　　`gen-placeholder-art.ts` | **占位美术生成器**（程序生成合规贴图与背景，默认不覆盖你画的图） |
 | 　　`preview/make-preview.ts` | 无依赖骨架预览生成器 |
 | 　`preview/` | 预览 HTML + 截图 |
 
@@ -166,15 +176,23 @@
 - 首次联网运行 `pnpm install` 安装 Phaser / Vite / Electron。
 - 运行 `node --test tests/*.test.ts` 执行核心逻辑测试（零依赖，可随时跑）。
 - 运行 `node tools/preview/make-preview.ts` 生成骨架预览 `preview/rig-preview.html`。
+- 运行 `pnpm art:placeholder` 生成一整套**合规的占位贴图与战斗背景**（**默认不覆盖你画好的图**；要重生成加 `--force`）。
+- 运行 `pnpm skin:gen` 扫描 `assets/` 并生成/校验 `skin.json`（缺件、尺寸、枢轴画错都会报出来，且**报错不写盘**）。
+- 运行 `pnpm skin:check` 只校验不写盘（CI 用）。
 - 运行 `pnpm gen:motions` 重新生成动作库（**默认不覆盖已有文件**，保护手工调整过的动作）。
 - 运行 `pnpm gen:motions:force` 强制重新生成全部动作（会覆盖手工调整）。
 - 运行 `pnpm dev` 启动开发服务器（需先 install）。
 
 ## 上手路径（美术）
 
-1. 读 [`docs/rig-spec.md`](docs/rig-spec.md)
-2. 按 §4 画布尺寸与 §2 slot 清单，产出第 1 个角色的 17 个部件（`cloak` 可选）
-3. 命名严格等于 slot 名，放入 `assets/chars/<charId>/parts/`
-4. 由 `tools/gen-skin.ts` 自动生成 `skin.json` 并做 slot 完整性校验（待实现）
+1. 读 [`docs/rig-spec.md`](docs/rig-spec.md)（骨架与部件规范）与 [`docs/asset-pipeline.md`](docs/asset-pipeline.md)（操作手册）
+2. **先跑 `pnpm art:placeholder` 生成一套占位贴图**，用图片查看器打开对着看尺寸与枢轴
+3. 按 §4 画布尺寸与 §2 slot 清单，产出角色的 17 个部件（`cloak` / `weapon` 可选）
+4. 命名严格等于 slot 名，**同名覆盖** `assets/chars/<charId>/parts/<slot>.png`
+5. 跑 `pnpm skin:gen` —— 缺件 / 尺寸错 / 枢轴错会直接告诉你是哪一张、应该是多少
+6. 浏览器刷新看效果（Vite 热更新，不用重启）
+
+战斗背景同理：同名覆盖 `assets/bg/battle/{far,mid,ground}.png` 后刷新即可。
 
 > 骨架与动作数据已冻结，**美术可以并行开工，不需要等程序**。
+> 贴图缺失时程序会**自动回退成色块占位** —— 画到一半也能随时跑起来看。
