@@ -43,6 +43,10 @@ jianghu-game/assets/chars/*/raw/
 # ---- 本地工具状态（WorkBuddy 会话与记忆，不纳入版本库）----
 .workbuddy/
 
+# ---- 分发用压缩包（7MB 二进制，与已入库的解压源码重复）----
+# 源码在 jianghu-tools/视频抠图工具-带裁剪功能/，此包仅供本地分发
+jianghu-tools/*.zip
+
 # ---- 临时文件 ----
 *.tmp
 *.bak
