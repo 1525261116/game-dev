@@ -26,6 +26,7 @@
     "skin:fit": "node tools/fit-skin-part.ts",
     "art:placeholder": "node tools/gen-placeholder-art.ts",
     "art:placeholder:force": "node tools/gen-placeholder-art.ts --force",
+    "art:gen": "node tools/gen-art.ts",
     "preview:rig": "node tools/preview/make-preview.ts",
     "gen:motions": "node tools/gen-motions.ts",
     "gen:motions:force": "node tools/gen-motions.ts --force"

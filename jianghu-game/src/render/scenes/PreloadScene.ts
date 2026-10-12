@@ -32,12 +32,33 @@ const SKIN_MODULES = import.meta.glob('../../../assets/chars/*/skin.json', {
   import: 'default',
 }) as Record<string, SkinDef>;
 
-/** 全部贴图 URL（key 会在下面规范化成"相对 assets/"的路径） */
-const PNG_URLS = import.meta.glob('../../../assets/**/*.png', {
-  eager: true,
-  import: 'default',
-  query: '?url',
-}) as Record<string, string>;
+/**
+ * 全部**运行期**贴图 URL（key 会在下面规范化成"相对 assets/"的路径）。
+ *
+ * 刻意只扫这三处，而不是 assets/ 全量：
+ *   · chars/<角色>/parts/  角色部件
+ *   · weapons/<组>/        武器
+ *   · bg/                  背景
+ * 这样 `chars/<角色>/raw/`（AI 生图原图，动辄 2K）**不会被当成运行期贴图加载**，
+ * 否则启动时白加载几十 MB、手机直接爆内存。
+ */
+const PNG_URLS = {
+  ...(import.meta.glob('../../../assets/chars/*/parts/*.png', {
+    eager: true,
+    import: 'default',
+    query: '?url',
+  }) as Record<string, string>),
+  ...(import.meta.glob('../../../assets/weapons/*/*.png', {
+    eager: true,
+    import: 'default',
+    query: '?url',
+  }) as Record<string, string>),
+  ...(import.meta.glob('../../../assets/bg/**/*.png', {
+    eager: true,
+    import: 'default',
+    query: '?url',
+  }) as Record<string, string>),
+};
 
 /** 规范化后的资源路径集合：`chars/x/parts/y.png` */
 const ASSET_PATHS: ReadonlySet<string> = new Set(Object.keys(PNG_URLS).map(toAssetRelPath));

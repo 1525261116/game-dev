@@ -31,6 +31,10 @@ yarn-error.log*
 Thumbs.db
 desktop.ini
 
+# ---- AI 生图原图（过程产物：带背景、尺寸未对位；正式部件在 parts/）----
+# 重新生成：cd jianghu-game && ARK_API_KEY=xxx pnpm art:gen
+jianghu-game/assets/chars/*/raw/
+
 # ---- 环境变量与密钥 ----
 .env
 .env.*

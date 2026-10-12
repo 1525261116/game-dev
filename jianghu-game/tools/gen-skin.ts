@@ -71,11 +71,21 @@ export function collectAssetFiles(dir: string = ASSETS_DIR): Set<string> {
   return out;
 }
 
-/** 列出 assets/chars 下的角色目录 */
+/**
+ * 列出 assets/chars 下的**角色**目录。
+ *
+ * 判据：目录里有 skin.json（已导入过）**或**有 parts/（新角色，正准备导入）。
+ * 这样 `chars/<角色>/raw/`（AI 生图原图中转目录）、只有 .gitkeep 的空目录
+ * 都不会被当成"还没画好的角色"而报错 —— 否则生图跑一半会让 skin:check 直接红。
+ */
 function listCharIds(): string[] {
   if (!existsSync(CHARS_DIR)) return [];
   return readdirSync(CHARS_DIR)
     .filter((n) => statSync(join(CHARS_DIR, n)).isDirectory())
+    .filter(
+      (n) =>
+        existsSync(join(CHARS_DIR, n, 'skin.json')) || existsSync(join(CHARS_DIR, n, 'parts')),
+    )
     .sort();
 }
 
