@@ -129,13 +129,22 @@ async function callArk(apiKey: string, body: Record<string, unknown>): Promise<A
   return { ok: true, url: first.url };
 }
 
-/** 下载到本地（Ark 返回的 URL 是临时的，必须立刻落盘） */
-async function download(url: string, outPath: string): Promise<number> {
+/**
+ * 下载并**统一转成 PNG**（Ark 返回的 URL 是临时的，必须立刻落盘）。
+ *
+ * ⚠️ 实测：Seedream 返回的是 **JPEG**（2048×2048），即便我们要的是 .png 文件名。
+ *    JPEG 没有透明通道、且有压缩噪点，直接改名会让下游的抠底与锐利边缘变差，
+ *    所以这里立刻用 sharp 转成真 PNG。
+ */
+async function download(url: string, outPath: string): Promise<{ bytes: number; from: string }> {
   const res = await fetch(url, { signal: AbortSignal.timeout(180_000) });
   if (!res.ok) throw new Error(`下载失败 HTTP ${res.status}`);
   const buf = Buffer.from(await res.arrayBuffer());
-  writeFileSync(outPath, buf);
-  return buf.length;
+
+  const meta = await sharp(buf).metadata();
+  const png = await sharp(buf).png({ compressionLevel: 9 }).toBuffer();
+  writeFileSync(outPath, png);
+  return { bytes: png.length, from: `${meta.format?.toUpperCase() ?? '?'} ${meta.width}×${meta.height}` };
 }
 
 /* ══════════════════ 审图用的接触表 ══════════════════ */
@@ -305,9 +314,9 @@ async function main(): Promise<void> {
     }
 
     try {
-      const bytes = await download(r.url!, job.outPath);
+      const dl = await download(r.url!, job.outPath);
       ok++;
-      console.log(`✓ ${(bytes / 1024).toFixed(0)} KB　${((Date.now() - t0) / 1000).toFixed(1)}s`);
+      console.log(`✓ ${(dl.bytes / 1024).toFixed(0)} KB　${dl.from} → PNG　${((Date.now() - t0) / 1000).toFixed(1)}s`);
     } catch (e) {
       failed++;
       console.log(`✗ 下载失败：${(e as Error).message}`);
