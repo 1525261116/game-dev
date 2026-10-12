@@ -20,7 +20,8 @@
  *   raw/ 是"待对位"的中转目录，已在 .gitignore 里排除（过程产物，不进仓库）。
  * ══════════════════════════════════════════════════════════════════
  */
-import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync, readdirSync, statSync } from 'node:fs';
+import { resolve as resolvePath } from 'node:path';
 import { dirname, extname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -42,8 +43,19 @@ export interface PromptConfig {
   /** 武器组：写进 skin.json，决定用哪一套共享武器贴图（不填则跟随所在单位的武器组） */
   weaponGroup?: string;
   model: string;
-  /** 默认出图尺寸（WxH 或 1K/2K/4K 预设） */
+  /** 默认出图尺寸（WxH 或 1K/2K 预设；实测面积上限 4,624,220 px，2048×2048 已接近上限） */
   size: string;
+  /**
+   * 参考图（图生图）：本地文件路径或 http(s) URL。
+   *
+   * 实测收益：① 同一套衣服的各个部件不再各画各的（风格/配色一致）
+   *          ② 画面更干净（"纯白背景"拦不住的背景墨点飞溅也消失了）
+   *          ③ 细节更好（织物纹理、褶皱体积感）
+   * 本地文件会转成 base64 data URI 直接发（已验证该模型接受 data URI，无需公网 URL）。
+   */
+  reference?: string;
+  /** 随机种子（可复现；不填则每次不同） */
+  seed?: number;
   /**
    * 按部件覆盖出图尺寸。
    *
@@ -213,6 +225,8 @@ interface Cli {
   char: string | null;
   /** 覆盖原始图输出目录（用于 A/B 对比两版提示语，互不覆盖） */
   out: string | null;
+  /** 覆盖参考图（传 none 可关掉配置里的参考图） */
+  ref: string | null;
   model: string | null;
   size: string | null;
   delayMs: number;
@@ -226,10 +240,27 @@ function parseCli(argv: string[]): Cli {
     only: flag('only')?.split(',').map((s) => s.trim()).filter(Boolean) ?? null,
     char: flag('char') ?? null,
     out: flag('out') ?? null,
+    ref: flag('ref') ?? null,
     model: flag('model') ?? null,
     size: flag('size') ?? null,
     delayMs: Number(flag('delay') ?? 1200),
   };
+}
+
+/**
+ * 把参考图变成 API 能吃的形式：
+ *   · http(s) URL → 原样传
+ *   · 本地文件    → 读出来转 base64 data URI（实测该模型接受）
+ */
+export function toImageRef(ref: string): { value: string; note: string } {
+  if (/^https?:\/\//.test(ref)) return { value: ref, note: 'URL' };
+  const abs = resolvePath(ref);
+  if (!existsSync(abs)) throw new Error(`参考图不存在：${ref}`);
+  const ext = abs.toLowerCase().endsWith('.png') ? 'png' : 'jpeg';
+  const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
+  const b64 = readFileSync(abs).toString('base64');
+  const kb = Math.round(statSync(abs).size / 1024);
+  return { value: `data:${mime};base64,${b64}`, note: `本地文件 ${kb}KB → base64` };
 }
 
 async function main(): Promise<void> {
@@ -244,6 +275,8 @@ async function main(): Promise<void> {
   const charId = cli.char ?? cfg.charId;
   const model = cli.model ?? cfg.model;
   const defaultSize = cli.size ?? cfg.size;
+  const refSpec = cli.ref === 'none' ? undefined : (cli.ref ?? cfg.reference);
+  const ref = refSpec ? toImageRef(refSpec) : null;
 
   const rawDir = cli.out
     ? join(GAME_ROOT, cli.out)
@@ -277,6 +310,7 @@ async function main(): Promise<void> {
     `角色 ${charId}　体型 ${cfg.body}　模型 ${model}　尺寸 ${[...usedSizes].join(' / ')}　水印 ${cfg.watermark === true ? '开（部件贴图建议关）' : '关'}`,
   );
   console.log(`输出目录 ${rawDir.replace(`${GAME_ROOT}/`, '')}/`);
+  if (ref) console.log(`参考图：${ref.note}${refSpec && /^https?:/.test(refSpec) ? `（${refSpec.slice(0, 60)}…）` : ''}`);
   console.log(`任务 ${jobs.length} 张${cli.only ? `（--only=${cli.only.join(',')}）` : ''}`);
 
   if (cli.dry) {
@@ -323,6 +357,8 @@ async function main(): Promise<void> {
       size: job.size,
       stream: false,
       watermark: cfg.watermark === true,
+      ...(ref ? { image: ref.value } : {}),
+      ...(cfg.seed !== undefined ? { seed: cfg.seed } : {}),
     });
 
     if (!r.ok) {
