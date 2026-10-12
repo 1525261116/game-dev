@@ -8,30 +8,56 @@ import type { BattleSetupRow, SkillRow, UnitRow } from '../../core/config/schema
 /** 功法表（来自 data/tables/skills.csv） */
 export const SKILL_ROWS: SkillRow[] = [
   {
+    "id": "GF_kuangfeng_dao",
+    "name": "狂风刀法",
+    "quality": "fan",
+    "realm": "chujiao",
+    "multiplier": 1.2,
+    "range": "single_any",
+    "stanceStart": 1,
+    "stanceEnd": 2
+  },
+  {
     "id": "GF_duanyue_dao",
     "name": "断岳刀法",
     "quality": "liang",
     "realm": "lveyou",
-    "multiplier": 1.2,
-    "targets": "column"
+    "multiplier": 1.5,
+    "range": "single_any",
+    "stanceStart": 2,
+    "stanceEnd": 3
+  },
+  {
+    "id": "GF_badao",
+    "name": "霸刀",
+    "quality": "ji",
+    "realm": "chujiao",
+    "multiplier": 0.7,
+    "range": "all",
+    "stanceStart": 3,
+    "stanceEnd": 1
   },
   {
     "id": "GF_liuyun_jian",
     "name": "流云剑法",
-    "quality": "shang",
+    "quality": "liang",
     "realm": "chujiao",
-    "multiplier": 1,
-    "targets": "single"
+    "multiplier": 0.8,
+    "range": "single_any",
+    "stanceStart": 1,
+    "stanceEnd": 2
   },
   {
     "id": "GF_luohan_quan",
     "name": "罗汉拳",
-    "quality": "liang",
-    "realm": "lveyou",
-    "multiplier": 1.1,
-    "targets": "single",
+    "quality": "fan",
+    "realm": "chujiao",
+    "multiplier": 1.2,
+    "range": "single_any",
+    "stanceStart": 1,
+    "stanceEnd": 2,
     "statusId": "stun",
-    "statusChance": 0.25,
+    "statusChance": 0.15,
     "statusRounds": 1
   },
   {
@@ -39,27 +65,36 @@ export const SKILL_ROWS: SkillRow[] = [
     "name": "杨家枪法",
     "quality": "fan",
     "realm": "chujiao",
-    "multiplier": 1,
-    "targets": "row"
+    "multiplier": 1.2,
+    "range": "single_any",
+    "stanceStart": 1,
+    "stanceEnd": 2,
+    "statusId": "knockback",
+    "statusChance": 0.15,
+    "statusRounds": 1
   },
   {
     "id": "GF_liuye_feidao",
     "name": "柳叶飞刀",
     "quality": "fan",
     "realm": "chujiao",
-    "multiplier": 1,
-    "targets": "single"
+    "multiplier": 1.2,
+    "range": "single_back",
+    "stanceStart": 1,
+    "stanceEnd": 2
   },
   {
     "id": "GF_judge_bi",
     "name": "判官笔",
-    "quality": "liang",
+    "quality": "fan",
     "realm": "chujiao",
-    "multiplier": 1,
-    "targets": "single",
+    "multiplier": 1.2,
+    "range": "single_any",
+    "stanceStart": 2,
+    "stanceEnd": 3,
     "statusId": "seal",
-    "statusChance": 0.3,
-    "statusRounds": 2
+    "statusChance": 0.1,
+    "statusRounds": 1
   }
 ];
 
@@ -81,7 +116,10 @@ export const UNIT_ROWS: UnitRow[] = [
     "lifesteal": 0,
     "innerCultivation": 40,
     "gongfaCultivation": 10,
-    "skillId": "GF_duanyue_dao"
+    "breath": 40,
+    "skillId": "GF_kuangfeng_dao",
+    "skillIdB": "GF_duanyue_dao",
+    "skillIdC": "GF_badao"
   },
   {
     "id": "ally_jian",
@@ -99,6 +137,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "lifesteal": 0,
     "innerCultivation": 35,
     "gongfaCultivation": 12,
+    "breath": 50,
     "skillId": "GF_liuyun_jian"
   },
   {
@@ -117,6 +156,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "lifesteal": 0,
     "innerCultivation": 30,
     "gongfaCultivation": 8,
+    "breath": 30,
     "skillId": "GF_luohan_quan"
   },
   {
@@ -135,6 +175,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "lifesteal": 0,
     "innerCultivation": 20,
     "gongfaCultivation": 6,
+    "breath": 45,
     "skillId": "GF_yangjia_qiang"
   },
   {
@@ -153,6 +194,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "lifesteal": 0,
     "innerCultivation": 15,
     "gongfaCultivation": 4,
+    "breath": 35,
     "skillId": "GF_liuye_feidao"
   },
   {
@@ -171,6 +213,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "lifesteal": 0,
     "innerCultivation": 25,
     "gongfaCultivation": 8,
+    "breath": 50,
     "skillId": "GF_judge_bi"
   }
 ];

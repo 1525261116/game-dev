@@ -19,7 +19,9 @@ import {
 } from '../core/config/schema.ts';
 import { BATTLE_SETUP_ROWS, SKILL_ROWS, UNIT_ROWS } from './generated/tables.ts';
 import { FORMATIONS } from './formations.ts';
-import { gongfaPower } from './gongfa-power.ts';
+import { gongfaPower, innerCost, innerRegenPerRound, toInner } from './gongfa-power.ts';
+import { DEFAULT_RANDOM_COUNT } from '../core/battle/range.ts';
+import type { RangeId } from '../core/battle/range.ts';
 import type { BattleSetupRow, SkillRow, TableIssue, UnitRow } from '../core/config/schema.ts';
 import type {
   BattleUnitConfig,
@@ -29,7 +31,7 @@ import type {
 } from '../core/battle/simulate.ts';
 import type { MotionGroup } from '../core/anim/types.ts';
 import type { SlotIndex } from '../core/battle/types.ts';
-import type { Quality, TargetShape } from './gongfa_visual.ts';
+import type { Quality } from './gongfa_visual.ts';
 
 /** 功法表：按 id 索引 */
 export const SKILLS_BY_ID: Record<string, SkillRow> = Object.fromEntries(
@@ -103,15 +105,25 @@ export function validateTablesAtRuntime(): { ok: boolean; issues: TableIssue[] }
  * 功法行 → 战斗用招式配置。
  * 注意「功法威力」不是表里写死的，而是由 **品质 × 境界倍率 × 3** 算出来的
  * （见 data/gongfa-power.ts），这样调平衡时只需改品质或境界，无需逐个改威力。
+ * 内力消耗同理：由品质推导（凡10/良20/上35/极55/绝80）。
  */
 export function toSkillConfig(row: SkillRow): SkillConfig {
+  const quality = row.quality as Quality;
   const cfg: SkillConfig = {
     id: row.id,
     name: row.name,
-    power: gongfaPower(row.quality as Quality, row.realm),
+    quality,
+    power: gongfaPower(quality, row.realm),
     multiplier: row.multiplier,
-    targets: row.targets as TargetShape,
+    range: row.range as RangeId,
+    // 连招起收势：表里留空 = 1/1（不参与连招链，等价辅助型）
+    stanceStart: row.stanceStart ?? 1,
+    stanceEnd: row.stanceEnd ?? 1,
+    innerCost: innerCost(quality),
   };
+  if (row.range === 'random_n') {
+    cfg.randomCount = row.randomCount ?? DEFAULT_RANDOM_COUNT;
+  }
   if (row.statusId && row.statusChance !== undefined && row.statusRounds !== undefined) {
     cfg.status = { id: row.statusId, chance: row.statusChance, rounds: row.statusRounds };
   }
@@ -120,12 +132,20 @@ export function toSkillConfig(row: SkillRow): SkillConfig {
 
 /** 单位行 → 战斗用单位配置 */
 export function toUnitConfig(row: UnitRow): BattleUnitConfig {
-  const skill = SKILLS_BY_ID[row.skillId];
-  if (!skill) {
-    throw new Error(
-      `单位「${row.name}」引用了不存在的功法「${row.skillId}」——请检查 data/tables/units.csv 与 skills.csv`,
-    );
-  }
+  // 装备位最多 3 门套路（GDD 02 §2.1「三大类 × 装备位」），顺序即连招顺序
+  const skillIds = [row.skillId, row.skillIdB, row.skillIdC].filter(
+    (id): id is string => typeof id === 'string' && id.length > 0,
+  );
+
+  const skills = skillIds.map((id) => {
+    const skill = SKILLS_BY_ID[id];
+    if (!skill) {
+      throw new Error(
+        `单位「${row.name}」引用了不存在的功法「${id}」——请检查 data/tables/units.csv 与 skills.csv`,
+      );
+    }
+    return toSkillConfig(skill);
+  });
 
   const stats: UnitStats = {
     hpMax: row.hpMax,
@@ -138,6 +158,9 @@ export function toUnitConfig(row: UnitRow): BattleUnitConfig {
     lifesteal: row.lifesteal,
     innerCultivation: row.innerCultivation,
     gongfaCultivation: row.gongfaCultivation,
+    // 内力上限与每回合回复都由「内息」派生，公式在 data/gongfa-power.ts
+    innerMax: toInner(row.breath),
+    innerRegen: innerRegenPerRound(row.breath),
   };
 
   return {
@@ -147,7 +170,7 @@ export function toUnitConfig(row: UnitRow): BattleUnitConfig {
     slot: row.slot as SlotIndex,
     group: row.group as MotionGroup,
     stats,
-    skill: toSkillConfig(skill),
+    skills,
   };
 }
 
@@ -160,8 +183,11 @@ export function buildParty(side: 'ally' | 'enemy'): BattleUnitConfig[] {
 
 /** 把一套阵容转成可读文本（调试与战报显示用） */
 export function describeUnit(row: UnitRow): string {
-  const skill = SKILLS_BY_ID[row.skillId];
-  return `${row.name}（气血 ${row.hpMax}／攻 ${row.atk}／防 ${row.def}／速 ${row.spd}）招式：${skill?.name ?? row.skillId}`;
+  const names = [row.skillId, row.skillIdB, row.skillIdC]
+    .filter((id): id is string => typeof id === 'string' && id.length > 0)
+    .map((id) => SKILLS_BY_ID[id]?.name ?? id)
+    .join(' / ');
+  return `${row.name}（气血 ${row.hpMax}／攻 ${row.atk}／防 ${row.def}／速 ${row.spd}／内力 ${toInner(row.breath)}）套路：${names}`;
 }
 
 /**

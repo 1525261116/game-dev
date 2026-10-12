@@ -109,7 +109,12 @@ test('单位转换：字段完整、站位与武器组正确', () => {
     assert.equal(cfg.group, row.group);
     assert.equal(cfg.stats.hpMax, row.hpMax);
     assert.equal(cfg.stats.atk, row.atk);
-    assert.ok(cfg.skill.id === row.skillId);
+    // 装备位 1~3 门套路：顺序与表一致，第一门就是 skillId
+    assert.ok(cfg.skills.length >= 1 && cfg.skills.length <= 3);
+    assert.equal(cfg.skills[0]!.id, row.skillId);
+    // 内力上限/回复由内息派生
+    assert.equal(cfg.stats.innerMax, row.breath * 10);
+    assert.equal(cfg.stats.innerRegen, row.breath / 10);
   }
 });
 

@@ -31,6 +31,11 @@ export function toInner(breath: number, innerBonus = 0): number {
   return breath * 10 + innerBonus;
 }
 
+/** 每回合内力回复 = 内息 ÷ 10 + 内功加成（GDD 02 §2.1.1-4） */
+export function innerRegenPerRound(breath: number, innerBonus = 0): number {
+  return breath / 10 + innerBonus;
+}
+
 /** 命中 / 闪避：每 10 点身法 = +1%（即 身法 × 0.001） */
 export function agilityToRate(agility: number): number {
   return (agility / 10) * 0.01;
@@ -73,6 +78,28 @@ export const QUALITY_NAME: Record<Quality, string> = {
   ji: '极品',
   jue: '绝世',
 };
+
+/* ══════════════════════ 内力消耗与普攻 ══════════════════════ */
+
+/**
+ * 套路释放的内力消耗（GDD 02 §2.1.1-4）
+ * 凡品 10 / 良品 20 / 上品 35 / 极品 55 / 绝世 80
+ *
+ * 与 QUALITY_POWER 同值并非巧合：设计刻意让"威力底子"与"内力成本"同轴，
+ * 高品质功法更强也更贵。这里指向同一个常量，调平衡时只需要改一个点。
+ */
+export const INNER_COST_BY_QUALITY: Record<Quality, number> = QUALITY_POWER;
+
+/** 按品质取一次释放的内力消耗 */
+export function innerCost(quality: Quality): number {
+  return INNER_COST_BY_QUALITY[quality];
+}
+
+/**
+ * 内力不足时自动改用普通攻击（GDD 02 "内力不足 → 自动改用普攻"）
+ * 普攻伤害 = 攻击力 × 0.5，且**不消耗内力**。
+ */
+export const BASIC_ATTACK_ATK_MUL = 0.5;
 
 /**
  * 功法境界十档与倍率（GDD 03 §3.1.4）

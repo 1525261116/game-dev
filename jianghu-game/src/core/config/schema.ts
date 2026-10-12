@@ -13,10 +13,17 @@
  */
 import { z } from 'zod';
 import { MOTION_GROUPS } from '../anim/types.ts';
+import { RANDOM_COUNT_RANGE, RANGE_IDS } from '../battle/range.ts';
+import type { RangeId } from '../battle/range.ts';
 
 /* ══════════════════ 枚举取值（与代码保持一致） ══════════════════ */
 
 export const QUALITIES = ['fan', 'liang', 'shang', 'ji', 'jue'] as const;
+
+/**
+ * 表现层的 4 型特效形状（≠ 战斗层的 10 型范围）。
+ * 10 型落在战斗数据层（skills.csv 的 range 列），由 core/battle/range.ts 换算。
+ */
 export const TARGET_SHAPES = ['single', 'column', 'row', 'all'] as const;
 
 /** 状态 id 白名单：与 src/data/status.ts 的 STATUS_DEFS 保持一致 */
@@ -51,14 +58,20 @@ export const skillRowSchema = z.object({
   id: z.string().min(1, 'id 不能为空'),
   /** 显示名 */
   name: z.string().min(1, 'name 不能为空'),
-  /** 品质：决定基础威力（凡10/良20/上35/极55/绝80） */
+  /** 品质：决定基础威力（凡10/良20/上35/极55/绝80）与内力消耗 */
   quality: z.enum(QUALITIES),
   /** 功法境界 id：决定境界倍率（见 data/gongfa-power.ts） */
   realm: z.string().min(1),
   /** 招式倍率（乘在功法威力上） */
   multiplier: z.coerce.number().positive('倍率必须大于 0'),
-  /** 打击范围 */
-  targets: z.enum(TARGET_SHAPES),
+  /** 攻击范围：10 型之一（口径见 05_combat/功法系统.md §6.5） */
+  range: z.enum(RANGE_IDS as unknown as [RangeId, ...RangeId[]]),
+  /** 仅随机 N 型使用：N ∈ {2,3,4}，留空 = 3 */
+  randomCount: optionalNumber,
+  /** 连招起势 1~3；留空 = 1（不参与连招链） */
+  stanceStart: optionalNumber,
+  /** 连招收势 1~3；留空 = 1（不参与连招链） */
+  stanceEnd: optionalNumber,
   /** 附带状态 id（可选） */
   statusId: z.preprocess(emptyToUndefined, z.enum(STATUS_IDS).optional()),
   /** 状态触发概率 0~1 */
@@ -100,8 +113,17 @@ export const unitRowSchema = z.object({
   innerCultivation: z.coerce.number(),
   /** 当前功法类型修为 */
   gongfaCultivation: z.coerce.number(),
+  /**
+   * 内息：决定内力上限（内息 × 10）与每回合回复（内息 ÷ 10）。
+   * 见 GDD 02 §2.1.1-4「内力系统」。
+   */
+  breath: z.coerce.number().nonnegative(),
   /** 使用的功法 id（必须能在 skills.csv 里找到） */
   skillId: z.string().min(1),
+  /** 第 2 门装备套路（可选；连招链的主力） */
+  skillIdB: optionalString,
+  /** 第 3 门装备套路（可选） */
+  skillIdC: optionalString,
 });
 
 export type UnitRow = z.infer<typeof unitRowSchema>;
@@ -128,11 +150,64 @@ export interface TableIssue {
   message: string;
 }
 
+/* ══════════════════ 范围 × 伤害原型：禁配红线 ══════════════════ */
+
+/**
+ * 伤害原型档位（由招式倍率推断）与它**允许**的攻击范围。
+ *
+ * 口径：05_combat/功法系统.md §6.5.4「范围 × 伤害原型：正交 + 合法组合矩阵」
+ * 红线：① 单体爆发/常规/连击型**禁止**配排/列/十字/全体
+ *       ② 范围大招**禁止**配单体
+ * 这条校验是 GDD 3.10.4 明确要求「必须实现」的自动化脚本之一。
+ */
+export const SINGLE_ONLY_RANGES: readonly RangeId[] = ['single_any', 'single_front', 'single_back'];
+export const AOE_ONLY_RANGES: readonly RangeId[] = ['all', 'row_front', 'row_mid', 'row_back', 'cross', 'random_n'];
+
+export const DAMAGE_ARCHETYPES = [
+  { id: 'single_burst', name: '单体爆发', multiplier: 1.5, allowed: SINGLE_ONLY_RANGES },
+  { id: 'single_normal', name: '单体常规', multiplier: 1.2, allowed: SINGLE_ONLY_RANGES },
+  { id: 'combo_hit', name: '连击型', multiplier: 0.8, allowed: SINGLE_ONLY_RANGES },
+  { id: 'aoe_normal', name: '范围常规/控制+伤害', multiplier: 1.0, allowed: null },
+  { id: 'aoe_ultimate', name: '范围大招', multiplier: 0.7, allowed: AOE_ONLY_RANGES },
+] as const;
+
+/**
+ * 由倍率推断允许的范围；返回 null 表示**不限**（倍率 1.0 同时覆盖
+ * 「范围常规」与「控制+伤害」，两者都允许任意范围）。
+ *
+ * 用相对容差比较，避免 CSV 里的 1.2 读成 1.2000000000000002 时误判。
+ */
+export function allowedRangesFor(multiplier: number): readonly RangeId[] | null {
+  const hit = DAMAGE_ARCHETYPES.find((a) => Math.abs(a.multiplier - multiplier) < 1e-9);
+  return hit ? hit.allowed : null;
+}
+
+/** 逐行检查「伤害原型 × 范围」是否踩红线（GDD 3.10.4） */
+export function checkRangeMultiplierMatrix(skills: readonly SkillRow[]): TableIssue[] {
+  const issues: TableIssue[] = [];
+  skills.forEach((s, i) => {
+    const allowed = allowedRangesFor(s.multiplier);
+    if (!allowed || allowed.includes(s.range)) return;
+    const archetype = DAMAGE_ARCHETYPES.find((a) => Math.abs(a.multiplier - s.multiplier) < 1e-9);
+    issues.push({
+      file: 'skills.csv',
+      row: i + 1,
+      field: 'range',
+      message:
+        `「${s.name}」倍率 ${s.multiplier}（${archetype?.name ?? '未识别原型'}）` +
+        `不允许搭配范围「${s.range}」，只允许 ${allowed.join(' / ')}`,
+    });
+  });
+  return issues;
+}
+
 /**
  * 跨表校验：单表校验管不住的问题在这里兜底。
- *  ① 单位引用的功法必须存在（防止拼错 id）
+ *  ① 单位引用的功法必须存在（防止拼错 id）—— 三个装备位都要查
  *  ② 同一阵营的站位不能重复（防止两个角色站同一格）
  *  ③ 每方至少要有一个单位（否则战斗无法开始）
+ *  ④ 功法「伤害原型 × 范围」不得踩禁配红线（GDD 3.10.4）
+ *  ⑤ 随机 N 的 N 必须在 {2,3,4}；连招起收势必须在 1~3
  */
 export function checkCrossTable(
   skills: SkillRow[],
@@ -143,14 +218,51 @@ export function checkCrossTable(
   const issues: TableIssue[] = [];
   const skillIds = new Set(skills.map((s) => s.id));
 
-  units.forEach((u, i) => {
-    if (!skillIds.has(u.skillId)) {
+  issues.push(...checkRangeMultiplierMatrix(skills));
+
+  /* 功法表内部一致性：随机 N 的 N、连招编号取值范围 */
+  skills.forEach((s, i) => {
+    const fieldRow = { file: 'skills.csv', row: i + 1 } as const;
+    if (s.range === 'random_n') {
+      // 留空允许（按默认 N=3 处理）；填了就必须落在区间内
+      if (s.randomCount !== undefined
+        && (s.randomCount < RANDOM_COUNT_RANGE.min || s.randomCount > RANDOM_COUNT_RANGE.max)) {
+        issues.push({
+          ...fieldRow,
+          field: 'randomCount',
+          message: `「${s.name}」随机 N 的 N=${s.randomCount} 越界，允许范围 ${RANDOM_COUNT_RANGE.min}~${RANDOM_COUNT_RANGE.max}`,
+        });
+      }
+    } else if (s.randomCount !== undefined) {
       issues.push({
-        file: 'units.csv',
-        row: i + 1,
-        field: 'skillId',
-        message: `${u.name} 引用了不存在的功法「${u.skillId}」，请检查 skills.csv`,
+        ...fieldRow,
+        field: 'randomCount',
+        message: `「${s.name}」范围是 ${s.range}，不是随机 N，randomCount 必须留空`,
       });
+    }
+    for (const field of ['stanceStart', 'stanceEnd'] as const) {
+      const v = s[field];
+      if (v !== undefined && (v < 1 || v > 3)) {
+        issues.push({
+          ...fieldRow,
+          field,
+          message: `「${s.name}」${field}=${v} 越界，连招编号只能是 1~3`,
+        });
+      }
+    }
+  });
+
+  units.forEach((u, i) => {
+    for (const field of ['skillId', 'skillIdB', 'skillIdC'] as const) {
+      const ref = u[field];
+      if (ref && !skillIds.has(ref)) {
+        issues.push({
+          file: 'units.csv',
+          row: i + 1,
+          field,
+          message: `${u.name} 引用了不存在的功法「${ref}」，请检查 skills.csv`,
+        });
+      }
     }
   });
 

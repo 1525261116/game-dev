@@ -1,7 +1,7 @@
-id,name,side,slot,group,hpMax,atk,def,spd,crit,dodge,hit,lifesteal,innerCultivation,gongfaCultivation,skillId
-ally_dao,刀客,ally,0,dao,1250,340,90,55,0.15,0.05,0.90,0,40,10,GF_duanyue_dao
-ally_jian,剑客,ally,1,jian,1150,320,80,62,0.20,0.10,0.92,0,35,12,GF_liuyun_jian
-ally_quan,拳师,ally,2,quan,1450,300,110,48,0.10,0.04,0.88,0,30,8,GF_luohan_quan
-enemy_qiang,枪手,enemy,0,qiang,1100,300,85,52,0.12,0.05,0.88,0,20,6,GF_yangjia_qiang
-enemy_anqi,暗器手,enemy,1,anqi,900,280,60,70,0.25,0.15,0.90,0,15,4,GF_liuye_feidao
-enemy_qimen,奇门客,enemy,2,qimen,1000,290,75,58,0.14,0.08,0.90,0,25,8,GF_judge_bi
+id,name,side,slot,group,hpMax,atk,def,spd,crit,dodge,hit,lifesteal,innerCultivation,gongfaCultivation,breath,skillId,skillIdB,skillIdC
+ally_dao,刀客,ally,0,dao,1250,340,90,55,0.15,0.05,0.90,0,40,10,40,GF_kuangfeng_dao,GF_duanyue_dao,GF_badao
+ally_jian,剑客,ally,1,jian,1150,320,80,62,0.20,0.10,0.92,0,35,12,50,GF_liuyun_jian,,
+ally_quan,拳师,ally,2,quan,1450,300,110,48,0.10,0.04,0.88,0,30,8,30,GF_luohan_quan,,
+enemy_qiang,枪手,enemy,0,qiang,1100,300,85,52,0.12,0.05,0.88,0,20,6,45,GF_yangjia_qiang,,
+enemy_anqi,暗器手,enemy,1,anqi,900,280,60,70,0.25,0.15,0.90,0,15,4,35,GF_liuye_feidao,,
+enemy_qimen,奇门客,enemy,2,qimen,1000,290,75,58,0.14,0.08,0.90,0,25,8,50,GF_judge_bi,,

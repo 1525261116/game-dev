@@ -20,6 +20,7 @@ import { THEME, bodyStyle, createButton, dimStyle, titleStyle } from '../ui/Them
 import type { BattleEvent, BattleLog } from '../../core/battle/simulate.ts';
 import type { MotionGroup } from '../../core/anim/types.ts';
 import type { SlotIndex } from '../../core/battle/types.ts';
+import type { CombatIntent } from '../../core/battle/targeting.ts';
 
 const VIEW_W = 960;
 const VIEW_H = 540;
@@ -27,6 +28,10 @@ const CELL_W = 92;
 const CELL_H = 104;
 const HP_BAR_W = 88;
 const HP_BAR_H = 6;
+const INNER_BAR_H = 3;
+/** 内力条颜色：充足=靛蓝，见底=灰（一眼看出下一手会不会退化成普攻） */
+const INNER_COLOR = 0x4a6fd4;
+const INNER_COLOR_LOW = 0xb9b3a4;
 
 /** 九宫格站位 → 屏幕坐标（与布阵逻辑一致） */
 function slotPosition(slot: SlotIndex, side: 'ally' | 'enemy'): { x: number; y: number } {
@@ -48,14 +53,22 @@ interface UnitView {
   y: number;
   hpMax: number;
   hp: number;
+  innerMax: number;
+  inner: number;
   dead: boolean;
   hpBar: Phaser.GameObjects.Rectangle;
+  innerBar: Phaser.GameObjects.Rectangle;
   hpText: Phaser.GameObjects.Text;
   nameText: Phaser.GameObjects.Text;
 }
 
 export class BattleScene extends Phaser.Scene {
   private seed = 'demo';
+  /**
+   * 战斗倾向（玩家唯一的间接控制手段，GDD 02 §2.1.1-5）。
+   * 设计推荐默认「优先连招」——它会追求起势/收势匹配，打出 +30%/+60% 的连招。
+   */
+  private intent: CombatIntent = 'combo';
 
   private log!: BattleLog;
   private units = new Map<string, UnitView>();
@@ -75,8 +88,9 @@ export class BattleScene extends Phaser.Scene {
     super('battle');
   }
 
-  init(data: { seed?: string }): void {
+  init(data: { seed?: string; intent?: CombatIntent }): void {
     this.seed = data.seed ?? `battle-${Date.now()}`;
+    if (data.intent) this.intent = data.intent;
   }
 
   create(): void {
@@ -89,11 +103,16 @@ export class BattleScene extends Phaser.Scene {
     this.log = simulateBattle({
       allies: DEFAULT_BATTLE.allies,
       enemies: DEFAULT_BATTLE.enemies,
+      allyIntent: this.intent,
+      enemyIntent: 'output', // 敌方 AI 默认点残血（GDD 02 §6.5.7）
       seed: this.seed,
     });
 
     this.add.text(24, 18, '战斗 · 九宫格对阵', titleStyle(18)).setResolution(2);
     this.add.text(24, 44, `种子 ${this.seed}`, dimStyle(11)).setResolution(2);
+    this.add
+      .text(24, 60, `倾向 ${this.intent === 'combo' ? '优先连招' : '优先输出'}`, dimStyle(11))
+      .setResolution(2);
 
     this.roundText = this.add
       .text(VIEW_W / 2, 26, '', bodyStyle(15))
@@ -118,8 +137,14 @@ export class BattleScene extends Phaser.Scene {
     this.add.rectangle(VIEW_W / 2, VIEW_H / 2 + 10, 1, 380, THEME.gold, 0.28);
     this.buildUnits();
 
-    createButton(this, VIEW_W / 2 - 100, VIEW_H - 36, '重新战斗', () => this.rematch(), 160, 40);
-    createButton(this, VIEW_W / 2 + 100, VIEW_H - 36, '返回菜单', () => this.scene.start('menu'), 160, 40);
+    createButton(this, VIEW_W / 2 - 190, VIEW_H - 36, `倾向：${this.intent === 'combo' ? '优先连招' : '优先输出'}`, () => this.toggleIntent(), 170, 40);
+    createButton(this, VIEW_W / 2, VIEW_H - 36, '重新战斗', () => this.rematch(), 160, 40);
+    createButton(this, VIEW_W / 2 + 190, VIEW_H - 36, '返回菜单', () => this.scene.start('menu'), 160, 40);
+  }
+
+  /** 战前倾向切换：立刻用同一套阵容 + 新倾向重打一场（设计：倾向是玩家唯一的间接控制手段） */
+  private toggleIntent(): void {
+    this.scene.restart({ seed: this.seed, intent: this.intent === 'combo' ? 'output' : 'combo' });
   }
 
   /** 画九宫格站位框（双方各 9 格） */
@@ -150,12 +175,17 @@ export class BattleScene extends Phaser.Scene {
       const hpBar = this.add
         .rectangle(p.x - HP_BAR_W / 2, p.y - 62, HP_BAR_W, HP_BAR_H, THEME.jade)
         .setOrigin(0, 0.5);
+      // 内力条：比血条细，放在血条下方（内力是唯一的节奏资源，必须看得见）
+      this.add.rectangle(p.x, p.y - 54, HP_BAR_W, INNER_BAR_H, 0x000000, 0.14);
+      const innerBar = this.add
+        .rectangle(p.x - HP_BAR_W / 2, p.y - 54, HP_BAR_W, INNER_BAR_H, INNER_COLOR)
+        .setOrigin(0, 0.5);
       const hpText = this.add
         .text(p.x, p.y - 74, `${u.hpMax}`, dimStyle(10))
         .setOrigin(0.5)
         .setResolution(2);
       const nameText = this.add
-        .text(p.x, p.y + 58, u.name, dimStyle(11))
+        .text(p.x, p.y + 58, `${u.name}`, dimStyle(11))
         .setOrigin(0.5)
         .setResolution(2);
 
@@ -169,8 +199,11 @@ export class BattleScene extends Phaser.Scene {
         y: p.y,
         hpMax: u.hpMax,
         hp: u.hpMax,
+        innerMax: u.innerMax,
+        inner: u.innerMax,
         dead: false,
         hpBar,
+        innerBar,
         hpText,
         nameText,
       });
@@ -233,11 +266,28 @@ export class BattleScene extends Phaser.Scene {
 
       case 'act': {
         const actor = this.units.get(ev.actorId);
-        this.tipText.setText(`${ev.actorName} · ${ev.skillName}`);
+        // 内力条与"内力 −cost"必须能看见，否则玩家不知道为什么会突然改普攻
+        if (actor) {
+          actor.inner = ev.innerAfter;
+          this.refreshInner(actor);
+        }
+        const tag = ev.basic ? '（内力不足·普攻）' : '';
+        this.tipText.setText(`${ev.actorName} · ${ev.skillName}${tag}`);
         if (actor) {
           // 攻击动作播到"命中"那一刻，由 CharacterView 的 onHit 回调触发受击，
           // 所以这里不需要硬编码任何时间
           actor.char.play(`${actor.group}_atk_a`);
+          if (ev.comboStage >= 2) {
+            this.floatText(
+              actor.x,
+              actor.y - 118,
+              ev.comboStage === 3 ? '三连！' : '连招 ×2',
+              THEME.goldHex,
+              ev.comboStage === 3 ? 24 : 18,
+            );
+          } else if (ev.basic) {
+            this.floatText(actor.x, actor.y - 118, '普攻', THEME.dimHex, 15);
+          }
         }
         // 占据攻击动作约 60% 的时长，之后接伤害事件（看起来才像"打中了"）
         const clip = getMotion(`${actor?.group ?? 'dao'}_atk_a`);
@@ -288,6 +338,18 @@ export class BattleScene extends Phaser.Scene {
           target.hp = ev.hpAfter;
           this.refreshHp(target);
           this.floatText(target.x, target.y - 78, `-${ev.value}`, THEME.jadeHex, 17);
+        }
+        this.timer = 200;
+        break;
+      }
+
+      case 'heal': {
+        // 回春：持续回复（曾经被错算成每回合扣 1 点血，现在是治疗）
+        const u = this.units.get(ev.targetId);
+        if (u) {
+          u.hp = ev.hpAfter;
+          this.refreshHp(u);
+          this.floatText(u.x, u.y - 78, `+${ev.value}`, THEME.jadeHex, 17);
         }
         this.timer = 200;
         break;
@@ -359,6 +421,13 @@ export class BattleScene extends Phaser.Scene {
     u.hpBar.width = HP_BAR_W * ratio;
     u.hpBar.setFillStyle(ratio > 0.5 ? THEME.jade : ratio > 0.22 ? THEME.gold : THEME.red);
     u.hpText.setText(`${u.hp}`);
+  }
+
+  /** 刷新内力条（内力见底时变暗，提示"下一手只能普攻"） */
+  private refreshInner(u: UnitView): void {
+    const ratio = Math.max(0, Math.min(1, u.innerMax > 0 ? u.inner / u.innerMax : 0));
+    u.innerBar.width = HP_BAR_W * ratio;
+    u.innerBar.setFillStyle(ratio > 0.15 ? INNER_COLOR : INNER_COLOR_LOW);
   }
 
   /** 飘字：向上飘并淡出（对象池级别的开销，用完即销毁） */

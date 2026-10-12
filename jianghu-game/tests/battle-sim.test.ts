@@ -13,7 +13,10 @@ import assert from 'node:assert/strict';
 
 import { simulateBattle, simulateMany } from '../src/core/battle/simulate.ts';
 import { ALLY_PARTY, ENEMY_PARTY } from '../src/data/battle-presets.ts';
+import { makeSkill, makeStats, makeUnit } from './fixtures.ts';
 import type { BattleEvent, BattleLog } from '../src/core/battle/simulate.ts';
+import type { BattleUnitConfig } from '../src/core/battle/simulate.ts';
+import type { SlotIndex } from '../src/core/battle/types.ts';
 
 /** 用固定种子跑一场 */
 function run(seed: string | number, maxRounds = 30): BattleLog {
@@ -128,34 +131,47 @@ test('死亡单位不会再出手，也不会再被打', () => {
 /* ══════════════════════ 群体递减 ══════════════════════ */
 
 test('★ 群体递减在真实战斗中生效：同一次 AOE 里，后续目标伤害更低', () => {
-  let checked = 0;
-  for (let i = 0; i < 60 && checked < 5; i++) {
-    const log = run(`aoe-${i}`);
-    // 找一次打了 2 个以上目标的 act，看其后连续的 damage 事件
+  // 用"面板完全一致"的三名敌人做夹具：唯一变量只剩序位，于是可以精确断言 0.85 / 0.70。
+  // （旧版用配置表阵容 + 位置启发式判断暴击，遇到"死亡事件插在两条伤害之间"就会误判。）
+  const attacker = makeUnit({
+    id: 'atk',
+    slot: 4,
+    stats: makeStats({ atk: 500, hit: 1, crit: 0 }),
+    skills: [makeSkill({ range: 'all', power: 300, multiplier: 1 })],
+  });
+  const enemies: BattleUnitConfig[] = [0, 1, 2].map((i) =>
+    makeUnit({
+      id: `foe_${i}`,
+      slot: i as SlotIndex,
+      side: 'enemy',
+      stats: makeStats({ atk: 1, hpMax: 1_000_000 }),
+    }),
+  );
+
+  let verified = false;
+  for (let seed = 0; seed < 20 && !verified; seed++) {
+    const log = simulateBattle({ allies: [attacker], enemies, seed: `decay-${seed}`, maxRounds: 3 });
     const events = log.events;
-    for (let j = 0; j < events.length; j++) {
+    for (let j = 0; j < events.length && !verified; j++) {
       const ev = events[j]!;
-      if (ev.type !== 'act' || ev.targetIds.length < 2) continue;
+      if (ev.type !== 'act' || ev.range !== 'all') continue;
       const dmg: number[] = [];
-      for (let k = j + 1; k < events.length && dmg.length < ev.targetIds.length; k++) {
+      let miss = false;
+      for (let k = j + 1; k < events.length; k++) {
         const e = events[k]!;
-        if (e.type === 'damage') dmg.push(e.value);
         if (e.type === 'act') break;
+        if (e.type === 'damage') dmg.push(e.value);
+        if (e.type === 'miss') miss = true;
       }
-      // 至少要拿到两个伤害数字才能比较（可能被闪避打断，所以不强制严格）
-      if (dmg.length >= 2) {
-        const crit = events.slice(j + 1, j + 1 + ev.targetIds.length).some(
-          (e) => e.type === 'damage' && e.crit,
-        );
-        // 排除暴击干扰后再比较
-        if (!crit) {
-          assert.ok(dmg[1]! <= dmg[0]!, `AOE 第 2 个目标伤害（${dmg[1]}）应 ≤ 第 1 个（${dmg[0]}）`);
-          checked++;
-        }
-      }
+      if (miss || dmg.length !== 3) continue;
+      const [d1, d2, d3] = dmg as [number, number, number];
+      assert.ok(d1 > d2 && d2 > d3, `AOE 伤害必须按序位递减：${dmg.join(' / ')}`);
+      assert.ok(Math.abs(d2 / d1 - 0.85) < 0.02, `第 2 位应为 0.85 倍，实际 ${(d2 / d1).toFixed(3)}`);
+      assert.ok(Math.abs(d3 / d1 - 0.7) < 0.02, `第 3 位应为 0.70 倍，实际 ${(d3 / d1).toFixed(3)}`);
+      verified = true;
     }
   }
-  assert.ok(checked >= 1, '未能在 60 场中观察到一次多目标 AOE，测试样本不足');
+  assert.ok(verified, '未能在 20 场中观察到一次三目标全命中的 AOE，测试样本不足');
 });
 
 /* ══════════════════════ 状态系统 ══════════════════════ */

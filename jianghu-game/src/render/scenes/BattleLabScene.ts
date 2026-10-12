@@ -23,6 +23,7 @@ import { THEME, bodyStyle, createButton, dimStyle, titleStyle } from '../ui/Them
 import type { BattleEvent, BattleLog } from '../../core/battle/simulate.ts';
 import type { MotionGroup } from '../../core/anim/types.ts';
 import type { SlotIndex } from '../../core/battle/types.ts';
+import type { CombatIntent } from '../../core/battle/targeting.ts';
 
 const VIEW_W = 960;
 const VIEW_H = 540;
@@ -85,16 +86,19 @@ export class BattleLabScene extends Phaser.Scene {
   private fmText!: Phaser.GameObjects.Text;
   private speedText!: Phaser.GameObjects.Text;
   private roundText!: Phaser.GameObjects.Text;
+  /** 战斗倾向：决定"放哪门功法"与"打谁"（GDD 02 §2.1.1-5） */
+  private intent: CombatIntent = 'combo';
 
   constructor() {
     super('battle-lab');
   }
 
-  init(data: { seed?: string; allyFmIdx?: number; enemyFmIdx?: number; speedIdx?: number }): void {
+  init(data: { seed?: string; allyFmIdx?: number; enemyFmIdx?: number; speedIdx?: number; intent?: CombatIntent }): void {
     if (data.seed !== undefined) this.seed = data.seed;
     if (data.allyFmIdx !== undefined) this.allyFmIdx = data.allyFmIdx;
     if (data.enemyFmIdx !== undefined) this.enemyFmIdx = data.enemyFmIdx;
     if (data.speedIdx !== undefined) this.speedIdx = data.speedIdx;
+    if (data.intent !== undefined) this.intent = data.intent;
   }
 
   /** 当前选中的阵法（null = 不使用） */
@@ -122,6 +126,8 @@ export class BattleLabScene extends Phaser.Scene {
     this.log = simulateBattle({
       allies: DEFAULT_BATTLE.allies,
       enemies: DEFAULT_BATTLE.enemies,
+      allyIntent: this.intent,
+      enemyIntent: this.intent,
       ...(af ? { allyFormation: af } : {}),
       ...(ef ? { enemyFormation: ef } : {}),
       seed: this.seed,
@@ -166,7 +172,16 @@ export class BattleLabScene extends Phaser.Scene {
     let by = FIELD.y0 + 176;
     createButton(this, PANEL_X + 90, by, '换种子重放', () => this.restart({ seed: `lab-${Math.floor(Math.random() * 1e9)}` }), 168, 34);
     by += 42;
-    createButton(this, PANEL_X + 90, by, '回放速度', () => this.restart({ speedIdx: (this.speedIdx + 1) % SPEEDS.length }), 168, 34);
+    createButton(this, PANEL_X + 50, by, '回放速度', () => this.restart({ speedIdx: (this.speedIdx + 1) % SPEEDS.length }), 96, 34);
+    createButton(
+      this,
+      PANEL_X + 152,
+      by,
+      this.intent === 'combo' ? '倾向·连招' : '倾向·输出',
+      () => this.toggleIntent(),
+      96,
+      34,
+    );
     by += 42;
     createButton(this, PANEL_X + 90, by, '我方阵法 ▸', () => this.restart({ allyFmIdx: nextFormationIdx(this.allyFmIdx) }), 168, 34);
     by += 42;
@@ -232,16 +247,30 @@ export class BattleLabScene extends Phaser.Scene {
       `结果：${this.log.winner === 'ally' ? '我方胜' : this.log.winner === 'enemy' ? '敌方胜' : '平局'}`,
     ]);
     this.fmText.setText([`我方阵法：${fmt(this.allyFmIdx)}`, `敌方阵法：${fmt(this.enemyFmIdx)}`]);
-    this.speedText.setText(`回放速度：${SPEED_LABEL[this.speedIdx]}`);
+    this.speedText.setText(
+      `回放速度：${SPEED_LABEL[this.speedIdx]}　倾向：${this.intent === 'combo' ? '优先连招' : '优先输出'}`,
+    );
   }
 
-  private restart(patch: { seed?: string; allyFmIdx?: number; enemyFmIdx?: number; speedIdx?: number }): void {
+  private restart(patch: {
+    seed?: string;
+    allyFmIdx?: number;
+    enemyFmIdx?: number;
+    speedIdx?: number;
+    intent?: CombatIntent;
+  }): void {
     this.scene.restart({
       seed: patch.seed ?? this.seed,
       allyFmIdx: patch.allyFmIdx ?? this.allyFmIdx,
       enemyFmIdx: patch.enemyFmIdx ?? this.enemyFmIdx,
       speedIdx: patch.speedIdx ?? this.speedIdx,
+      intent: patch.intent ?? this.intent,
     });
+  }
+
+  /** 切换战斗倾向（同一套阵容、同一个种子，对比召唤/输出两种打法） */
+  private toggleIntent(): void {
+    this.restart({ intent: this.intent === 'combo' ? 'output' : 'combo' });
   }
 
   /* ══════════════════════ 批量统计 ══════════════════════ */
@@ -253,6 +282,8 @@ export class BattleLabScene extends Phaser.Scene {
       {
         allies: DEFAULT_BATTLE.allies,
         enemies: DEFAULT_BATTLE.enemies,
+        allyIntent: this.intent,
+        enemyIntent: this.intent,
         ...(af ? { allyFormation: af } : {}),
         ...(ef ? { enemyFormation: ef } : {}),
       },
@@ -273,6 +304,7 @@ export class BattleLabScene extends Phaser.Scene {
       `我方输出 ${s.avgAllyDamage.toFixed(0)}`,
       `敌方输出 ${s.avgEnemyDamage.toFixed(0)}`,
       `反弹伤害 ${s.avgReflectDamage.toFixed(1)}`,
+      `连招次数 ${this.log.stats.comboStage2}　三连 ${this.log.stats.comboStage3}　普攻 ${this.log.stats.basicAttacks}`,
       '',
       '回合分布：',
       bars,
@@ -325,7 +357,12 @@ export class BattleLabScene extends Phaser.Scene {
       case 'act': {
         const actor = this.units.get(ev.actorId);
         if (actor) actor.char.play(`${actor.group}_atk_a`);
-        this.pushLog(`${ev.actorName} 施展「${ev.skillName}」→ ${ev.targetIds.length} 目标`);
+        const combo =
+          ev.comboStage === 3 ? ' 三连+60%' : ev.comboStage === 2 ? ' 连招+30%' : '';
+        const basic = ev.basic ? '（内力不足·普攻）' : ` 内力-${ev.cost}→${ev.innerAfter}`;
+        this.pushLog(
+          `${ev.actorName} 施展「${ev.skillName}」[${ev.range}] → ${ev.targetIds.length} 目标${basic}${combo}`,
+        );
         this.timer = 200;
         break;
       }
@@ -382,6 +419,17 @@ export class BattleLabScene extends Phaser.Scene {
           this.refreshHp(t);
         }
         this.pushLog(`　└ ${t?.name ?? ev.targetId} 持续伤害 ${ev.value}（${ev.statusId}）`);
+        this.timer = 140;
+        break;
+      }
+
+      case 'heal': {
+        const t = this.units.get(ev.targetId);
+        if (t) {
+          t.hp = ev.hpAfter;
+          this.refreshHp(t);
+        }
+        this.pushLog(`　└ ${t?.name ?? ev.targetId} 回复 ${ev.value}（${ev.statusId}）`);
         this.timer = 140;
         break;
       }
