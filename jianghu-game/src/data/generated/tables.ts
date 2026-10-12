@@ -117,7 +117,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 40,
     "gongfaCultivation": 10,
     "breath": 40,
-    "charId": "ren_dao",
+    "charId": "hero_trial",
     "skillId": "GF_kuangfeng_dao",
     "skillIdB": "GF_duanyue_dao",
     "skillIdC": "GF_badao"
