@@ -22,35 +22,25 @@ import { STATUS_BY_ID } from '../../data/status.ts';
 import { getMotion } from '../anim/MotionLib.ts';
 import { CharacterView } from '../anim/CharacterView.ts';
 import { THEME, bodyStyle, createButton, dimStyle, titleStyle } from '../ui/Theme.ts';
+import { BUTTON_H, BUTTON_W, BUTTON_Y, FIELD, HUD_H, VIEW_H, VIEW_W, slotPosition } from '../ui/layout.ts';
 import type { BattleEvent, BattleLog } from '../../core/battle/simulate.ts';
 import type { MotionGroup } from '../../core/anim/types.ts';
 import type { SlotIndex } from '../../core/battle/types.ts';
 import type { CombatIntent } from '../../core/battle/targeting.ts';
 import type { StatusId } from '../../core/battle/types.ts';
 
-const VIEW_W = 960;
-const VIEW_H = 540;
-const HP_BAR_W = 84;
-const HP_BAR_H = 6;
-const INNER_BAR_H = 3;
+const HP_BAR_W = FIELD.hpBarW;
+const HP_BAR_H = FIELD.hpBarH;
+const INNER_BAR_H = FIELD.innerBarH;
 
-/**
- * 角色缩放与站位间距。
- *
- * 这三个数字是**一起调出来的**，改一个就要重算另外两个：
- *   一行的垂直占用 = 状态图标(15) + 血条(6) + 内力条(3) + 姓名行(12) + 角色(73) ≈ 124px
- *   所以行距必须 > 124 —— 否则"上一行的脚"会压到"下一行的头顶信息"。
- *   早期版本把姓名牌放在脚下、血条放在头顶，结果姓名牌与下一行血条重叠 2px。
- */
-const CHAR_SCALE = 0.52;
-const ROW_GAP = 128;
-/** 一行的信息栈相对角色原点的偏移（负 = 头顶方向） */
-const STATUS_Y = -84;
-const HP_BAR_Y = -72;
-const INNER_BAR_Y = -65;
-const INFO_Y = -54;
+/** 角色缩放与信息栈偏移全部来自 layout.ts（纵向预算的推导写在那里） */
+const CHAR_SCALE = FIELD.charScale;
+const STATUS_Y = FIELD.statusY;
+const HP_BAR_Y = FIELD.hpBarY;
+const INNER_BAR_Y = FIELD.innerBarY;
+const INFO_Y = FIELD.infoY;
 /** 脚下投影 */
-const SHADOW_Y = 26;
+const SHADOW_Y = FIELD.shadowY;
 /** 内力条颜色：充足=靛蓝，见底=灰（一眼看出下一手会不会退化成普攻） */
 const INNER_COLOR = 0x4a6fd4;
 const INNER_COLOR_LOW = 0xb9b3a4;
@@ -64,15 +54,6 @@ const STATUS_COLOR: Record<string, number> = {
   debuff: 0xa62b1f,
   buff: 0x2f5d4a,
 };
-
-/** 九宫格站位 → 屏幕坐标（与布阵逻辑一致） */
-function slotPosition(slot: SlotIndex, side: 'ally' | 'enemy'): { x: number; y: number } {
-  const row = Math.floor(slot / 3); // 0 前排 / 1 中排 / 2 后排
-  const col = slot % 3; // 0 上 / 1 中 / 2 下
-  const depthX = [352, 258, 164][row]!;
-  const y = 176 + col * ROW_GAP;
-  return side === 'ally' ? { x: depthX, y } : { x: VIEW_W - depthX, y };
-}
 
 /** 场景内一个角色的全部可视元素 */
 interface UnitView {
@@ -174,15 +155,17 @@ export class BattleScene extends Phaser.Scene {
   private drawFieldMarks(): void {
     // 中线：左右对峙的视觉锚点
     this.add
-      .rectangle(VIEW_W / 2, VIEW_H / 2 + 10, 2, 300, THEME.ink, 0.1)
+      .rectangle(VIEW_W / 2, VIEW_H / 2 + 20, 2, 400, THEME.ink, 0.1)
       .setDepth(-15);
 
     for (let slot = 0 as SlotIndex; slot < 9; slot = (slot + 1) as SlotIndex) {
       for (const side of ['ally', 'enemy'] as const) {
         const p = slotPosition(slot, side);
-        // 站位软投影：一排"脚印"，暗示九宫格的存在但不抢戏
+        // 站位环（参考视频的做法：深色椭圆环，而不是方格）——
+        // 既暗示九宫格的存在，又不把画面切碎
         this.add
-          .ellipse(p.x, p.y + 26, 46, 14, THEME.ink, 0.06)
+          .ellipse(p.x, p.y + SHADOW_Y - 2, FIELD.ringW, FIELD.ringH)
+          .setStrokeStyle(1.5, THEME.ink, 0.16)
           .setDepth(-14);
       }
     }
@@ -190,15 +173,15 @@ export class BattleScene extends Phaser.Scene {
 
   /** 顶部 HUD：一条半透明墨色横幅，把标题 / 回合 / 阵法信息收成一组 */
   private drawHud(): void {
-    // 横幅只占 72px 高：第一行的"状态图标 + 血条 + 姓名"要落在 76px 以下
-    this.add.rectangle(VIEW_W / 2, 36, VIEW_W, 72, THEME.ink, 0.1).setDepth(-5);
+    // 横幅只占 HUD_H 高：第一行的"状态图标 + 血条 + 内力条 + 姓名"从 y=75 开始
+    this.add.rectangle(VIEW_W / 2, HUD_H / 2, VIEW_W, HUD_H, THEME.ink, 0.1).setDepth(-5);
 
     this.add.text(24, 14, '战斗 · 九宫格对阵', titleStyle(18)).setResolution(2).setDepth(2);
 
     // 回合徽标：底 + 文字（比裸文字更容易一眼定位）
-    this.add.rectangle(VIEW_W / 2, 26, 108, 26, THEME.ink, 0.72).setStrokeStyle(1, THEME.gold, 0.7).setDepth(1);
+    this.add.rectangle(VIEW_W / 2, 26, 124, 28, THEME.ink, 0.72).setStrokeStyle(1, THEME.gold, 0.7).setDepth(1);
     this.roundText = this.add
-      .text(VIEW_W / 2, 26, '第 1 回合', { ...bodyStyle(14), color: '#f2ecdf' })
+      .text(VIEW_W / 2, 26, '第 1 回合', { ...bodyStyle(15), color: '#f2ecdf' })
       .setOrigin(0.5)
       .setResolution(2)
       .setDepth(2);
@@ -213,7 +196,7 @@ export class BattleScene extends Phaser.Scene {
       .setDepth(2);
 
     this.tipText = this.add
-      .text(VIEW_W / 2, VIEW_H - 96, '自动战斗中…', { ...bodyStyle(13), color: '#3a342b' })
+      .text(VIEW_W / 2, VIEW_H - 78, '自动战斗中…', { ...bodyStyle(13), color: '#3a342b' })
       .setOrigin(0.5)
       .setResolution(2)
       .setDepth(2)
@@ -236,15 +219,15 @@ export class BattleScene extends Phaser.Scene {
     // 底部按钮：收窄，别把画面占满
     createButton(
       this,
-      VIEW_W / 2 - 190,
-      VIEW_H - 32,
+      VIEW_W / 2 - 200,
+      BUTTON_Y,
       `倾向：${this.intent === 'combo' ? '优先连招' : '优先输出'}`,
       () => this.toggleIntent(),
-      168,
-      36,
+      BUTTON_W,
+      BUTTON_H,
     ).setDepth(3);
-    createButton(this, VIEW_W / 2 - 10, VIEW_H - 32, '重新战斗', () => this.rematch(), 140, 36).setDepth(3);
-    createButton(this, VIEW_W / 2 + 152, VIEW_H - 32, '返回菜单', () => this.scene.start('menu'), 140, 36).setDepth(3);
+    createButton(this, VIEW_W / 2, BUTTON_Y, '重新战斗', () => this.rematch(), BUTTON_W - 20, BUTTON_H).setDepth(3);
+    createButton(this, VIEW_W / 2 + 200, BUTTON_Y, '返回菜单', () => this.scene.start('menu'), BUTTON_W - 20, BUTTON_H).setDepth(3);
   }
 
   /** 战前倾向切换：立刻用同一套阵容 + 新倾向重打一场（设计：倾向是玩家唯一的间接控制手段） */
@@ -274,7 +257,7 @@ export class BattleScene extends Phaser.Scene {
       char.play(`${u.group}_idle`);
 
       // 脚下软投影：让角色"站在地上"，而不是浮在背景上
-      this.add.ellipse(p.x, p.y + SHADOW_Y, 44, 13, THEME.ink, 0.16).setDepth(1);
+      this.add.ellipse(p.x, p.y + SHADOW_Y, FIELD.ringW - 10, FIELD.ringH - 8, THEME.ink, 0.16).setDepth(1);
 
       // 血条：深色底槽（浅色背景上必须可见）+ 填充（左对齐）
       this.add.rectangle(p.x, p.y + HP_BAR_Y, HP_BAR_W + 2, HP_BAR_H + 2, THEME.ink, 0.55);

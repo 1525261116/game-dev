@@ -25,15 +25,22 @@ import type { MotionGroup } from '../../core/anim/types.ts';
 import type { SlotIndex } from '../../core/battle/types.ts';
 import type { CombatIntent } from '../../core/battle/targeting.ts';
 
-const VIEW_W = 960;
-const VIEW_H = 540;
+import { SCALE_FROM_960, VIEW_H, VIEW_W } from '../ui/layout.ts';
+
+/**
+ * 验证台是"显微镜"不是玩家界面，布局比战斗场景紧凑。
+ * 这里所有数字都是为 960×540 调的，所以统一乘 SCALE_FROM_960（=4/3）搬过来，
+ * 而不是逐个手改 —— 少一次手算就少一类错位。
+ */
+const K = SCALE_FROM_960;
+const s960 = (v: number): number => Math.round(v * K);
 
 /** 回放区（左侧） */
-const FIELD = { x0: 16, x1: 566, y0: 76, y1: 432 };
+const FIELD = { x0: s960(16), x1: s960(566), y0: s960(76), y1: s960(432) };
 /** 日志区（底部） */
-const LOG_TOP = 444;
+const LOG_TOP = s960(444);
 /** 面板区（右侧） */
-const PANEL_X = 580;
+const PANEL_X = s960(580);
 
 /** 回放速度档位 */
 const SPEEDS = [0.5, 1, 2, 4, 99] as const;
@@ -43,9 +50,9 @@ const SPEED_LABEL = ['0.5×', '1×', '2×', '4×', '瞬间'] as const;
 function labSlotPosition(slot: SlotIndex, side: 'ally' | 'enemy'): { x: number; y: number } {
   const row = Math.floor(slot / 3); // 0 前排 / 1 中排 / 2 后排
   const col = slot % 3; // 0 上 / 1 中 / 2 下
-  const depthX = [268, 200, 132][row]!;
-  const y = FIELD.y0 + 54 + col * 104;
-  return side === 'ally' ? { x: depthX, y } : { x: 566 - depthX, y };
+  const depthX = s960(268 - row * 68);
+  const y = FIELD.y0 + s960(54) + col * s960(104);
+  return side === 'ally' ? { x: depthX, y } : { x: FIELD.x1 - depthX, y };
 }
 
 interface LabUnit {
@@ -161,17 +168,17 @@ export class BattleLabScene extends Phaser.Scene {
 
     // 右侧面板
     this.add
-      .rectangle(PANEL_X + 182, (FIELD.y0 + FIELD.y1 + 90) / 2, 364, FIELD.y1 - FIELD.y0 + 90, THEME.paperLight, 0.25)
+      .rectangle(PANEL_X + 182 * K, (FIELD.y0 + FIELD.y1 + 90 * K) / 2, 364 * K, FIELD.y1 - FIELD.y0 + 90 * K, THEME.paperLight, 0.25)
       .setStrokeStyle(1, THEME.line, 0.8);
 
     this.seedText = this.add.text(PANEL_X + 10, FIELD.y0 + 10, '', bodyStyle(12)).setLineSpacing(4).setResolution(2);
-    this.fmText = this.add.text(PANEL_X + 10, FIELD.y0 + 76, '', dimStyle(11)).setLineSpacing(4).setResolution(2);
-    this.speedText = this.add.text(PANEL_X + 10, FIELD.y0 + 148, '', dimStyle(11)).setResolution(2);
+    this.fmText = this.add.text(PANEL_X + 10, FIELD.y0 + s960(76), '', dimStyle(11)).setLineSpacing(4).setResolution(2);
+    this.speedText = this.add.text(PANEL_X + 10, FIELD.y0 + s960(148), '', dimStyle(11)).setResolution(2);
 
     // 控制按钮
-    let by = FIELD.y0 + 176;
+    let by = FIELD.y0 + s960(176);
     createButton(this, PANEL_X + 90, by, '换种子重放', () => this.restart({ seed: `lab-${Math.floor(Math.random() * 1e9)}` }), 168, 30);
-    by += 38;
+    by += s960(38);
     createButton(this, PANEL_X + 50, by, '回放速度', () => this.restart({ speedIdx: (this.speedIdx + 1) % SPEEDS.length }), 96, 30);
     createButton(
       this,
@@ -182,15 +189,15 @@ export class BattleLabScene extends Phaser.Scene {
       96,
       30,
     );
-    by += 38;
+    by += s960(38);
     createButton(this, PANEL_X + 90, by, '我方阵法 ▸', () => this.restart({ allyFmIdx: nextFormationIdx(this.allyFmIdx) }), 168, 30);
-    by += 38;
+    by += s960(38);
     createButton(this, PANEL_X + 90, by, '敌方阵法 ▸', () => this.restart({ enemyFmIdx: nextFormationIdx(this.enemyFmIdx) }), 168, 30);
-    by += 38;
+    by += s960(38);
     createButton(this, PANEL_X + 90, by, '重跑 100 场统计', () => this.runBatch(), 168, 30);
 
     this.statText = this.add
-      .text(PANEL_X + 10, by + 26, '', dimStyle(11))
+      .text(PANEL_X + 10, by + s960(26), '', dimStyle(11))
       .setLineSpacing(4)
       .setResolution(2);
 
@@ -205,7 +212,7 @@ export class BattleLabScene extends Phaser.Scene {
       .setLineSpacing(3)
       .setResolution(2);
 
-    createButton(this, VIEW_W - 66, 26, '返回', () => this.scene.start('menu'), 104, 32);
+    createButton(this, VIEW_W - 90, 34, '返回', () => this.scene.start('menu'), 132, 38);
   }
 
   private buildUnits(): void {
@@ -223,17 +230,17 @@ export class BattleLabScene extends Phaser.Scene {
         weaponGroup: cfg?.group ?? u.group,
         weaponQuality: cfg?.skills[0]?.quality ?? 'fan',
       });
-      char.setScale(0.32);
+      char.setScale(0.42);
       char.play(`${u.group}_idle`);
 
-      this.add.rectangle(p.x, p.y - 34, 62, 5, 0x000000, 0.18);
-      const hpBar = this.add.rectangle(p.x - 31, p.y - 34, 62, 5, THEME.jade).setOrigin(0, 0.5);
+      this.add.rectangle(p.x, p.y - s960(34), 62 * K, 5 * K, 0x000000, 0.18);
+      const hpBar = this.add.rectangle(p.x - (62 * K) / 2, p.y - s960(34), 62 * K, 5 * K, THEME.jade).setOrigin(0, 0.5);
       const hpText = this.add
-        .text(p.x, p.y - 46, `${u.hpMax}`, dimStyle(9))
+        .text(p.x, p.y - s960(46), `${u.hpMax}`, dimStyle(9))
         .setOrigin(0.5)
         .setResolution(2);
       this.add
-        .text(p.x, p.y + 32, u.name, dimStyle(9))
+        .text(p.x, p.y + s960(32), u.name, dimStyle(9))
         .setOrigin(0.5)
         .setResolution(2);
 

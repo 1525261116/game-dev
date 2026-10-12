@@ -8,6 +8,7 @@
  */
 import Phaser from 'phaser';
 
+import { VIEW_H, VIEW_W } from './render/ui/layout.ts';
 import { BootScene } from './render/scenes/BootScene.ts';
 import { PreloadScene } from './render/scenes/PreloadScene.ts';
 import { MenuScene } from './render/scenes/MenuScene.ts';
@@ -20,9 +21,12 @@ const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
   parent: 'game',
 
-  // 逻辑分辨率固定 960×540：写代码时永远按这套坐标思考，不用管用户屏幕多大
-  width: 960,
-  height: 540,
+  // 逻辑分辨率固定 1280×720（见 src/render/ui/layout.ts）：
+  // 写代码时永远按这套坐标思考，不用管用户屏幕多大。
+  // 从 960×540 提上来是为了：① 画布被浏览器放大的倍数 1.56× → 1.17×（更清楚）
+  // ② 给"放大角色"腾出纵向空间（同一屏能放下 141px 高的角色而不撞车）
+  width: VIEW_W,
+  height: VIEW_H,
   backgroundColor: '#efe9da',
 
   scale: {

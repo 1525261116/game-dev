@@ -180,11 +180,22 @@ function mountainBand(yBase: number, amp: number, count: number, color: string, 
   return `<path d="${d}" fill="${color}" opacity="${opacity}"/>`;
 }
 
+/**
+ * 战斗背景三层。
+ *
+ * 坐标仍然按 **960×540 的设计空间**写（改动最小、构图不变），
+ * 但导出的位图是 **1280×720**：靠 `viewBox` 让矢量几何等比放大 ——
+ * 背景是矢量画的，放大不损失任何清晰度（这也是当初用 SVG 生成的原因之一）。
+ * 分辨率口径见 `src/render/ui/layout.ts`。
+ */
 function backgroundSvgs(): Record<'far' | 'mid' | 'ground', string> {
-  const W = 960;
+  const W = 960;   // 设计空间（坐标用）
   const H = 540;
+  const OW = 1280; // 导出尺寸（与游戏逻辑分辨率一致）
+  const OH = 720;
+  const SVGTAG = `<svg xmlns="http://www.w3.org/2000/svg" width="${OW}" height="${OH}" viewBox="0 0 ${W} ${H}">`;
 
-  const far = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+  const far = `${SVGTAG}
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#e9e3d3"/>
@@ -204,7 +215,7 @@ function backgroundSvgs(): Record<'far' | 'mid' | 'ground', string> {
   <ellipse cx="720" cy="380" rx="300" ry="20" fill="#ffffff" opacity="0.35"/>
 </svg>`;
 
-  const mid = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+  const mid = `${SVGTAG}
   ${mountainBand(400, 130, 6, '#6f7a80', 0.5, 4.4)}
   ${mountainBand(430, 90, 7, '#5b666c', 0.42, 7.9)}
   <g opacity="0.55" fill="#3f484d">
@@ -216,7 +227,7 @@ function backgroundSvgs(): Record<'far' | 'mid' | 'ground', string> {
   <ellipse cx="520" cy="424" rx="420" ry="24" fill="#ffffff" opacity="0.4"/>
 </svg>`;
 
-  const ground = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">
+  const ground = `${SVGTAG}
   <defs>
     <linearGradient id="soil" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#cfc7b4"/>
