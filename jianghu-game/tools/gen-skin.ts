@@ -104,6 +104,8 @@ interface BuildResult {
  */
 export function buildSkin(charId: string, bodyOverride: string | undefined, files: Set<string>): BuildResult {
   const issues: SkinIssue[] = [];
+  /** 本次从底图继承来的部件（用于给出"还有哪些可以画"的提示） */
+  const seenInherited = new Set<SlotName>();
   const skinPath = join(CHARS_DIR, charId, 'skin.json');
   const existing = readExisting(skinPath);
 
@@ -117,6 +119,7 @@ export function buildSkin(charId: string, bodyOverride: string | undefined, file
   const artSource = existing.art ?? charId;
   const partsDir = join(CHARS_DIR, artSource, 'parts');
   const localPartsDir = join(CHARS_DIR, charId, 'parts');
+  const localPartsDirExists = existsSync(localPartsDir) && artSource !== charId;
 
   if (!existsSync(partsDir)) {
     issues.push({
@@ -127,43 +130,57 @@ export function buildSkin(charId: string, bodyOverride: string | undefined, file
     return { skin: { id: charId, body, parts: {} }, issues };
   }
 
-  const parts: Partial<Record<SlotName, SkinPart>> = {};
   const slotSet = new Set<string>(SLOT_NAMES);
-  const seen = new Set<string>();
 
-  for (const name of readdirSync(partsDir).sort()) {
-    const ext = extname(name).toLowerCase();
-    const stem = basename(name, ext);
-    if (ext !== '.png') {
-      issues.push({
-        level: 'warn',
-        code: 'NOT_PNG',
-        message: `忽略非 PNG 文件：${name}（部件贴图必须是带透明通道的 PNG）`,
-      });
-      continue;
-    }
-    if (!slotSet.has(stem)) {
-      issues.push({
-        level: 'warn',
-        code: 'UNKNOWN_FILE',
-        message: `${artSource}/parts/${name}：文件名「${stem}」不是已注册 slot，可能拼错了`,
-      });
-      continue;
-    }
-    seen.add(stem);
-    const slot = stem as SlotName;
-    const relPath = relative(ASSETS_DIR, join(partsDir, name)).split(/[\\/]/).join('/');
+  /**
+   * 扫描一个 parts/ 目录。`own` 标记是否为角色的自有贴图（决定缺失时是 error 还是"继承底图"）。
+   */
+  const scanParts = (dir: string, own: boolean): Partial<Record<SlotName, SkinPart>> => {
+    const out: Partial<Record<SlotName, SkinPart>> = {};
+    for (const name of readdirSync(dir).sort()) {
+      const ext = extname(name).toLowerCase();
+      const stem = basename(name, ext);
+      if (ext !== '.png') {
+        issues.push({
+          level: 'warn',
+          code: 'NOT_PNG',
+          message: `忽略非 PNG 文件：${name}（部件贴图必须是带透明通道的 PNG）`,
+        });
+        continue;
+      }
+      if (!slotSet.has(stem)) {
+        issues.push({
+          level: 'warn',
+          code: 'UNKNOWN_FILE',
+          message: `${relative(ASSETS_DIR, dir).split(/[\\/]/).join('/')}/${name}：文件名「${stem}」不是已注册 slot，可能拼错了`,
+        });
+        continue;
+      }
+      const slot = stem as SlotName;
+      const relPath = relative(ASSETS_DIR, join(dir, name)).split(/[\\/]/).join('/');
 
-    let size: { w: number; h: number };
-    try {
-      size = readPngSize(readFileSync(join(partsDir, name)));
-    } catch (e) {
-      issues.push({ level: 'error', code: 'BAD_PNG', message: `${relPath}：${(e as Error).message}` });
-      continue;
+      let size: { w: number; h: number };
+      try {
+        size = readPngSize(readFileSync(join(dir, name)));
+      } catch (e) {
+        issues.push({ level: 'error', code: 'BAD_PNG', message: `${relPath}：${(e as Error).message}` });
+        continue;
+      }
+      const pivot = expectedSkinPivot(rig, slot) ?? [0.5, 0.5];
+      out[slot] = { file: relPath, w: size.w, h: size.h, pivot };
+      if (!own) seenInherited.add(slot);
     }
+    return out;
+  };
 
-    const pivot = expectedSkinPivot(rig, slot) ?? [0.5, 0.5];
-    parts[slot] = { file: relPath, w: size.w, h: size.h, pivot };
+  // ① 先铺底图（声明了 art 时），② 用自有贴图逐 slot 覆盖
+  //    —— 这样"先画 6 张丢进来试穿"是合法状态：没画的部分继承底图
+  const parts: Partial<Record<SlotName, SkinPart>> = scanParts(partsDir, partsDir === localPartsDir);
+  if (localPartsDirExists) {
+    const local = scanParts(localPartsDir, true);
+    // 被自有贴图覆盖的 slot 不再算"继承"
+    for (const slot of Object.keys(local)) seenInherited.delete(slot as SlotName);
+    Object.assign(parts, local);
   }
 
   const skin: SkinDef = {
@@ -179,12 +196,14 @@ export function buildSkin(charId: string, bodyOverride: string | undefined, file
   // 骨架级校验（缺件 / 尺寸 / 枢轴 / 文件存在）
   issues.push(...validateSkin(skin, rig, files));
 
-  // 复用了别人的图，但自己也放了图 → 提醒（容易让人误以为生效了）
-  if (existing.art && existsSync(localPartsDir) && readdirSync(localPartsDir).length > 0) {
+  // 复用了底图且**只画了一部分** → 把"哪些还是底图"说清楚（试穿阶段最需要这条信息）。
+  // 完全没画（自有 0 张）是"换色弟子"的正常用法，不报，免得每次检查都刷屏。
+  const ownCount = Object.keys(parts).length - seenInherited.size;
+  if (existing.art && ownCount > 0 && seenInherited.size > 0) {
     issues.push({
       level: 'warn',
-      code: 'SHADOWED_PARTS',
-      message: `${charId} 声明了 art=${existing.art}，本地 parts/ 里的 ${readdirSync(localPartsDir).length} 个文件会被忽略`,
+      code: 'INHERITED_PARTS',
+      message: `自有贴图 ${ownCount} 张，其余 ${seenInherited.size} 个部件继承底图 ${artSource}：${[...seenInherited].join(', ')}`,
     });
   }
 

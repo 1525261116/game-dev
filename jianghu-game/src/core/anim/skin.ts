@@ -122,6 +122,55 @@ export function weaponSkinFile(group: string, quality: string): string | null {
   return `weapons/${group}/${group}_${suffix}.png`;
 }
 
+/* ══════════════════════ 对位几何（纯数学） ══════════════════════ */
+
+/** 内容盒在这个画布上的落位结果 */
+export interface PartFit {
+  /** 内容缩放后的尺寸（像素） */
+  destW: number;
+  destH: number;
+  /** 缩放倍数 */
+  scale: number;
+  /** 内容左上角在画布上的位置（可为负 = 允许超出画布，相邻部件本就要重叠） */
+  left: number;
+  top: number;
+}
+
+export type PartFitMode = 'contain' | 'height' | 'width';
+
+/**
+ * 把"内容包围盒"放进"部件画布"，**并让枢轴点对齐**。
+ *
+ * 关键洞察：对每个 slot 来说，枢轴在**内容盒**上的相对位置
+ * 就等于它在**画布**上的相对位置 —— 躯干枢轴 (0.5, 1) 意味着
+ * "腰"在内容底边中心，上臂枢轴 (0.5, 0) 意味着"肩"在内容顶边中心。
+ * 所以对位可以完全自动化，不需要人眼微调。
+ *
+ * 这是 `tools/fit-skin-part.ts` 的核心，单独放在 core 里是为了能零依赖测试。
+ */
+export function fitPartGeometry(
+  box: { w: number; h: number },
+  canvas: { w: number; h: number },
+  pivot: { x: number; y: number },
+  mode: PartFitMode = 'contain',
+): PartFit {
+  const scale =
+    mode === 'height'
+      ? canvas.h / box.h
+      : mode === 'width'
+        ? canvas.w / box.w
+        : Math.min(canvas.w / box.w, canvas.h / box.h);
+
+  const destW = Math.max(1, Math.round(box.w * scale));
+  const destH = Math.max(1, Math.round(box.h * scale));
+
+  // 内容盒上的枢轴点 → 画布上的枢轴点
+  const left = Math.round(pivot.x * canvas.w - pivot.x * destW);
+  const top = Math.round(pivot.y * canvas.h - pivot.y * destH);
+
+  return { destW, destH, scale, left, top };
+}
+
 /* ══════════════════════ 校验 ══════════════════════ */
 
 /**

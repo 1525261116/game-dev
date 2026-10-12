@@ -19,6 +19,7 @@ import {
   ART_SCALE,
   expectedSkinPivot,
   expectedSkinSize,
+  fitPartGeometry,
   requiredSkinSlots,
   skinErrors,
   validateSkin,
@@ -153,6 +154,49 @@ test('武器贴图路径按「武器组 × 品质」共享', () => {
   assert.equal(weaponSkinFile('jian', 'jue'), 'weapons/jian/jian_chuan.png');
   assert.equal(weaponSkinFile('quan', 'fan'), null, '拳掌没有武器贴图');
   assert.equal(weaponSkinFile('dao', 'unknown'), null);
+});
+
+/* ══════════════════ ②.5 对位几何（AI 生图落地用） ══════════════════ */
+
+test('对位：contain 缩放不拉伸，且枢轴钉在画布枢轴上', () => {
+  // 躯干：内容 127×289 → 画布 80×92，枢轴 0.5,1
+  const fit = fitPartGeometry({ w: 127, h: 289 }, { w: 80, h: 92 }, { x: 0.5, y: 1 });
+  assert.equal(fit.destW, 40, '289→92 缩放 0.318×，127→40');
+  assert.equal(fit.destH, 92);
+  // 内容底边中心必须落在画布 (40, 92)
+  assert.equal(fit.left + fit.destW / 2, 40);
+  assert.equal(fit.top + fit.destH, 92);
+});
+
+test('对位：顶边枢轴（肩/肘/膝/腕）与 25% 枢轴（脚）也正确', () => {
+  const arm = fitPartGeometry({ w: 66, h: 646 }, { w: 24, h: 52 }, { x: 0.5, y: 0 });
+  assert.equal(arm.destH, 52);
+  assert.equal(arm.top, 0, '肩在顶边 → 内容顶边贴住画布顶边');
+  // 内容宽为奇数像素时，中心只能落在 ±0.5px 内（枢轴是百分比，量化误差不可避免）
+  assert.ok(Math.abs(arm.left + arm.destW / 2 - 12) <= 0.5);
+
+  const foot = fitPartGeometry({ w: 200, h: 60 }, { w: 36, h: 16 }, { x: 0.25, y: 0.5 });
+  assert.ok(Math.abs(foot.left + 0.25 * foot.destW - 0.25 * 36) <= 0.5);
+  assert.ok(Math.abs(foot.top + 0.5 * foot.destH - 0.5 * 16) <= 0.5);
+});
+
+test('对位：height 模式按高度贴合（宽度可溢出画布，相邻部件本就要重叠）', () => {
+  // 内容很宽时 contain 会被宽度卡住；height 模式则强行按高度贴合、宽度溢出
+  const box = { w: 400, h: 289 };
+  const contain = fitPartGeometry(box, { w: 80, h: 92 }, { x: 0.5, y: 1 });
+  assert.equal(contain.destW, 80, 'contain 受宽度限制');
+  assert.ok(contain.destH < 92);
+
+  const byHeight = fitPartGeometry(box, { w: 80, h: 92 }, { x: 0.5, y: 1 }, 'height');
+  assert.equal(byHeight.destH, 92);
+  assert.ok(byHeight.destW > 80, 'height 模式下宽度按比例放大并溢出画布');
+  assert.equal(byHeight.top + byHeight.destH, 92, '枢轴仍然钉住');
+});
+
+test('对位：内容比画布小很多时会放大（不设上限），且尺寸至少 1px', () => {
+  const tiny = fitPartGeometry({ w: 10, h: 10 }, { w: 80, h: 92 }, { x: 0.5, y: 0.5 });
+  assert.ok(tiny.scale > 1);
+  assert.ok(tiny.destW > 0 && tiny.destH > 0);
 });
 
 /* ══════════════════ ③ 真实资源全部合规 ══════════════════ */

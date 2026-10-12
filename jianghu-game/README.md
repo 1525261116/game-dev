@@ -55,6 +55,7 @@
 | 　　`零基础上手手册_v1.0.md` | **零基础上手手册**（原理 / 术语 / 实操） |
 | 　　`rig-spec.md` | 骨架与部件规范（贴图按此画） |
 | 　　`asset-pipeline.md` | **美术资源管线手册**（换贴图 / 换背景 / 改战斗 UI 全流程） |
+| 　　`战斗演出制作计划_v1.0.md` | **战斗演出制作计划**（对标参考视频风格；P0~P6 分阶段 + 验收 + 资源清单） |
 | 　　`sprint-01-report.md` | Sprint-01 报告 |
 | 　　`sprint-02-report.md` | Sprint-02 报告（战斗系统深化） |
 | 　`src/` | — |
@@ -104,6 +105,8 @@
 | 　　`validate-tables.ts` | 配置表校验器（只检查，不生成文件） |
 | 　　`gen-skin.ts` | **皮肤导入器**（零依赖，自己读 PNG 文件头；校验 + 生成 skin.json） |
 | 　　`gen-placeholder-art.ts` | **占位美术生成器**（程序生成合规贴图与背景，默认不覆盖你画的图） |
+| 　　`gen-skin-templates.ts` | **枢轴对位模板生成器**（4× 放大 + 粉色十字准星，手调关节用） |
+| 　　`fit-skin-part.ts` | **部件对位器**（抠底 → 裁边 → 缩放 → 自动钉住关节；AI 生图落地关键工具） |
 | 　　`preview/make-preview.ts` | 无依赖骨架预览生成器 |
 | 　`preview/` | 预览 HTML + 截图 |
 
@@ -179,6 +182,8 @@
 - 运行 `pnpm art:placeholder` 生成一整套**合规的占位贴图与战斗背景**（**默认不覆盖你画好的图**；要重生成加 `--force`）。
 - 运行 `pnpm skin:gen` 扫描 `assets/` 并生成/校验 `skin.json`（缺件、尺寸、枢轴画错都会报出来，且**报错不写盘**）。
 - 运行 `pnpm skin:check` 只校验不写盘（CI 用）。
+- 运行 `pnpm skin:templates` 生成**枢轴对位模板**（4× 放大，粉色十字 = 关节必须落的位置）。
+- 运行 `pnpm skin:fit <原始图或目录> --slot=<slot> --char=<角色id>` 把 AI 生图**自动抠底、裁边、缩放并对准关节**；只画了一部分也能用（声明 `art` 后其余部件继承底图）。
 - 运行 `pnpm gen:motions` 重新生成动作库（**默认不覆盖已有文件**，保护手工调整过的动作）。
 - 运行 `pnpm gen:motions:force` 强制重新生成全部动作（会覆盖手工调整）。
 - 运行 `pnpm dev` 启动开发服务器（需先 install）。

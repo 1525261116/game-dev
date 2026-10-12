@@ -22,6 +22,8 @@
     "atlas:pack": "node tools/pack-atlas.ts",
     "skin:gen": "node tools/gen-skin.ts",
     "skin:check": "node tools/gen-skin.ts --check",
+    "skin:templates": "node tools/gen-skin-templates.ts",
+    "skin:fit": "node tools/fit-skin-part.ts",
     "art:placeholder": "node tools/gen-placeholder-art.ts",
     "art:placeholder:force": "node tools/gen-placeholder-art.ts --force",
     "preview:rig": "node tools/preview/make-preview.ts",
