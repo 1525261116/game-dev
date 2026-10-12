@@ -1,0 +1,180 @@
+{
+  "id": "ren_jian",
+  "name": "剑客",
+  "body": "male_adult",
+  "art": "base_male",
+  "palette": {
+    "torso": "#2f5d4a",
+    "upperArmR": "#2f5d4a",
+    "forearmR": "#2f5d4a",
+    "handR": "#e8d9c5",
+    "upperArmL": "#27503f",
+    "forearmL": "#27503f",
+    "handL": "#e8d9c5",
+    "pelvis": "#242a30",
+    "thighR": "#2b3138",
+    "shinR": "#2b3138",
+    "footR": "#1f2429",
+    "thighL": "#242a30",
+    "shinL": "#242a30",
+    "footL": "#1f2429",
+    "head": "#e8d9c5",
+    "cloak": "#3c5f7a"
+  },
+  "weaponGroup": "jian",
+  "parts": {
+    "cloak": {
+      "file": "chars/base_male/parts/cloak.png",
+      "w": 92,
+      "h": 116,
+      "pivot": [
+        0.5,
+        0.05
+      ]
+    },
+    "footL": {
+      "file": "chars/base_male/parts/footL.png",
+      "w": 36,
+      "h": 16,
+      "pivot": [
+        0.25,
+        0.5
+      ]
+    },
+    "footR": {
+      "file": "chars/base_male/parts/footR.png",
+      "w": 36,
+      "h": 16,
+      "pivot": [
+        0.25,
+        0.5
+      ]
+    },
+    "forearmL": {
+      "file": "chars/base_male/parts/forearmL.png",
+      "w": 22,
+      "h": 48,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "forearmR": {
+      "file": "chars/base_male/parts/forearmR.png",
+      "w": 22,
+      "h": 48,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "handL": {
+      "file": "chars/base_male/parts/handL.png",
+      "w": 20,
+      "h": 20,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "handR": {
+      "file": "chars/base_male/parts/handR.png",
+      "w": 20,
+      "h": 20,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "head": {
+      "file": "chars/base_male/parts/head.png",
+      "w": 48,
+      "h": 51,
+      "pivot": [
+        0.5,
+        1
+      ]
+    },
+    "pelvis": {
+      "file": "chars/base_male/parts/pelvis.png",
+      "w": 68,
+      "h": 32,
+      "pivot": [
+        0.5,
+        0.5
+      ]
+    },
+    "shinL": {
+      "file": "chars/base_male/parts/shinL.png",
+      "w": 24,
+      "h": 60,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "shinR": {
+      "file": "chars/base_male/parts/shinR.png",
+      "w": 24,
+      "h": 60,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "thighL": {
+      "file": "chars/base_male/parts/thighL.png",
+      "w": 28,
+      "h": 64,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "thighR": {
+      "file": "chars/base_male/parts/thighR.png",
+      "w": 28,
+      "h": 64,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "torso": {
+      "file": "chars/base_male/parts/torso.png",
+      "w": 80,
+      "h": 92,
+      "pivot": [
+        0.5,
+        1
+      ]
+    },
+    "upperArmL": {
+      "file": "chars/base_male/parts/upperArmL.png",
+      "w": 24,
+      "h": 52,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "upperArmR": {
+      "file": "chars/base_male/parts/upperArmR.png",
+      "w": 24,
+      "h": 52,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "weapon": {
+      "file": "chars/base_male/parts/weapon.png",
+      "w": 14,
+      "h": 112,
+      "pivot": [
+        0.5,
+        0.12
+      ]
+    }
+  }
+}

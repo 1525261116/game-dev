@@ -9,11 +9,23 @@
  * 分层：本文件属于表现层，只读动作数据、只画画面，不产生任何数值。
  */
 import { sampleClip } from '../../core/anim/clip.ts';
-import { getRig } from '../../data/rigs.ts';
+import { getRig, DEFAULT_RIG_ID } from '../../data/rigs.ts';
 import { getMotion } from './MotionLib.ts';
 import { RigView } from './RigView.ts';
+import { resolveUnitSkin } from './SkinRegistry.ts';
 import type Phaser from 'phaser';
 import type { MotionClip, RigDef } from '../../core/anim/types.ts';
+
+/** 建角色视图时的可选参数（不传 = 用占位色块，行为与接入贴图之前一致） */
+export interface CharacterOptions {
+  /** 皮肤 id（units.csv 的 charId）。给了就用贴图，没给/没加载到就回退色块 */
+  skinId?: string;
+  /** 武器组与主要功法品质：决定武器外观（按「组 × 品质」共享贴图） */
+  weaponGroup?: string;
+  weaponQuality?: string;
+  /** 体型 id；不传则取皮肤声明的体型，再退回默认体型 */
+  rigId?: string;
+}
 
 export class CharacterView {
   private readonly view: RigView;
@@ -34,10 +46,23 @@ export class CharacterView {
   /** 动作播放完毕回调 */
   onFinished?: () => void;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, facing: 1 | -1 = 1, rigId = 'male_adult') {
-    this.rig = getRig(rigId);
-    this.view = new RigView(scene, this.rig, x, y);
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    facing: 1 | -1 = 1,
+    opts: CharacterOptions = {},
+  ) {
+    // 皮肤决定体型与贴图；两者都没有时退回占位色块（保证美术没到位也能跑）
+    const skin = resolveUnitSkin(opts.skinId, opts.weaponGroup, opts.weaponQuality);
+    this.rig = getRig(opts.rigId ?? skin?.body ?? DEFAULT_RIG_ID);
+    this.view = new RigView(scene, this.rig, x, y, skin);
     this.view.setFacing(facing);
+  }
+
+  /** 当前使用的皮肤 id（调试面板用） */
+  get skinId(): string | null {
+    return this.view.skinId;
   }
 
   /** 播放指定 id 的动作；返回 false 表示动作库中没有这个动作 */
@@ -90,6 +115,15 @@ export class CharacterView {
 
   setPosition(x: number, y: number): void {
     this.view.setPosition(x, y);
+  }
+
+  setAlpha(a: number): void {
+    this.view.setAlpha(a);
+  }
+
+  /** 命中闪白（只对贴图生效；色块静默跳过） */
+  flashWhite(): void {
+    this.view.flashWhite();
   }
 
   destroy(): void {

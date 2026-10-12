@@ -118,6 +118,11 @@ export const unitRowSchema = z.object({
    * 见 GDD 02 §2.1.1-4「内力系统」。
    */
   breath: z.coerce.number().nonnegative(),
+  /**
+   * 美术皮肤 id（对应 assets/chars/<charId>/skin.json）。
+   * 它是「单位」与「贴图」之间唯一的连接点 —— 换皮只改这一列。
+   */
+  charId: z.string().min(1, 'charId 不能为空（对应 assets/chars/ 下的目录名）'),
   /** 使用的功法 id（必须能在 skills.csv 里找到） */
   skillId: z.string().min(1),
   /** 第 2 门装备套路（可选；连招链的主力） */

@@ -1,0 +1,160 @@
+{
+  "id": "base_burly",
+  "name": "底图·魁梧",
+  "body": "burly",
+  "parts": {
+    "cloak": {
+      "file": "chars/base_burly/parts/cloak.png",
+      "w": 103,
+      "h": 130,
+      "pivot": [
+        0.5,
+        0.05
+      ]
+    },
+    "footL": {
+      "file": "chars/base_burly/parts/footL.png",
+      "w": 36,
+      "h": 16,
+      "pivot": [
+        0.25,
+        0.5
+      ]
+    },
+    "footR": {
+      "file": "chars/base_burly/parts/footR.png",
+      "w": 36,
+      "h": 16,
+      "pivot": [
+        0.25,
+        0.5
+      ]
+    },
+    "forearmL": {
+      "file": "chars/base_burly/parts/forearmL.png",
+      "w": 22,
+      "h": 48,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "forearmR": {
+      "file": "chars/base_burly/parts/forearmR.png",
+      "w": 22,
+      "h": 48,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "handL": {
+      "file": "chars/base_burly/parts/handL.png",
+      "w": 20,
+      "h": 20,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "handR": {
+      "file": "chars/base_burly/parts/handR.png",
+      "w": 20,
+      "h": 20,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "head": {
+      "file": "chars/base_burly/parts/head.png",
+      "w": 48,
+      "h": 51,
+      "pivot": [
+        0.5,
+        1
+      ]
+    },
+    "pelvis": {
+      "file": "chars/base_burly/parts/pelvis.png",
+      "w": 76,
+      "h": 36,
+      "pivot": [
+        0.5,
+        0.5
+      ]
+    },
+    "shinL": {
+      "file": "chars/base_burly/parts/shinL.png",
+      "w": 24,
+      "h": 60,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "shinR": {
+      "file": "chars/base_burly/parts/shinR.png",
+      "w": 24,
+      "h": 60,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "thighL": {
+      "file": "chars/base_burly/parts/thighL.png",
+      "w": 28,
+      "h": 64,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "thighR": {
+      "file": "chars/base_burly/parts/thighR.png",
+      "w": 28,
+      "h": 64,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "torso": {
+      "file": "chars/base_burly/parts/torso.png",
+      "w": 90,
+      "h": 103,
+      "pivot": [
+        0.5,
+        1
+      ]
+    },
+    "upperArmL": {
+      "file": "chars/base_burly/parts/upperArmL.png",
+      "w": 24,
+      "h": 52,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "upperArmR": {
+      "file": "chars/base_burly/parts/upperArmR.png",
+      "w": 24,
+      "h": 52,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "weapon": {
+      "file": "chars/base_burly/parts/weapon.png",
+      "w": 14,
+      "h": 112,
+      "pivot": [
+        0.5,
+        0.12
+      ]
+    }
+  }
+}

@@ -110,6 +110,8 @@ export interface BattleUnitConfig {
   slot: SlotIndex;
   /** 武器组：决定战斗时播哪一组动作 */
   group: MotionGroup;
+  /** 美术皮肤 id（对应 assets/chars/<charId>/skin.json）；表现层据此换贴图 */
+  charId: string;
   stats: UnitStats;
   /** 装备的套路（最多 3 门，顺序即连招顺序；至少 1 门） */
   skills: SkillConfig[];
@@ -201,6 +203,12 @@ export type BattleEvent =
   | { type: 'miss'; targetId: string }
   /** 被施加状态 */
   | { type: 'statusApplied'; targetId: string; statusId: StatusId; rounds: number }
+  /**
+   * 状态到期被移除。
+   * 为什么要有这条事件？表现层需要在角色头顶维护"当前生效的状态图标"，
+   * 只有施加事件没有到期事件的话，图标会永远挂着 —— 玩家的读数是错的。
+   */
+  | { type: 'statusExpired'; targetId: string; statusId: StatusId }
   /** 持续伤害（中毒/流血/灼烧） */
   | { type: 'dot'; targetId: string; statusId: StatusId; value: number; hpAfter: number }
   /** 持续回复（回春：百分比为负的持续效果） */
@@ -900,9 +908,16 @@ function tickEndOfRound(
     u.inner = Math.min(u.cfg.stats.innerMax, u.inner + Math.max(0, Math.round(gain)));
 
     // ③ 状态倒计时（当回合刚施加的不减，保证 1 回合的控制真的能控住一次）
-    u.statuses = u.statuses
+    const before = u.statuses;
+    const after = before
       .map((s) => (s.appliedRound < currentRound ? { ...s, remaining: s.remaining - 1 } : s))
       .filter((s) => s.remaining > 0);
+    for (const s of before) {
+      if (!after.some((a) => a.id === s.id)) {
+        events.push({ type: 'statusExpired', targetId: u.id, statusId: s.id });
+      }
+    }
+    u.statuses = after;
   }
 }
 

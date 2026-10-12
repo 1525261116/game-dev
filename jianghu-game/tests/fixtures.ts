@@ -58,6 +58,7 @@ export function makeUnit(input: MakeUnitInput): BattleUnitConfig {
     name: id,
     side: 'ally',
     group: 'dao' as MotionGroup,
+    charId: 'base_male',
     stats: makeStats(),
     skills: [makeSkill()],
     ...rest,

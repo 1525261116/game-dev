@@ -1,6 +1,7 @@
 # ---- 依赖 ----
 node_modules/
 .pnpm-store/
+.npm-cache/
 
 # ---- 构建产物 ----
 dist/

@@ -169,6 +169,7 @@ export function toUnitConfig(row: UnitRow): BattleUnitConfig {
     side: row.side,
     slot: row.slot as SlotIndex,
     group: row.group as MotionGroup,
+    charId: row.charId,
     stats,
     skills,
   };
@@ -187,7 +188,7 @@ export function describeUnit(row: UnitRow): string {
     .filter((id): id is string => typeof id === 'string' && id.length > 0)
     .map((id) => SKILLS_BY_ID[id]?.name ?? id)
     .join(' / ');
-  return `${row.name}（气血 ${row.hpMax}／攻 ${row.atk}／防 ${row.def}／速 ${row.spd}／内力 ${toInner(row.breath)}）套路：${names}`;
+  return `${row.name}（皮肤 ${row.charId}／气血 ${row.hpMax}／攻 ${row.atk}／防 ${row.def}／速 ${row.spd}／内力 ${toInner(row.breath)}）套路：${names}`;
 }
 
 /**

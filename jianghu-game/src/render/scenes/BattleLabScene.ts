@@ -212,9 +212,17 @@ export class BattleLabScene extends Phaser.Scene {
     const start = this.log.events.find((e) => e.type === 'battleStart');
     if (!start || start.type !== 'battleStart') return;
 
+    // 皮肤同样取自配置表：验证台看到的画面必须和玩家看到的完全一致
+    const byId = new Map([...DEFAULT_BATTLE.allies, ...DEFAULT_BATTLE.enemies].map((x) => [x.id, x]));
+
     for (const u of start.units) {
+      const cfg = byId.get(u.id);
       const p = labSlotPosition(u.slot, u.side);
-      const char = new CharacterView(this, p.x, p.y, u.side === 'ally' ? 1 : -1);
+      const char = new CharacterView(this, p.x, p.y, u.side === 'ally' ? 1 : -1, {
+        ...(cfg?.charId ? { skinId: cfg.charId } : {}),
+        weaponGroup: cfg?.group ?? u.group,
+        weaponQuality: cfg?.skills[0]?.quality ?? 'fan',
+      });
       char.setScale(0.32);
       char.play(`${u.group}_idle`);
 
@@ -393,6 +401,11 @@ export class BattleLabScene extends Phaser.Scene {
       case 'statusApplied':
         this.pushLog(`　└ 附加状态 ${ev.statusId}（${ev.rounds} 回合）`);
         this.timer = 120;
+        break;
+
+      case 'statusExpired':
+        this.pushLog(`　└ 状态到期 ${ev.statusId}`);
+        this.timer = 60;
         break;
 
       case 'immune':

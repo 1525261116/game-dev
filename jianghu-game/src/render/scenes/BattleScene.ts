@@ -3,17 +3,22 @@
  *
  * ══════════════════════════════════════════════════════════════════
  * 这个文件刻意不包含任何数值计算。
- *   它做三件事：① 拿到 BattleLog ② 按事件顺序演出 ③ 更新血条与飘字
+ *   它做四件事：① 铺背景 ② 摆角色 ③ 按事件顺序演出 ④ 维护头顶信息（血/内力/状态）
  *
  * 数值全部来自 core/battle/simulate.ts 算好的结果，这里只是"放录像"。
  * 所以：
  *   · 同一场战斗可以换任何速度回放，结果不会变
  *   · 表现出错不会污染数值，数值出错也不会被画面掩盖
  * ══════════════════════════════════════════════════════════════════
+ *
+ * 美术资源是**可选**的：`assets/bg/battle/` 下的三张背景 与 `assets/chars/<角色>/skin.json`
+ * 在就画贴图，不在就回退成"宣纸底 + 色块角色"。这样美术可以分批交付，
+ * 程序与美术互不阻塞（铁律：表现层可降级，数值层不许降级）。
  */
 import Phaser from 'phaser';
 import { simulateBattle } from '../../core/battle/simulate.ts';
 import { DEFAULT_BATTLE } from '../../data/battle-presets.ts';
+import { STATUS_BY_ID } from '../../data/status.ts';
 import { getMotion } from '../anim/MotionLib.ts';
 import { CharacterView } from '../anim/CharacterView.ts';
 import { THEME, bodyStyle, createButton, dimStyle, titleStyle } from '../ui/Theme.ts';
@@ -21,24 +26,51 @@ import type { BattleEvent, BattleLog } from '../../core/battle/simulate.ts';
 import type { MotionGroup } from '../../core/anim/types.ts';
 import type { SlotIndex } from '../../core/battle/types.ts';
 import type { CombatIntent } from '../../core/battle/targeting.ts';
+import type { StatusId } from '../../core/battle/types.ts';
 
 const VIEW_W = 960;
 const VIEW_H = 540;
-const CELL_W = 92;
-const CELL_H = 104;
-const HP_BAR_W = 88;
+const HP_BAR_W = 84;
 const HP_BAR_H = 6;
 const INNER_BAR_H = 3;
+
+/**
+ * 角色缩放与站位间距。
+ *
+ * 这三个数字是**一起调出来的**，改一个就要重算另外两个：
+ *   一行的垂直占用 = 状态图标(15) + 血条(6) + 内力条(3) + 姓名行(12) + 角色(73) ≈ 124px
+ *   所以行距必须 > 124 —— 否则"上一行的脚"会压到"下一行的头顶信息"。
+ *   早期版本把姓名牌放在脚下、血条放在头顶，结果姓名牌与下一行血条重叠 2px。
+ */
+const CHAR_SCALE = 0.52;
+const ROW_GAP = 128;
+/** 一行的信息栈相对角色原点的偏移（负 = 头顶方向） */
+const STATUS_Y = -84;
+const HP_BAR_Y = -72;
+const INNER_BAR_Y = -65;
+const INFO_Y = -54;
+/** 脚下投影 */
+const SHADOW_Y = 26;
 /** 内力条颜色：充足=靛蓝，见底=灰（一眼看出下一手会不会退化成普攻） */
 const INNER_COLOR = 0x4a6fd4;
 const INNER_COLOR_LOW = 0xb9b3a4;
+
+/** 背景三层（远山 / 中景 / 地面），缺图时自动跳过 */
+const BG_LAYERS = ['bg/battle/far.png', 'bg/battle/mid.png', 'bg/battle/ground.png'] as const;
+
+/** 状态图标：按类别上色（与《状态效果系统.md》的 UI 约定一致） */
+const STATUS_COLOR: Record<string, number> = {
+  control: 0x7b4fa8,
+  debuff: 0xa62b1f,
+  buff: 0x2f5d4a,
+};
 
 /** 九宫格站位 → 屏幕坐标（与布阵逻辑一致） */
 function slotPosition(slot: SlotIndex, side: 'ally' | 'enemy'): { x: number; y: number } {
   const row = Math.floor(slot / 3); // 0 前排 / 1 中排 / 2 后排
   const col = slot % 3; // 0 上 / 1 中 / 2 下
   const depthX = [352, 258, 164][row]!;
-  const y = 158 + col * 116;
+  const y = 176 + col * ROW_GAP;
   return side === 'ally' ? { x: depthX, y } : { x: VIEW_W - depthX, y };
 }
 
@@ -58,8 +90,12 @@ interface UnitView {
   dead: boolean;
   hpBar: Phaser.GameObjects.Rectangle;
   innerBar: Phaser.GameObjects.Rectangle;
-  hpText: Phaser.GameObjects.Text;
-  nameText: Phaser.GameObjects.Text;
+  /** 一行信息：`名字 当前血量`（无底框，用描边保证压在背景上也读得清） */
+  infoText: Phaser.GameObjects.Text;
+  /** 头顶状态图标（最多 4 个，超出折叠成 +N） */
+  statusIcons: Phaser.GameObjects.Container;
+  /** 当前生效的状态（id → 剩余回合），回放过程中维护 */
+  statuses: { id: StatusId; rounds: number }[];
 }
 
 export class BattleScene extends Phaser.Scene {
@@ -108,38 +144,107 @@ export class BattleScene extends Phaser.Scene {
       seed: this.seed,
     });
 
-    this.add.text(24, 18, '战斗 · 九宫格对阵', titleStyle(18)).setResolution(2);
-    this.add.text(24, 44, `种子 ${this.seed}`, dimStyle(11)).setResolution(2);
-    this.add
-      .text(24, 60, `倾向 ${this.intent === 'combo' ? '优先连招' : '优先输出'}`, dimStyle(11))
-      .setResolution(2);
+    // ② 画面（顺序 = 图层顺序，从远到近）
+    this.drawBackground();
+    this.drawFieldMarks();
+    this.drawHud();
+    this.buildUnits();
 
+    this.timer = 400;
+  }
+
+  /* ══════════════════════ 背景与场地 ══════════════════════ */
+
+  /**
+   * 贴图背景三层。缺图时什么都不画 —— 底色是宣纸色，
+   * 所以"没有背景"看起来依然是一个干净的水墨空间，而不是黑屏。
+   */
+  private drawBackground(): void {
+    BG_LAYERS.forEach((key, i) => {
+      if (!this.textures.exists(key)) return;
+      this.add.image(0, 0, key).setOrigin(0, 0).setDisplaySize(VIEW_W, VIEW_H).setDepth(-20 + i);
+    });
+  }
+
+  /**
+   * 场地标记：**不再画九宫格方框**（有背景后再画格子很出戏），
+   * 改为每个站位一个软投影 + 一条极淡的中线墨痕，既能读出"两阵对峙"，
+   * 又不会把画面切碎。
+   */
+  private drawFieldMarks(): void {
+    // 中线：左右对峙的视觉锚点
+    this.add
+      .rectangle(VIEW_W / 2, VIEW_H / 2 + 10, 2, 300, THEME.ink, 0.1)
+      .setDepth(-15);
+
+    for (let slot = 0 as SlotIndex; slot < 9; slot = (slot + 1) as SlotIndex) {
+      for (const side of ['ally', 'enemy'] as const) {
+        const p = slotPosition(slot, side);
+        // 站位软投影：一排"脚印"，暗示九宫格的存在但不抢戏
+        this.add
+          .ellipse(p.x, p.y + 26, 46, 14, THEME.ink, 0.06)
+          .setDepth(-14);
+      }
+    }
+  }
+
+  /** 顶部 HUD：一条半透明墨色横幅，把标题 / 回合 / 阵法信息收成一组 */
+  private drawHud(): void {
+    // 横幅只占 72px 高：第一行的"状态图标 + 血条 + 姓名"要落在 76px 以下
+    this.add.rectangle(VIEW_W / 2, 36, VIEW_W, 72, THEME.ink, 0.1).setDepth(-5);
+
+    this.add.text(24, 14, '战斗 · 九宫格对阵', titleStyle(18)).setResolution(2).setDepth(2);
+
+    // 回合徽标：底 + 文字（比裸文字更容易一眼定位）
+    this.add.rectangle(VIEW_W / 2, 26, 108, 26, THEME.ink, 0.72).setStrokeStyle(1, THEME.gold, 0.7).setDepth(1);
     this.roundText = this.add
-      .text(VIEW_W / 2, 26, '', bodyStyle(15))
-      .setOrigin(0.5, 0)
-      .setResolution(2);
+      .text(VIEW_W / 2, 26, '第 1 回合', { ...bodyStyle(14), color: '#f2ecdf' })
+      .setOrigin(0.5)
+      .setResolution(2)
+      .setDepth(2);
+
+    this.add
+      .text(VIEW_W / 2, 48, `种子 ${this.seed}　倾向 ${this.intent === 'combo' ? '优先连招' : '优先输出'}`, {
+        ...dimStyle(10),
+        color: '#5d564a',
+      })
+      .setOrigin(0.5)
+      .setResolution(2)
+      .setDepth(2);
 
     this.tipText = this.add
-      .text(VIEW_W / 2, VIEW_H - 78, '自动战斗中…', bodyStyle(13))
+      .text(VIEW_W / 2, VIEW_H - 96, '自动战斗中…', { ...bodyStyle(13), color: '#3a342b' })
       .setOrigin(0.5)
-      .setResolution(2);
+      .setResolution(2)
+      .setDepth(2)
+      .setStroke('#efe9da', 4);
 
     // 阵法提示（我方靠左、敌方靠右，开局即公布）
-    this.allyFormationText = this.add.text(24, 72, '', dimStyle(11)).setLineSpacing(3).setResolution(2);
+    this.allyFormationText = this.add
+      .text(24, 60, '', { ...dimStyle(11), color: '#4a443a' })
+      .setLineSpacing(3)
+      .setResolution(2)
+      .setDepth(2);
     this.enemyFormationText = this.add
-      .text(VIEW_W - 24, 72, '', dimStyle(11))
+      .text(VIEW_W - 24, 60, '', { ...dimStyle(11), color: '#4a443a' })
       .setOrigin(1, 0)
       .setAlign('right')
       .setLineSpacing(3)
-      .setResolution(2);
+      .setResolution(2)
+      .setDepth(2);
 
-    this.drawGrid();
-    this.add.rectangle(VIEW_W / 2, VIEW_H / 2 + 10, 1, 380, THEME.gold, 0.28);
-    this.buildUnits();
-
-    createButton(this, VIEW_W / 2 - 190, VIEW_H - 36, `倾向：${this.intent === 'combo' ? '优先连招' : '优先输出'}`, () => this.toggleIntent(), 170, 40);
-    createButton(this, VIEW_W / 2, VIEW_H - 36, '重新战斗', () => this.rematch(), 160, 40);
-    createButton(this, VIEW_W / 2 + 190, VIEW_H - 36, '返回菜单', () => this.scene.start('menu'), 160, 40);
+    // 底部按钮：收窄，别把画面占满
+    createButton(
+      this,
+      VIEW_W / 2 - 190,
+      VIEW_H - 32,
+      `倾向：${this.intent === 'combo' ? '优先连招' : '优先输出'}`,
+      () => this.toggleIntent(),
+      168,
+      36,
+    ).setDepth(3);
+    createButton(this, VIEW_W / 2 - 10, VIEW_H - 32, '重新战斗', () => this.rematch(), 140, 36).setDepth(3);
+    createButton(this, VIEW_W / 2 + 152, VIEW_H - 32, '返回菜单', () => this.scene.start('menu'), 140, 36).setDepth(3);
   }
 
   /** 战前倾向切换：立刻用同一套阵容 + 新倾向重打一场（设计：倾向是玩家唯一的间接控制手段） */
@@ -147,47 +252,50 @@ export class BattleScene extends Phaser.Scene {
     this.scene.restart({ seed: this.seed, intent: this.intent === 'combo' ? 'output' : 'combo' });
   }
 
-  /** 画九宫格站位框（双方各 9 格） */
-  private drawGrid(): void {
-    for (let slot = 0 as SlotIndex; slot < 9; slot = (slot + 1) as SlotIndex) {
-      for (const side of ['ally', 'enemy'] as const) {
-        const p = slotPosition(slot, side);
-        this.add
-          .rectangle(p.x, p.y, CELL_W, CELL_H, THEME.paperLight, 0.35)
-          .setStrokeStyle(1, THEME.line, 0.9);
-      }
-    }
-  }
+  /* ══════════════════════ 角色 ══════════════════════ */
 
-  /** 依据战斗日志的 battleStart 事件创建角色（位置、朝向、血条全部来自日志） */
+  /** 依据战斗日志的 battleStart 事件创建角色（位置、皮肤、血条全部来自日志/配置表） */
   private buildUnits(): void {
     const start = this.log.events.find((e) => e.type === 'battleStart');
     if (!start || start.type !== 'battleStart') return;
 
+    // 单位表里的 charId 与武器组 → 表现层皮肤（core 不关心贴图，只传 id）
+    const byId = new Map([...DEFAULT_BATTLE.allies, ...DEFAULT_BATTLE.enemies].map((u) => [u.id, u]));
+
     for (const u of start.units) {
+      const cfg = byId.get(u.id);
       const p = slotPosition(u.slot, u.side);
-      const char = new CharacterView(this, p.x, p.y, u.side === 'ally' ? 1 : -1);
-      char.setScale(0.55);
+      const char = new CharacterView(this, p.x, p.y, u.side === 'ally' ? 1 : -1, {
+        ...(cfg?.charId ? { skinId: cfg.charId } : {}),
+        weaponGroup: cfg?.group ?? u.group,
+        weaponQuality: cfg?.skills[0]?.quality ?? 'fan',
+      });
+      char.setScale(CHAR_SCALE);
       char.play(`${u.group}_idle`);
 
-      // 血条：底槽 + 填充（左对齐）
-      this.add.rectangle(p.x, p.y - 62, HP_BAR_W, HP_BAR_H, 0x000000, 0.18);
+      // 脚下软投影：让角色"站在地上"，而不是浮在背景上
+      this.add.ellipse(p.x, p.y + SHADOW_Y, 44, 13, THEME.ink, 0.16).setDepth(1);
+
+      // 血条：深色底槽（浅色背景上必须可见）+ 填充（左对齐）
+      this.add.rectangle(p.x, p.y + HP_BAR_Y, HP_BAR_W + 2, HP_BAR_H + 2, THEME.ink, 0.55);
       const hpBar = this.add
-        .rectangle(p.x - HP_BAR_W / 2, p.y - 62, HP_BAR_W, HP_BAR_H, THEME.jade)
+        .rectangle(p.x - HP_BAR_W / 2, p.y + HP_BAR_Y, HP_BAR_W, HP_BAR_H, THEME.jade)
         .setOrigin(0, 0.5);
       // 内力条：比血条细，放在血条下方（内力是唯一的节奏资源，必须看得见）
-      this.add.rectangle(p.x, p.y - 54, HP_BAR_W, INNER_BAR_H, 0x000000, 0.14);
+      this.add.rectangle(p.x, p.y + INNER_BAR_Y, HP_BAR_W + 2, INNER_BAR_H + 2, THEME.ink, 0.4);
       const innerBar = this.add
-        .rectangle(p.x - HP_BAR_W / 2, p.y - 54, HP_BAR_W, INNER_BAR_H, INNER_COLOR)
+        .rectangle(p.x - HP_BAR_W / 2, p.y + INNER_BAR_Y, HP_BAR_W, INNER_BAR_H, INNER_COLOR)
         .setOrigin(0, 0.5);
-      const hpText = this.add
-        .text(p.x, p.y - 74, `${u.hpMax}`, dimStyle(10))
+
+      // 一行信息：名字 + 当前血量。用描边代替底框 —— 不会和相邻站位"打架"
+      const infoText = this.add
+        .text(p.x, p.y + INFO_Y, `${u.name} ${u.hpMax}`, { ...dimStyle(11), color: '#2f2a22' })
         .setOrigin(0.5)
-        .setResolution(2);
-      const nameText = this.add
-        .text(p.x, p.y + 58, `${u.name}`, dimStyle(11))
-        .setOrigin(0.5)
-        .setResolution(2);
+        .setResolution(2)
+        .setDepth(2)
+        .setStroke('#efe9da', 4);
+
+      const statusIcons = this.add.container(p.x, p.y + STATUS_Y).setDepth(3);
 
       this.units.set(u.id, {
         id: u.id,
@@ -204,8 +312,9 @@ export class BattleScene extends Phaser.Scene {
         dead: false,
         hpBar,
         innerBar,
-        hpText,
-        nameText,
+        infoText,
+        statusIcons,
+        statuses: [],
       });
     }
   }
@@ -280,13 +389,13 @@ export class BattleScene extends Phaser.Scene {
           if (ev.comboStage >= 2) {
             this.floatText(
               actor.x,
-              actor.y - 118,
+              actor.y - 128,
               ev.comboStage === 3 ? '三连！' : '连招 ×2',
               THEME.goldHex,
               ev.comboStage === 3 ? 24 : 18,
             );
           } else if (ev.basic) {
-            this.floatText(actor.x, actor.y - 118, '普攻', THEME.dimHex, 15);
+            this.floatText(actor.x, actor.y - 128, '普攻', THEME.dimHex, 15);
           }
         }
         // 占据攻击动作约 60% 的时长，之后接伤害事件（看起来才像"打中了"）
@@ -304,9 +413,9 @@ export class BattleScene extends Phaser.Scene {
           this.cameras.main.shake(ev.crit ? 130 : 80, ev.crit ? 0.006 : 0.003);
           this.floatText(
             target.x,
-            target.y - 78,
+            target.y - 100,
             ev.crit ? `暴击 ${ev.value}` : `${ev.value}`,
-            ev.crit ? THEME.redHex : THEME.inkHex,
+            ev.crit ? THEME.redHex : '#2b2620',
             ev.crit ? 26 : 21,
           );
         }
@@ -317,7 +426,7 @@ export class BattleScene extends Phaser.Scene {
       case 'miss': {
         const target = this.units.get(ev.targetId);
         if (target) {
-          this.floatText(target.x, target.y - 78, '闪避', THEME.dimHex, 18);
+          this.floatText(target.x, target.y - 100, '闪避', THEME.dimHex, 18);
         }
         this.timer = 220;
         break;
@@ -326,9 +435,23 @@ export class BattleScene extends Phaser.Scene {
       case 'statusApplied': {
         const target = this.units.get(ev.targetId);
         if (target) {
-          this.floatText(target.x, target.y - 100, `【${statusName(ev.statusId)}】`, THEME.goldHex, 15);
+          this.floatText(target.x, target.y - 116, `【${statusName(ev.statusId)}】`, THEME.goldHex, 15);
+          const existing = target.statuses.find((s) => s.id === ev.statusId);
+          if (existing) existing.rounds = Math.max(existing.rounds, ev.rounds);
+          else target.statuses.push({ id: ev.statusId, rounds: ev.rounds });
+          this.renderStatusIcons(target);
         }
         this.timer = 180;
+        break;
+      }
+
+      case 'statusExpired': {
+        const target = this.units.get(ev.targetId);
+        if (target) {
+          target.statuses = target.statuses.filter((s) => s.id !== ev.statusId);
+          this.renderStatusIcons(target);
+        }
+        this.timer = 60;
         break;
       }
 
@@ -337,7 +460,7 @@ export class BattleScene extends Phaser.Scene {
         if (target) {
           target.hp = ev.hpAfter;
           this.refreshHp(target);
-          this.floatText(target.x, target.y - 78, `-${ev.value}`, THEME.jadeHex, 17);
+          this.floatText(target.x, target.y - 100, `-${ev.value}`, THEME.redHex, 17);
         }
         this.timer = 200;
         break;
@@ -349,7 +472,7 @@ export class BattleScene extends Phaser.Scene {
         if (u) {
           u.hp = ev.hpAfter;
           this.refreshHp(u);
-          this.floatText(u.x, u.y - 78, `+${ev.value}`, THEME.jadeHex, 17);
+          this.floatText(u.x, u.y - 100, `+${ev.value}`, THEME.jadeHex, 17);
         }
         this.timer = 200;
         break;
@@ -361,7 +484,7 @@ export class BattleScene extends Phaser.Scene {
         if (u) {
           u.hp = ev.hpAfter;
           this.refreshHp(u);
-          this.floatText(u.x, u.y - 78, `反弹 ${ev.value}`, THEME.goldHex, 18);
+          this.floatText(u.x, u.y - 100, `反弹 ${ev.value}`, THEME.goldHex, 18);
         }
         this.timer = 240;
         break;
@@ -370,14 +493,14 @@ export class BattleScene extends Phaser.Scene {
       case 'immune': {
         // 守境阵「首次受制可免」
         const u = this.units.get(ev.targetId);
-        if (u) this.floatText(u.x, u.y - 100, '免疫', THEME.goldHex, 18);
+        if (u) this.floatText(u.x, u.y - 116, '免疫', THEME.goldHex, 18);
         this.timer = 220;
         break;
       }
 
       case 'skip': {
         const actor = this.units.get(ev.actorId);
-        if (actor) this.floatText(actor.x, actor.y - 78, `被${ev.reason}`, THEME.goldHex, 15);
+        if (actor) this.floatText(actor.x, actor.y - 116, `被${ev.reason}`, THEME.goldHex, 15);
         this.timer = 260;
         break;
       }
@@ -388,9 +511,12 @@ export class BattleScene extends Phaser.Scene {
           u.dead = true;
           u.hp = 0;
           u.char.play(`${u.group}_down`);
+          u.char.setAlpha(0.7);
           u.hpBar.width = 0;
-          u.hpText.setText('0');
-          u.nameText.setAlpha(0.4);
+          u.infoText.setText(`${u.name} 0`).setAlpha(0.45);
+          // 阵亡后状态一律清空（尸体不该还挂着中毒图标）
+          u.statuses = [];
+          this.renderStatusIcons(u);
         }
         this.timer = 380;
         break;
@@ -415,22 +541,65 @@ export class BattleScene extends Phaser.Scene {
 
   /* ══════════════════════ 视觉更新 ══════════════════════ */
 
-  /** 刷新血条（按剩余比例变色，低血更醒目） */
+  /** 刷新血条与信息行（按剩余比例变色，低血更醒目） */
   private refreshHp(u: UnitView): void {
     const ratio = Math.max(0, Math.min(1, u.hp / u.hpMax));
     u.hpBar.width = HP_BAR_W * ratio;
-    u.hpBar.setFillStyle(ratio > 0.5 ? THEME.jade : ratio > 0.22 ? THEME.gold : THEME.red);
-    u.hpText.setText(`${u.hp}`);
+    const color = ratio > 0.5 ? THEME.jade : ratio > 0.22 ? THEME.gold : THEME.red;
+    u.hpBar.setFillStyle(color);
+    u.infoText.setText(`${u.name} ${u.hp}`);
+    if (ratio <= 0.22) u.infoText.setColor(THEME.redHex);
   }
 
-  /** 刷新内力条（内力见底时变暗，提示"下一手只能普攻"） */
+  /** 刷新内力条（内力见底时变灰，提示"下一手只能普攻"） */
   private refreshInner(u: UnitView): void {
     const ratio = Math.max(0, Math.min(1, u.innerMax > 0 ? u.inner / u.innerMax : 0));
     u.innerBar.width = HP_BAR_W * ratio;
     u.innerBar.setFillStyle(ratio > 0.15 ? INNER_COLOR : INNER_COLOR_LOW);
   }
 
-  /** 飘字：向上飘并淡出（对象池级别的开销，用完即销毁） */
+  /**
+   * 重绘头顶状态图标：最多 4 个彩色小方块 + 首字，超出折叠成「+N」。
+   * 为什么必须有它？战斗里有 22 种状态、还可能叠层 ——
+   * 不给玩家读数，他只能靠飘字回忆，等于把策略信息藏起来了。
+   */
+  private renderStatusIcons(u: UnitView): void {
+    u.statusIcons.removeAll(true);
+    if (u.dead || u.statuses.length === 0) return;
+
+    const shown = u.statuses.slice(0, 4);
+    const size = 15;
+    const gap = 2;
+    const totalW = shown.length * size + (shown.length - 1) * gap;
+    shown.forEach((s, i) => {
+      const def = STATUS_BY_ID[s.id];
+      const color = STATUS_COLOR[def?.kind ?? 'debuff'] ?? 0x555555;
+      const x = -totalW / 2 + i * (size + gap) + size / 2;
+      const box = this.add.rectangle(x, 0, size, size, color, 0.92).setStrokeStyle(1, 0xefe9da, 0.5);
+      const label = this.add
+        .text(x, 0, (def?.name ?? s.id).slice(0, 1), {
+          ...dimStyle(10),
+          color: '#f7f4ec',
+        })
+        .setOrigin(0.5)
+        .setResolution(2);
+      u.statusIcons.add(box);
+      u.statusIcons.add(label);
+    });
+
+    if (u.statuses.length > shown.length) {
+      const more = this.add
+        .text(totalW / 2 + 8, 0, `+${u.statuses.length - shown.length}`, {
+          ...dimStyle(10),
+          color: '#f7f4ec',
+        })
+        .setOrigin(0, 0.5)
+        .setResolution(2);
+      u.statusIcons.add(more);
+    }
+  }
+
+  /** 飘字：向上飘并淡出（带浅色描边，保证压在背景纹理上也读得清） */
   private floatText(x: number, y: number, text: string, color: string, size: number): void {
     const t = this.add
       .text(x, y, text, {
@@ -440,7 +609,9 @@ export class BattleScene extends Phaser.Scene {
         fontStyle: 'bold',
       })
       .setOrigin(0.5)
-      .setResolution(2);
+      .setResolution(2)
+      .setDepth(5)
+      .setStroke('#f2eee4', 4);
     this.tweens.add({
       targets: t,
       y: y - 42,
@@ -457,22 +628,7 @@ export class BattleScene extends Phaser.Scene {
   }
 }
 
-/** 状态 id → 中文名（用于飘字显示） */
+/** 状态 id → 中文名（用于飘字与状态图标） */
 function statusName(id: string): string {
-  const map: Record<string, string> = {
-    stun: '眩晕',
-    seal: '封穴',
-    root: '定身',
-    knockback: '击退',
-    defDown: '破防',
-    atkDown: '虚弱',
-    spdDown: '迟滞',
-    poison: '中毒',
-    bleed: '流血',
-    burn: '灼烧',
-    shield: '护盾',
-    regen: '回复',
-    ironWall: '铁壁',
-  };
-  return map[id] ?? id;
+  return STATUS_BY_ID[id as StatusId]?.name ?? id;
 }

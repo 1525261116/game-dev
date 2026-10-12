@@ -1,0 +1,160 @@
+{
+  "id": "base_female",
+  "name": "底图·成年女",
+  "body": "female_adult",
+  "parts": {
+    "cloak": {
+      "file": "chars/base_female/parts/cloak.png",
+      "w": 88,
+      "h": 111,
+      "pivot": [
+        0.5,
+        0.05
+      ]
+    },
+    "footL": {
+      "file": "chars/base_female/parts/footL.png",
+      "w": 36,
+      "h": 16,
+      "pivot": [
+        0.25,
+        0.5
+      ]
+    },
+    "footR": {
+      "file": "chars/base_female/parts/footR.png",
+      "w": 36,
+      "h": 16,
+      "pivot": [
+        0.25,
+        0.5
+      ]
+    },
+    "forearmL": {
+      "file": "chars/base_female/parts/forearmL.png",
+      "w": 22,
+      "h": 48,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "forearmR": {
+      "file": "chars/base_female/parts/forearmR.png",
+      "w": 22,
+      "h": 48,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "handL": {
+      "file": "chars/base_female/parts/handL.png",
+      "w": 20,
+      "h": 20,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "handR": {
+      "file": "chars/base_female/parts/handR.png",
+      "w": 20,
+      "h": 20,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "head": {
+      "file": "chars/base_female/parts/head.png",
+      "w": 48,
+      "h": 51,
+      "pivot": [
+        0.5,
+        1
+      ]
+    },
+    "pelvis": {
+      "file": "chars/base_female/parts/pelvis.png",
+      "w": 65,
+      "h": 31,
+      "pivot": [
+        0.5,
+        0.5
+      ]
+    },
+    "shinL": {
+      "file": "chars/base_female/parts/shinL.png",
+      "w": 24,
+      "h": 60,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "shinR": {
+      "file": "chars/base_female/parts/shinR.png",
+      "w": 24,
+      "h": 60,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "thighL": {
+      "file": "chars/base_female/parts/thighL.png",
+      "w": 28,
+      "h": 64,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "thighR": {
+      "file": "chars/base_female/parts/thighR.png",
+      "w": 28,
+      "h": 64,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "torso": {
+      "file": "chars/base_female/parts/torso.png",
+      "w": 77,
+      "h": 88,
+      "pivot": [
+        0.5,
+        1
+      ]
+    },
+    "upperArmL": {
+      "file": "chars/base_female/parts/upperArmL.png",
+      "w": 24,
+      "h": 52,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "upperArmR": {
+      "file": "chars/base_female/parts/upperArmR.png",
+      "w": 24,
+      "h": 52,
+      "pivot": [
+        0.5,
+        0
+      ]
+    },
+    "weapon": {
+      "file": "chars/base_female/parts/weapon.png",
+      "w": 14,
+      "h": 112,
+      "pivot": [
+        0.5,
+        0.12
+      ]
+    }
+  }
+}

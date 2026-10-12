@@ -1,0 +1,4 @@
+id,template,durationMs,fadeInMs,holdMs,fadeOutMs,titleLines,titleChars,titleStyle,bgLayer,dragonLayer,charLayer,skipMode,cooldownSec,note
+CUTIN_combo3,ink_dragon,1400,120,1100,150,2,4,shufa_white_72,ink_cloud_mono,dragon_head_left,color_keep,short_600ms,10,三连成功触发
+CUTIN_turnaround,ink_dragon,1400,120,1100,150,2,4,shufa_white_72,ink_cloud_mono,dragon_head_left,color_keep,short_600ms,30,战局转折（首名队友倒下/BOSS跨30%）
+CUTIN_breakthrough,ink_dragon,1600,150,1250,200,1,3,shufa_white_80,ink_cloud_mono,dragon_head_left,color_keep,short_700ms,60,功法境界突破（单场≤1）

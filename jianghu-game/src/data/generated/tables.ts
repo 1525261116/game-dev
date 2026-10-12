@@ -57,7 +57,7 @@ export const SKILL_ROWS: SkillRow[] = [
     "stanceStart": 1,
     "stanceEnd": 2,
     "statusId": "stun",
-    "statusChance": 0.15,
+    "statusChance": 1,
     "statusRounds": 1
   },
   {
@@ -117,6 +117,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 40,
     "gongfaCultivation": 10,
     "breath": 40,
+    "charId": "ren_dao",
     "skillId": "GF_kuangfeng_dao",
     "skillIdB": "GF_duanyue_dao",
     "skillIdC": "GF_badao"
@@ -138,6 +139,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 35,
     "gongfaCultivation": 12,
     "breath": 50,
+    "charId": "ren_jian",
     "skillId": "GF_liuyun_jian"
   },
   {
@@ -157,6 +159,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 30,
     "gongfaCultivation": 8,
     "breath": 30,
+    "charId": "ren_quan",
     "skillId": "GF_luohan_quan"
   },
   {
@@ -176,6 +179,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 20,
     "gongfaCultivation": 6,
     "breath": 45,
+    "charId": "ren_qiang",
     "skillId": "GF_yangjia_qiang"
   },
   {
@@ -195,6 +199,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 15,
     "gongfaCultivation": 4,
     "breath": 35,
+    "charId": "ren_anqi",
     "skillId": "GF_liuye_feidao"
   },
   {
@@ -214,6 +219,7 @@ export const UNIT_ROWS: UnitRow[] = [
     "innerCultivation": 25,
     "gongfaCultivation": 8,
     "breath": 50,
+    "charId": "ren_qimen",
     "skillId": "GF_judge_bi"
   }
 ];

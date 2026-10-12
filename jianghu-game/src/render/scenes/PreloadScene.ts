@@ -5,17 +5,45 @@
  * 假的进度条有两个坏处：① 加载慢了会卡在 99% 骗人；② 出错了你看不出来。
  *
  * 当前阶段的"真实准备工作"是：
- *   ① 清点动作库（确认 62 个动作都在）
- *   ② 用校验器全量检查动作数据（站位、挂点、循环一致性…）
- *   ③ 装载 3 套体型骨架
- * 将来美术贴图 / 音频接入后，真正的 preload() 也放在这里。
+ *   ① **加载美术贴图**：assets/ 下的皮肤 PNG + 战斗背景
+ *   ② 清点动作库（确认 62 个动作都在）
+ *   ③ 用校验器全量检查动作数据（站位、挂点、循环一致性…）、配置表、皮肤
+ *   ④ 装载 3 套体型骨架
+ *
+ * 贴图是怎么被找到的？
+ *   用 Vite 的 `import.meta.glob` 在**构建期**列出 assets/ 下的全部皮肤与 PNG，
+ *   不写任何资源清单 —— 美术往目录里丢文件就能生效，代码零改动。
  */
 import Phaser from 'phaser';
 import { validateClip } from '../../core/anim/validate.ts';
-import { BODY_TYPE_IDS, getRig } from '../../data/rigs.ts';
+import { BODY_TYPE_IDS, RIGS, getRig } from '../../data/rigs.ts';
 import { MOTIONS } from '../anim/MotionLib.ts';
 import { validateTablesAtRuntime } from '../../data/tables.ts';
+import { registerSkins, toAssetRelPath } from '../anim/SkinRegistry.ts';
+import { skinErrors, validateSkin } from '../../core/anim/skin.ts';
 import { FONT, THEME, bodyStyle, dimStyle, titleStyle } from '../ui/Theme.ts';
+import type { SkinDef } from '../../core/anim/skin.ts';
+
+/* ══════════════════ 资源清单（构建期静态分析，无需手工登记） ══════════════════ */
+
+/** 全部 skin.json（eager：模块加载即解析成对象） */
+const SKIN_MODULES = import.meta.glob('../../../assets/chars/*/skin.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, SkinDef>;
+
+/** 全部贴图 URL（key 会在下面规范化成"相对 assets/"的路径） */
+const PNG_URLS = import.meta.glob('../../../assets/**/*.png', {
+  eager: true,
+  import: 'default',
+  query: '?url',
+}) as Record<string, string>;
+
+/** 规范化后的资源路径集合：`chars/x/parts/y.png` */
+const ASSET_PATHS: ReadonlySet<string> = new Set(Object.keys(PNG_URLS).map(toAssetRelPath));
+
+/** 全部皮肤定义（id 由 skin.json 的 id 字段决定） */
+export const SKIN_DEFS: SkinDef[] = Object.values(SKIN_MODULES).map((s) => s);
 
 /** 一个加载步骤：label 是给玩家看的说明，run 是真正要做的事 */
 interface LoadStep {
@@ -39,7 +67,32 @@ export class PreloadScene extends Phaser.Scene {
     super('preload');
   }
 
-  create(): void {
+  /**
+   * 真正的资源加载。
+   *
+   * 为什么在 preload() 里搭界面？
+   *   因为 Phaser 会**先跑完 preload 再进 create**，进度条必须在这个阶段
+   *   就已经存在，否则玩家看到的是白屏而不是进度。
+   */
+  preload(): void {
+    this.buildLoadingUi();
+
+    // 进度条对应真实的加载工作（不做假动画）
+    this.load.on('progress', (p: number) => this.setProgress(p));
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      this.errors.push(`贴图加载失败：${file.key}`);
+    });
+
+    // 排队加载全部贴图：纹理 key 就用"相对 assets/ 的路径"
+    for (const [globKey, url] of Object.entries(PNG_URLS)) {
+      this.load.image(toAssetRelPath(globKey), url);
+    }
+
+    // 登记皮肤（key 由路径推导，不依赖加载完成）
+    registerSkins(SKIN_DEFS, ASSET_PATHS);
+  }
+
+  private buildLoadingUi(): void {
     const { width, height } = this.scale;
     const cx = width / 2;
 
@@ -49,7 +102,6 @@ export class PreloadScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setResolution(2);
 
-    // ── 进度条 ──
     const barW = 420;
     const barH = 10;
     this.barBg = this.add
@@ -59,9 +111,14 @@ export class PreloadScene extends Phaser.Scene {
       .rectangle(cx - barW / 2, height * 0.6, 0, barH, THEME.gold)
       .setOrigin(0, 0.5);
 
-    this.label = this.add.text(cx, height * 0.6 - 32, '正在准备…', bodyStyle(14)).setOrigin(0.5).setResolution(2);
+    this.label = this.add
+      .text(cx, height * 0.6 - 32, `正在加载美术资源…（${Object.keys(PNG_URLS).length} 张贴图）`, bodyStyle(14))
+      .setOrigin(0.5)
+      .setResolution(2);
     this.percent = this.add.text(cx, height * 0.6 + 30, '0%', dimStyle(12)).setOrigin(0.5).setResolution(2);
+  }
 
+  create(): void {
     this.steps = [
       {
         label: `正在清点动作库…（${MOTIONS.length} 个动作）`,
@@ -92,9 +149,30 @@ export class PreloadScene extends Phaser.Scene {
         },
       },
       {
+        label: '正在校验美术皮肤…',
+        run: () => {
+          for (const skin of SKIN_DEFS) {
+            const rig = RIGS[skin.body];
+            if (!rig) {
+              this.errors.push(`皮肤 ${skin.id} 声明了不存在的体型 ${skin.body}`);
+              continue;
+            }
+            for (const issue of skinErrors(validateSkin(skin, rig, ASSET_PATHS))) {
+              this.errors.push(`皮肤 ${skin.id} [${issue.code}] ${issue.message}`);
+            }
+          }
+        },
+      },
+      {
         label: '正在装载体型骨架…',
         run: () => {
           for (const id of BODY_TYPE_IDS) getRig(id);
+        },
+      },
+      {
+        label: `美术资源就绪（${SKIN_DEFS.length} 套皮肤 / ${Object.keys(PNG_URLS).length} 张贴图）`,
+        run: () => {
+          /* 统计信息，无实际工作 */
         },
       },
       {

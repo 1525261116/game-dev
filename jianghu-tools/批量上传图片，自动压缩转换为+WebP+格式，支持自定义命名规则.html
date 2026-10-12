@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片批量转 WebP 工具</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #242834;
+            --border: #2e3345;
+            --primary: #6c5ce7;
+            --primary-hover: #7f71ed;
+            --accent: #00cec9;
+            --text: #e4e6ef;
+            --text-dim: #8b8fa3;
+            --danger: #ff6b6b;
+            --success: #51cf66;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        header p {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .card-title {
+            font-size: 1.05rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title .badge {
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        /* Settings Grid */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .settings-grid .full-width {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 600px) {
+            .settings-grid { grid-template-columns: 1fr; }
+        }
+
+        .field label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+
+        .field input[type="text"],
+        .field input[type="number"] {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .field input:focus {
+            border-color: var(--primary);
+        }
+
+        .field .hint {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        /* Quality Slider */
+        .quality-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .quality-row input[type="range"] {
+            flex: 1;
+            accent-color: var(--primary);
+            height: 6px;
+        }
+
+        .quality-row .quality-value {
+            min-width: 42px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--accent);
+        }
+
+        /* Drop Zone */
+        .dropzone {
+            border: 2px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 48px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.25s;
+            position: relative;
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--primary);
+            background: rgba(108, 92, 231, 0.06);
+        }
+
+        .dropzone-icon {
+            font-size: 2.5rem;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+
+        .dropzone-text {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+        }
+
+        .dropzone-text strong {
+            color: var(--primary);
+        }
+
+        .dropzone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* File List */
+        .file-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .file-count {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+
+        .btn-clear {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--danger);
+            padding: 5px 14px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            border-color: var(--danger);
+            background: rgba(255, 107, 107, 0.08);
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            max-height: 480px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .file-grid::-webkit-scrollbar { width: 6px; }
+        .file-grid::-webkit-scrollbar-track { background: transparent; }
+        .file-grid::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+        .file-item {
+            background: var(--surface2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+
+        .file-item:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-item .thumb {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            display: block;
+            background: #15161d;
+        }
+
+        .file-item .info {
+            padding: 10px 12px;
+        }
+
+        .file-item .new-name {
+            font-size: 0.78rem;
+            color: var(--accent);
+            word-break: break-all;
+            font-weight: 500;
+        }
+
+        .file-item .old-name {
+            font-size: 0.72rem;
+            color: var(--text-dim);
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-item .remove-btn {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            border-top: 1px solid var(--border);
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            padding: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-item .remove-btn:hover {
+            color: var(--danger);
+            background: rgba(255, 107, 107, 0.06);
+        }
+
+        /* Name Preview */
+        .name-preview {
+            background: var(--surface2);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .name-preview-title {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .name-preview code {
+            display: block;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 0.82rem;
+            color: var(--accent);
+            line-height: 1.8;
+        }
+
+        /* Actions */
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #5a4bd1);
+            color: #fff;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, var(--primary-hover), #6c5ce7);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 20px rgba(108, 92, 231, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        /* Progress */
+        .progress-wrap {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-wrap.active { display: block; }
+
+        .progress-bar-bg {
+            width: 100%;
+            height: 8px;
+            background: var(--surface2);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            border-radius: 4px;
+            transition: width 0.3s;
+            width: 0%;
+        }
+
+        .progress-text {
+            font-size: 0.82rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+            text-align: center;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--success);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            opacity: 0;
+            transition: all 0.4s;
+            z-index: 999;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Sorting hint */
+        .sort-hint {
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Image to WebP Converter</h1>
+            <p>批量上传图片，自动压缩转换为 WebP 格式，支持自定义命名规则</p>
+        </header>
+
+        <!-- Settings -->
+        <div class="card">
+            <div class="card-title">命名与压缩设置</div>
+            <div class="settings-grid">
+                <div class="field">
+                    <label for="prefix">文件名前缀</label>
+                    <input type="text" id="prefix" value="greenland_chunk" placeholder="例如: greenland_chunk">
+                    <div class="hint">生成格式: 前缀_行_列.webp</div>
+                </div>
+                <div class="field">
+                    <label for="cols">每行数量（列数）</label>
+                    <input type="number" id="cols" value="5" min="1" max="100">
+                    <div class="hint">行数会根据图片总数自动计算</div>
+                </div>
+                <div class="field">
+                    <label>WebP 压缩质量</label>
+                    <div class="quality-row">
+                        <input type="range" id="quality" min="1" max="100" value="80">
+                        <span class="quality-value" id="qualityValue">80%</span>
+                    </div>
+                </div>
+                <div class="field">
+                    <label for="startIndex">起始索引</label>
+                    <input type="number" id="startIndex" value="0" min="0">
+                    <div class="hint">行列编号从此数字开始</div>
+                </div>
+            </div>
+            <!-- Name Preview -->
+            <div class="name-preview">
+                <div class="name-preview-title">命名预览</div>
+                <code id="namePreview">greenland_chunk_0_0.webp
+greenland_chunk_0_1.webp
+greenland_chunk_0_2.webp
+...
+</code>
+            </div>
+        </div>
+
+        <!-- Upload -->
+        <div class="card">
+            <div class="card-title">
+                上传图片
+                <span class="badge" id="countBadge" style="display:none">0</span>
+            </div>
+            <div class="dropzone" id="dropzone">
+                <div class="dropzone-icon">📁</div>
+                <div class="dropzone-text">
+                    拖拽图片到此处，或 <strong>点击选择文件</strong><br>
+                    <small>支持 JPG / PNG / GIF / BMP / TIFF 等格式，可多选</small>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" multiple>
+            </div>
+
+            <!-- File Grid -->
+            <div id="fileListWrap" style="display:none; margin-top: 20px;">
+                <div class="file-list-header">
+                    <span class="file-count" id="fileCount"></span>
+                    <button class="btn-clear" id="btnClear">清空全部</button>
+                </div>
+                <p class="sort-hint">提示：图片按文件名排序后依次编号，请确认顺序是否正确</p>
+                <div class="file-grid" id="fileGrid"></div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card">
+            <div class="actions">
+                <button class="btn btn-primary" id="btnConvert" disabled>
+                    转换并下载 WebP 压缩包
+                </button>
+            </div>
+            <div class="progress-wrap" id="progressWrap">
+                <div class="progress-bar-bg">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-text" id="progressText">准备中...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ── State ──
+        let uploadedFiles = [];
+
+        // ── DOM ──
+        const $ = id => document.getElementById(id);
+        const prefixInput    = $('prefix');
+        const colsInput      = $('cols');
+        const qualitySlider  = $('quality');
+        const qualityValue   = $('qualityValue');
+        const startIdxInput  = $('startIndex');
+        const namePreview    = $('namePreview');
+        const dropzone       = $('dropzone');
+        const fileInput      = $('fileInput');
+        const fileListWrap   = $('fileListWrap');
+        const fileGrid       = $('fileGrid');
+        const fileCount      = $('fileCount');
+        const countBadge     = $('countBadge');
+        const btnClear       = $('btnClear');
+        const btnConvert     = $('btnConvert');
+        const progressWrap   = $('progressWrap');
+        const progressBar    = $('progressBar');
+        const progressText   = $('progressText');
+        const toast          = $('toast');
+
+        // ── Naming Helper ──
+        function getFileName(index) {
+            const prefix = prefixInput.value.trim() || 'image';
+            const cols   = Math.max(1, parseInt(colsInput.value) || 5);
+            const start  = parseInt(startIdxInput.value) || 0;
+            const row = Math.floor(index / cols) + start;
+            const col = (index % cols) + start;
+            return `${prefix}_${row}_${col}.webp`;
+        }
+
+        function updatePreview() {
+            const total = Math.max(uploadedFiles.length, 6);
+            const cols  = Math.max(1, parseInt(colsInput.value) || 5);
+            let lines = [];
+            const show = Math.min(total, 12);
+            for (let i = 0; i < show; i++) {
+                lines.push(getFileName(i));
+            }
+            if (total > show) lines.push('...');
+            namePreview.textContent = lines.join('\n');
+        }
+
+        // ── Quality Slider ──
+        qualitySlider.addEventListener('input', () => {
+            qualityValue.textContent = qualitySlider.value + '%';
+        });
+
+        // Settings change → update preview + grid
+        [prefixInput, colsInput, startIdxInput].forEach(el => {
+            el.addEventListener('input', () => { updatePreview(); renderGrid(); });
+        });
+
+        // ── Drag & Drop ──
+        dropzone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            addFiles(e.dataTransfer.files);
+        });
+
+        fileInput.addEventListener('change', () => {
+            addFiles(fileInput.files);
+            fileInput.value = '';
+        });
+
+        // ── Natural sort helper ──
+        function naturalSort(a, b) {
+            return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: 'base' });
+        }
+
+        // ── Add Files ──
+        function addFiles(fileList) {
+            for (const f of fileList) {
+                if (f.type.startsWith('image/')) {
+                    uploadedFiles.push(f);
+                }
+            }
+            // Sort naturally by filename
+            uploadedFiles.sort(naturalSort);
+            refreshUI();
+        }
+
+        function removeFile(idx) {
+            uploadedFiles.splice(idx, 1);
+            refreshUI();
+        }
+
+        function clearAll() {
+            uploadedFiles = [];
+            refreshUI();
+        }
+
+        btnClear.addEventListener('click', clearAll);
+
+        function refreshUI() {
+            const n = uploadedFiles.length;
+            fileListWrap.style.display = n ? 'block' : 'none';
+            fileCount.textContent = `共 ${n} 张图片`;
+            countBadge.style.display = n ? 'inline' : 'none';
+            countBadge.textContent = n;
+            btnConvert.disabled = n === 0;
+            updatePreview();
+            renderGrid();
+        }
+
+        function renderGrid() {
+            fileGrid.innerHTML = '';
+            uploadedFiles.forEach((f, i) => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                const url = URL.createObjectURL(f);
+                div.innerHTML = `
+                    <img class="thumb" src="${url}" alt="">
+                    <div class="info">
+                        <div class="new-name">${getFileName(i)}</div>
+                        <div class="old-name" title="${f.name}">${f.name}</div>
+                    </div>
+                    <button class="remove-btn" data-idx="${i}">移除</button>
+                `;
+                div.querySelector('.remove-btn').addEventListener('click', () => removeFile(i));
+                fileGrid.appendChild(div);
+            });
+        }
+
+        // ── Convert ──
+        btnConvert.addEventListener('click', startConvert);
+
+        async function convertToWebp(file, quality) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth;
+                    canvas.height = img.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob(
+                        blob => blob ? resolve(blob) : reject(new Error('转换失败')),
+                        'image/webp',
+                        quality / 100
+                    );
+                    URL.revokeObjectURL(img.src);
+                };
+                img.onerror = () => reject(new Error('图片加载失败: ' + file.name));
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        async function startConvert() {
+            if (!uploadedFiles.length) return;
+
+            const quality = parseInt(qualitySlider.value);
+            const total = uploadedFiles.length;
+
+            btnConvert.disabled = true;
+            progressWrap.classList.add('active');
+            progressBar.style.width = '0%';
+            progressText.textContent = `正在转换 0 / ${total}...`;
+
+            const zip = new JSZip();
+            let done = 0;
+            let totalOriginal = 0;
+            let totalCompressed = 0;
+
+            // Process in batches for performance
+            const batchSize = 4;
+            for (let i = 0; i < total; i += batchSize) {
+                const batch = uploadedFiles.slice(i, i + batchSize);
+                const promises = batch.map((f, j) => {
+                    const idx = i + j;
+                    return convertToWebp(f, quality).then(blob => {
+                        totalOriginal += f.size;
+                        totalCompressed += blob.size;
+                        zip.file(getFileName(idx), blob);
+                        done++;
+                        const pct = Math.round((done / total) * 100);
+                        progressBar.style.width = pct + '%';
+                        progressText.textContent = `正在转换 ${done} / ${total}...`;
+                    });
+                });
+                await Promise.all(promises);
+            }
+
+            progressText.textContent = '正在打包 ZIP...';
+            const zipBlob = await zip.generateAsync({ type: 'blob' }, meta => {
+                progressBar.style.width = Math.round(meta.percent) + '%';
+            });
+
+            // Download
+            const prefix = prefixInput.value.trim() || 'images';
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(zipBlob);
+            link.download = `${prefix}_webp.zip`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+
+            // Done
+            const savedPct = totalOriginal > 0
+                ? Math.round((1 - totalCompressed / totalOriginal) * 100)
+                : 0;
+            progressText.textContent =
+                `完成！共 ${total} 张，体积减少约 ${savedPct}%（${formatSize(totalOriginal)} → ${formatSize(totalCompressed)}）`;
+            progressBar.style.width = '100%';
+            btnConvert.disabled = false;
+
+            showToast('转换完成，已开始下载！');
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function showToast(msg) {
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        // Init
+        updatePreview();
+    </script>
+</body>
+</html>
